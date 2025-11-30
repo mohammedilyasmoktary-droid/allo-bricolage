@@ -37,6 +37,37 @@ app.get('/health', (req, res) => {
   res.json({ status: 'ok', message: 'Allo Bricolage API is running' });
 });
 
+// Temporary public endpoint to seed database (REMOVE AFTER USE)
+app.post('/api/seed', async (req, res) => {
+  try {
+    console.log('🌱 Starting database seed via API...');
+    
+    // Import and run seed function
+    const { seedDatabase } = await import('./scripts/seed');
+    
+    // Run seed in background to avoid timeout
+    seedDatabase()
+      .then(() => {
+        console.log('✅ Seed completed successfully');
+      })
+      .catch((error) => {
+        console.error('❌ Seed failed:', error);
+      });
+    
+    // Return immediately to avoid timeout
+    res.json({ 
+      success: true, 
+      message: 'Database seed started. This may take 2-3 minutes. Check Render logs for progress.'
+    });
+  } catch (error: any) {
+    console.error('Seed error:', error);
+    res.status(500).json({ 
+      error: 'Failed to start seed',
+      message: error.message
+    });
+  }
+});
+
 // API Routes
 app.use('/api/auth', authRouter);
 app.use('/api/users', userRouter);
