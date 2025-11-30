@@ -38,7 +38,7 @@ app.get('/health', (req, res) => {
 });
 
 // Temporary public endpoint to seed database (REMOVE AFTER USE)
-app.post('/api/seed', async (req, res) => {
+app.get('/api/seed', async (req, res) => {
   try {
     console.log('🌱 Starting database seed via API...');
     
