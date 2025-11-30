@@ -1,34 +1,20 @@
-// @ts-ignore - Vercel serverless function
+import type { VercelRequest, VercelResponse } from '@vercel/node';
 import express from 'express';
-// @ts-ignore
 import cors from 'cors';
-// @ts-ignore
 import dotenv from 'dotenv';
-// @ts-ignore
 import path from 'path';
-// @ts-ignore
 import cookieParser from 'cookie-parser';
 
 // Import routes from compiled backend
-// @ts-ignore
 import { fileRouter } from '../backend/dist/routes/file.routes';
-// @ts-ignore
 import { authRouter } from '../backend/dist/routes/auth.routes';
-// @ts-ignore
 import { userRouter } from '../backend/dist/routes/user.routes';
-// @ts-ignore
 import { technicianRouter } from '../backend/dist/routes/technician.routes';
-// @ts-ignore
 import { categoryRouter } from '../backend/dist/routes/category.routes';
-// @ts-ignore
 import { bookingRouter } from '../backend/dist/routes/booking.routes';
-// @ts-ignore
 import { reviewRouter } from '../backend/dist/routes/review.routes';
-// @ts-ignore
 import { adminRouter } from '../backend/dist/routes/admin.routes';
-// @ts-ignore
 import { notificationRouter } from '../backend/dist/routes/notification.routes';
-// @ts-ignore
 import { subscriptionRouter } from '../backend/dist/routes/subscription.routes';
 
 // Load environment variables
@@ -75,6 +61,8 @@ app.use((err: any, req: express.Request, res: express.Response, next: express.Ne
   });
 });
 
-// Export the Express app as a serverless function
-export default app;
+// Export as Vercel serverless function
+export default (req: VercelRequest, res: VercelResponse) => {
+  return app(req, res);
+};
 
