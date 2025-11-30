@@ -62,3 +62,4 @@ backend/.env
 # Prisma
 backend/prisma/migrations/
 
+.github/workflows/
