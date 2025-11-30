@@ -1,0 +1,339 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+enum UserRole {
+  CLIENT
+  TECHNICIAN
+  ADMIN
+}
+
+enum VerificationStatus {
+  PENDING
+  APPROVED
+  REJECTED
+}
+
+enum BookingStatus {
+  PENDING
+  ACCEPTED
+  DECLINED
+  ON_THE_WAY
+  IN_PROGRESS
+  COMPLETED
+  AWAITING_PAYMENT
+  CANCELLED
+}
+
+enum PaymentMethod {
+  CASH
+  CARD
+  WAFACASH
+  BANK_TRANSFER
+}
+
+enum PaymentStatus {
+  UNPAID
+  PENDING
+  PAID
+}
+
+enum DocumentType {
+  ID_CARD
+  CERTIFICATE
+  OTHER
+}
+
+enum NotificationType {
+  BOOKING_CREATED
+  BOOKING_ACCEPTED
+  BOOKING_DECLINED
+  BOOKING_ON_THE_WAY
+  BOOKING_IN_PROGRESS
+  BOOKING_COMPLETED
+  BOOKING_CANCELLED
+  PAYMENT_CONFIRMED
+  VERIFICATION_APPROVED
+  VERIFICATION_REJECTED
+  SUBSCRIPTION_EXPIRED
+  SUBSCRIPTION_RENEWED
+}
+
+enum SubscriptionPlan {
+  FREE_TRIAL
+  BASIC
+  PREMIUM
+}
+
+enum SubscriptionStatus {
+  ACTIVE
+  EXPIRED
+  CANCELLED
+  PENDING_PAYMENT
+}
+
+model User {
+  id                String   @id @default(uuid())
+  role              UserRole @default(CLIENT)
+  name              String
+  email             String   @unique
+  phone             String
+  passwordHash      String
+  city              String
+  profilePictureUrl String? // Profile picture URL
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+
+  // Relations
+  technicianProfile   TechnicianProfile?
+  clientBookings      ServiceRequest[]     @relation("ClientBookings")
+  technicianBookings  ServiceRequest[]     @relation("TechnicianBookings")
+  reviewsAsReviewer   Review[]             @relation("ReviewerReviews")
+  reviewsAsReviewee   Review[]             @relation("RevieweeReviews")
+  notifications       Notification[]
+  sentMessages        ChatMessage[]        @relation("SentMessages")
+  receivedMessages    ChatMessage[]        @relation("ReceivedMessages")
+  galleryImages       GalleryImage[]       @relation("TechnicianGallery")
+  diagnosisRequests   DiagnosisRequest[]   @relation("ClientDiagnoses")
+  passwordResetTokens PasswordResetToken[]
+
+  @@index([email])
+  @@index([role])
+  @@index([city])
+}
+
+model TechnicianProfile {
+  id                 String             @id @default(uuid())
+  userId             String             @unique
+  user               User               @relation(fields: [userId], references: [id], onDelete: Cascade)
+  skills             Json // Array of skill strings stored as JSON
+  yearsOfExperience  Int
+  hourlyRate         Float? // Optional hourly rate
+  basePrice          Float? // Optional base price per job
+  bio                String?            @db.Text
+  profilePictureUrl  String? // Profile picture URL
+  verificationStatus VerificationStatus @default(PENDING)
+  averageRating      Float              @default(0)
+  isOnline           Boolean            @default(false)
+  createdAt          DateTime           @default(now())
+  updatedAt          DateTime           @updatedAt
+
+  // Relations
+  documents     TechnicianDocument[]
+  bookings      ServiceRequest[]
+  subscriptions Subscription[]
+
+  @@index([verificationStatus])
+  @@index([isOnline])
+  @@index([userId])
+}
+
+model TechnicianDocument {
+  id                  String            @id @default(uuid())
+  technicianProfileId String
+  technicianProfile   TechnicianProfile @relation(fields: [technicianProfileId], references: [id], onDelete: Cascade)
+  type                DocumentType
+  fileUrl             String
+  uploadedAt          DateTime          @default(now())
+
+  @@index([technicianProfileId])
+}
+
+model ServiceCategory {
+  id          String   @id @default(uuid())
+  name        String   @unique
+  description String?  @db.Text
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Relations
+  bookings          ServiceRequest[]
+  galleryImages     GalleryImage[]
+  diagnosisRequests DiagnosisRequest[] @relation("DiagnosisCategory")
+
+  @@index([isActive])
+}
+
+model ServiceRequest {
+  id                  String             @id @default(uuid())
+  clientId            String
+  client              User               @relation("ClientBookings", fields: [clientId], references: [id], onDelete: Cascade)
+  technicianId        String?
+  technician          User?              @relation("TechnicianBookings", fields: [technicianId], references: [id], onDelete: SetNull)
+  technicianProfileId String?
+  technicianProfile   TechnicianProfile? @relation(fields: [technicianProfileId], references: [id], onDelete: SetNull)
+  categoryId          String
+  category            ServiceCategory    @relation(fields: [categoryId], references: [id])
+  description         String             @db.Text
+  photos              Json // Array of photo URLs stored as JSON
+  city                String
+  address             String
+  scheduledDateTime   DateTime?
+  status              BookingStatus      @default(PENDING)
+  estimatedPrice      Float?
+  finalPrice          Float?
+  paymentMethod       PaymentMethod?
+  paymentStatus       PaymentStatus      @default(UNPAID)
+  createdAt           DateTime           @default(now())
+  updatedAt           DateTime           @updatedAt
+
+  // Relations
+  reviews       Review[]
+  chatMessages  ChatMessage[]
+  galleryImages GalleryImage[]
+
+  @@index([clientId])
+  @@index([technicianId])
+  @@index([categoryId])
+  @@index([status])
+  @@index([city])
+  @@index([createdAt])
+}
+
+model Review {
+  id         String         @id @default(uuid())
+  bookingId  String
+  booking    ServiceRequest @relation(fields: [bookingId], references: [id], onDelete: Cascade)
+  reviewerId String
+  reviewer   User           @relation("ReviewerReviews", fields: [reviewerId], references: [id], onDelete: Cascade)
+  revieweeId String
+  reviewee   User           @relation("RevieweeReviews", fields: [revieweeId], references: [id], onDelete: Cascade)
+  rating     Int // 1-5
+  comment    String?        @db.Text
+  createdAt  DateTime       @default(now())
+
+  @@unique([bookingId, reviewerId]) // One review per booking per reviewer
+  @@index([bookingId])
+  @@index([reviewerId])
+  @@index([revieweeId])
+}
+
+model Notification {
+  id        String           @id @default(uuid())
+  userId    String
+  user      User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+  type      NotificationType
+  message   String
+  isRead    Boolean          @default(false)
+  createdAt DateTime         @default(now())
+
+  @@index([userId])
+  @@index([isRead])
+  @@index([createdAt])
+}
+
+model Subscription {
+  id                  String             @id @default(uuid())
+  technicianProfileId String
+  technicianProfile   TechnicianProfile  @relation(fields: [technicianProfileId], references: [id], onDelete: Cascade)
+  plan                SubscriptionPlan
+  status              SubscriptionStatus @default(ACTIVE)
+  startDate           DateTime           @default(now())
+  endDate             DateTime
+  autoRenew           Boolean            @default(true)
+  createdAt           DateTime           @default(now())
+  updatedAt           DateTime           @updatedAt
+
+  // Relations
+  payments SubscriptionPayment[]
+
+  @@index([technicianProfileId])
+  @@index([status])
+  @@index([endDate])
+}
+
+model SubscriptionPayment {
+  id             String        @id @default(uuid())
+  subscriptionId String
+  subscription   Subscription  @relation(fields: [subscriptionId], references: [id], onDelete: Cascade)
+  amount         Float
+  paymentMethod  PaymentMethod
+  paymentStatus  PaymentStatus @default(PENDING)
+  receiptUrl     String? // For bank transfer receipts
+  transactionId  String? // For card/Wafacash transactions
+  paidAt         DateTime?
+  createdAt      DateTime      @default(now())
+
+  @@index([subscriptionId])
+  @@index([paymentStatus])
+}
+
+model ChatMessage {
+  id          String         @id @default(uuid())
+  bookingId   String
+  booking     ServiceRequest @relation(fields: [bookingId], references: [id], onDelete: Cascade)
+  senderId    String
+  sender      User           @relation("SentMessages", fields: [senderId], references: [id], onDelete: Cascade)
+  receiverId  String
+  receiver    User           @relation("ReceivedMessages", fields: [receiverId], references: [id], onDelete: Cascade)
+  message     String         @db.Text
+  messageType String         @default("TEXT") // TEXT, IMAGE, VOICE
+  fileUrl     String?
+  isRead      Boolean        @default(false)
+  createdAt   DateTime       @default(now())
+
+  @@index([bookingId])
+  @@index([senderId])
+  @@index([receiverId])
+  @@index([createdAt])
+}
+
+model GalleryImage {
+  id            String           @id @default(uuid())
+  bookingId     String?
+  booking       ServiceRequest?  @relation(fields: [bookingId], references: [id], onDelete: SetNull)
+  categoryId    String?
+  category      ServiceCategory? @relation(fields: [categoryId], references: [id], onDelete: SetNull)
+  imageUrl      String
+  title         String?
+  description   String?          @db.Text
+  isBeforeAfter Boolean          @default(false)
+  isBefore      Boolean          @default(false) // true for before, false for after
+  technicianId  String?
+  technician    User?            @relation("TechnicianGallery", fields: [technicianId], references: [id], onDelete: SetNull)
+  createdAt     DateTime         @default(now())
+
+  @@index([categoryId])
+  @@index([technicianId])
+  @@index([createdAt])
+}
+
+model DiagnosisRequest {
+  id                  String           @id @default(uuid())
+  clientId            String
+  client              User             @relation("ClientDiagnoses", fields: [clientId], references: [id], onDelete: Cascade)
+  issueType           String
+  description         String           @db.Text
+  photos              Json // Array of photo URLs stored as JSON
+  suggestedCategoryId String?
+  suggestedCategory   ServiceCategory? @relation("DiagnosisCategory", fields: [suggestedCategoryId], references: [id], onDelete: SetNull)
+  status              String           @default("PENDING") // PENDING, REVIEWED, CONVERTED
+  createdAt           DateTime         @default(now())
+  updatedAt           DateTime         @updatedAt
+
+  @@index([clientId])
+  @@index([status])
+}
+
+model PasswordResetToken {
+  id        String   @id @default(uuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  token     String   @unique
+  expiresAt DateTime
+  used      Boolean  @default(false)
+  createdAt DateTime @default(now())
+
+  @@index([userId])
+  @@index([token])
+  @@index([expiresAt])
+}
