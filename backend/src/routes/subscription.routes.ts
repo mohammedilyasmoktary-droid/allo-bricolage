@@ -86,7 +86,7 @@ router.get('/status', async (req, res) => {
           },
         });
 
-        subscriptionStatus = trialSubscription;
+        subscriptionStatus = trialSubscription as any;
       }
     }
 
@@ -120,7 +120,7 @@ router.post(
     body('paymentMethod').isIn(['CARD', 'WAFACASH', 'BANK_TRANSFER']).withMessage('Invalid payment method'),
     body('billingPeriod').isIn(['MONTHLY', 'YEARLY']).withMessage('Invalid billing period'),
   ],
-  async (req, res) => {
+  async (req: express.Request, res: express.Response) => {
     try {
       const errors = validationResult(req);
       if (!errors.isEmpty()) {
@@ -303,7 +303,7 @@ router.post(
   [
     body('paymentStatus').isIn(['PAID', 'REJECTED']).withMessage('Invalid payment status'),
   ],
-  async (req, res) => {
+  async (req: express.Request, res: express.Response) => {
     try {
       const errors = validationResult(req);
       if (!errors.isEmpty()) {

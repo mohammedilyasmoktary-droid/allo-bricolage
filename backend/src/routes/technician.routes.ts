@@ -30,7 +30,7 @@ router.get('/available', async (req, res) => {
         where: {
           OR: [
             { id: category as string },
-            { name: { contains: category as string, mode: 'insensitive' } },
+            { name: { contains: category as string } },
           ],
         },
       });
@@ -177,7 +177,7 @@ router.post(
     body('basePrice').optional().isFloat({ min: 0 }),
     body('bio').optional().isString(),
   ],
-  async (req, res) => {
+  async (req: express.Request, res: express.Response) => {
     try {
       const errors = validationResult(req);
       if (!errors.isEmpty()) {
