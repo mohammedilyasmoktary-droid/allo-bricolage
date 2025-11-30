@@ -625,7 +625,7 @@ router.patch(
         data: {
           paymentMethod,
           paymentStatus,
-          status,
+          status: status as any,
         },
         include: {
           client: {
