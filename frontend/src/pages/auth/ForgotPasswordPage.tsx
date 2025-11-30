@@ -32,7 +32,7 @@ const ForgotPasswordPage: React.FC = () => {
       setSuccess(true);
       
       // In development, show the reset link if provided
-      if (response.resetLink && process.env.NODE_ENV === 'development') {
+      if (response.resetLink && import.meta.env.DEV) {
         console.log('Reset link:', response.resetLink);
       }
     } catch (err: any) {
