@@ -273,5 +273,37 @@ router.get('/stats', async (req, res) => {
   }
 });
 
+// Temporary endpoint to seed database (remove after use)
+// WARNING: This endpoint should be removed or protected after seeding
+router.post('/seed', async (req, res) => {
+  try {
+    console.log('🌱 Starting database seed via API...');
+    
+    // Import seed function directly
+    const { seedDatabase } = await import('../scripts/seed');
+    
+    // Run seed in background to avoid timeout
+    seedDatabase()
+      .then(() => {
+        console.log('✅ Seed completed successfully');
+      })
+      .catch((error) => {
+        console.error('❌ Seed failed:', error);
+      });
+    
+    // Return immediately to avoid timeout
+    res.json({ 
+      success: true, 
+      message: 'Database seed started. This may take a few minutes. Check logs for progress.'
+    });
+  } catch (error: any) {
+    console.error('Seed error:', error);
+    res.status(500).json({ 
+      error: 'Failed to start seed',
+      message: error.message
+    });
+  }
+});
+
 export { router as adminRouter };
 
