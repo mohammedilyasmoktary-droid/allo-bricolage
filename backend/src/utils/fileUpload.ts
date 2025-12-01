@@ -60,9 +60,26 @@ export const upload = multer({
 // TODO: Replace with S3 URL when using S3
 export const getFileUrl = (filename: string, type: 'photos' | 'documents' | 'profile-pictures' = 'photos'): string => {
   // In production with S3, this would return: `https://bucket.s3.region.amazonaws.com/${filename}`
+  
+  // Use BACKEND_URL if explicitly set
+  if (process.env.BACKEND_URL) {
+    return `${process.env.BACKEND_URL}/uploads/${type}/${filename}`;
+  }
+  
+  // In production (Render, Railway, etc.), use the service URL
+  if (process.env.NODE_ENV === 'production') {
+    // Try to get from RENDER_EXTERNAL_URL (Render) or RAILWAY_PUBLIC_DOMAIN (Railway)
+    const serviceUrl = process.env.RENDER_EXTERNAL_URL || 
+                       (process.env.RAILWAY_PUBLIC_DOMAIN ? `https://${process.env.RAILWAY_PUBLIC_DOMAIN}` : null);
+    
+    if (serviceUrl) {
+      return `${serviceUrl}/uploads/${type}/${filename}`;
+    }
+  }
+  
+  // Fallback to localhost for development
   const port = process.env.PORT || 5001;
-  const baseUrl = process.env.BACKEND_URL || `http://localhost:${port}`;
-  return `${baseUrl}/uploads/${type}/${filename}`;
+  return `http://localhost:${port}/uploads/${type}/${filename}`;
 };
 
 // Helper to delete file

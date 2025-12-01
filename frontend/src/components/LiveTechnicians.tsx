@@ -3,6 +3,7 @@ import { Box, Typography, Grid, Card, CardContent, Button, Chip, Avatar, Rating,
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { techniciansApi, Technician } from '../api/technicians';
+import { normalizeImageUrl } from '../utils/imageUrl';
 import LocationOnIcon from '@mui/icons-material/LocationOn';
 
 const LiveTechnicians: React.FC = () => {
@@ -26,7 +27,11 @@ const LiveTechnicians: React.FC = () => {
       const onlineTechs = data.filter((tech) => tech.isOnline).slice(0, 6);
       setTechnicians(onlineTechs);
     } catch (err: any) {
-      setError(err.response?.data?.error || 'Failed to load technicians');
+      // Only show error if it's a real error, not just empty data
+      if (err.response?.status !== 404 && err.response?.status !== 200) {
+        console.error('Error loading technicians:', err);
+        setError(err.response?.data?.error || 'Failed to load technicians');
+      }
     } finally {
       setLoading(false);
     }
@@ -129,7 +134,7 @@ const LiveTechnicians: React.FC = () => {
                 <CardContent sx={{ flexGrow: 1, p: 3 }}>
                   <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 2 }}>
                     <Avatar
-                      src={technician.profilePictureUrl || technicianImage}
+                      src={normalizeImageUrl(technician.profilePictureUrl) || technicianImage}
                       alt={technician.user?.name}
                       sx={{
                         width: 60,

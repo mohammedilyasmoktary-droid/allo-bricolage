@@ -42,8 +42,16 @@ const ReviewFeed: React.FC = () => {
     try {
       const data = await reviewsApi.getAll();
       setReviews(data.slice(0, 6)); // Show latest 6 reviews
+      // Don't show error if data is just empty array
+      if (data.length === 0) {
+        setError(''); // Clear any previous error
+      }
     } catch (err: any) {
-      setError(err.response?.data?.error || 'Failed to load reviews');
+      // Only show error if it's a real error, not just empty data
+      if (err.response?.status !== 404 && err.response?.status !== 200) {
+        console.error('Error loading reviews:', err);
+        setError(err.response?.data?.error || 'Failed to load reviews');
+      }
     } finally {
       setLoading(false);
     }
