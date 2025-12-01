@@ -117,7 +117,10 @@ const RegisterPage: React.FC = () => {
       }
       navigate('/');
     } catch (err: any) {
-      setError(err.response?.data?.error || 'Erreur lors de l\'inscription');
+      console.error('Registration error:', err);
+      // Show more detailed error message
+      const errorMessage = err.message || err.response?.data?.error || err.response?.data?.message || 'Erreur lors de l\'inscription';
+      setError(errorMessage);
     } finally {
       setLoading(false);
     }

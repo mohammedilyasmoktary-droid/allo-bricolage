@@ -64,21 +64,41 @@ export const authApi = {
   },
 
   register: async (data: RegisterData | FormData) => {
-    // Check if data is FormData (for technician registration with file)
-    const isFormData = data instanceof FormData;
-    const config = isFormData
-      ? {
-          headers: {
-            'Content-Type': 'multipart/form-data',
-          },
-        }
-      : {};
+    try {
+      // Check if data is FormData (for technician registration with file)
+      const isFormData = data instanceof FormData;
+      const config = isFormData
+        ? {
+            headers: {
+              'Content-Type': 'multipart/form-data',
+            },
+          }
+        : {};
 
-    const response = await apiClient.post('/auth/register', data, config);
-    if (response.data.accessToken) {
-      localStorage.setItem('accessToken', response.data.accessToken);
+      console.log('Sending register request to:', `${apiClient.defaults.baseURL}/auth/register`);
+      const response = await apiClient.post('/auth/register', data, config);
+      if (response.data.accessToken) {
+        localStorage.setItem('accessToken', response.data.accessToken);
+      }
+      return response.data;
+    } catch (error: any) {
+      console.error('Register API error:', error);
+      // Re-throw with better error message
+      if (error.response) {
+        // Server responded with error
+        console.error('Server error response:', error.response.data);
+        const errorMessage = error.response.data?.error || error.response.data?.message || 'Erreur lors de l\'inscription';
+        throw new Error(errorMessage);
+      } else if (error.request) {
+        // Request made but no response
+        console.error('No response received from server');
+        throw new Error('Impossible de se connecter au serveur. Vérifiez que le serveur backend est démarré.');
+      } else {
+        // Something else happened
+        console.error('Request setup error:', error.message);
+        throw new Error('Erreur lors de l\'inscription. Veuillez réessayer.');
+      }
     }
-    return response.data;
   },
 
   logout: async () => {
