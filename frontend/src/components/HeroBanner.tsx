@@ -138,11 +138,7 @@ const HeroBanner: React.FC = () => {
                 variant="text"
                 size="small"
                 onClick={() => {
-                  if (user?.role === 'CLIENT') {
-                    navigate(`/client/search?service=${service}`);
-                  } else if (!user) {
-                    navigate('/register');
-                  }
+                  navigate(`/search?service=${service}`);
                 }}
                 sx={{
                   color: 'white',
