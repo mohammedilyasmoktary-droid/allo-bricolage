@@ -522,33 +522,6 @@ const HomePage: React.FC = () => {
                 >
                   <Box
                     sx={{
-                      position: 'absolute',
-                      top: -20,
-                      left: '50%',
-                      transform: 'translateX(-50%)',
-                      width: 40,
-                      height: 40,
-                      borderRadius: '50%',
-                      bgcolor: '#F4C542',
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      boxShadow: '0 4px 12px rgba(244, 197, 66, 0.4)',
-                      zIndex: 1,
-                    }}
-                  >
-                    <Typography
-                      sx={{
-                        color: '#032B5A',
-                        fontWeight: 800,
-                        fontSize: '1.25rem'
-                      }}
-                    >
-                      {step.number}
-                    </Typography>
-                  </Box>
-                  <Box
-                    sx={{
                       width: { xs: 70, md: 90 },
                       height: { xs: 70, md: 90 },
                       borderRadius: '50%',
