@@ -113,3 +113,4 @@ La page Environment dans Render ressemble à ceci :
 
 Une fois configuré, toutes les nouvelles images uploadées utiliseront automatiquement la bonne URL Render.
 
+

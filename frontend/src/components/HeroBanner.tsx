@@ -2,9 +2,6 @@ import React from 'react';
 import { Box, Typography, Button, Grid } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
-import FlashOnIcon from '@mui/icons-material/FlashOn';
-import ScheduleIcon from '@mui/icons-material/Schedule';
-import RequestQuoteIcon from '@mui/icons-material/RequestQuote';
 
 const HeroBanner: React.FC = () => {
   const navigate = useNavigate();
@@ -67,99 +64,70 @@ const HeroBanner: React.FC = () => {
         </Typography>
 
         {/* CTA Buttons */}
-        <Grid container spacing={2} justifyContent="center" sx={{ mb: 4 }}>
-          <Grid item xs={12} sm={6} md={4}>
+        <Grid container spacing={3} justifyContent="center" sx={{ mb: 4, maxWidth: 800, mx: 'auto' }}>
+          <Grid item xs={12} sm={6}>
             <Button
               fullWidth
               variant="contained"
               size="large"
-              startIcon={<FlashOnIcon />}
               onClick={() => {
                 if (user?.role === 'CLIENT') {
-                  navigate('/client/search?urgent=true');
+                  navigate('/recherche');
                 } else if (!user) {
                   navigate('/register?role=CLIENT');
                 } else {
-                  navigate('/client/search');
+                  navigate('/recherche');
                 }
               }}
               sx={{
                 bgcolor: '#F4C542',
                 color: '#032B5A',
-                '&:hover': { bgcolor: '#e0b038', transform: 'translateY(-2px)' },
+                '&:hover': { bgcolor: '#e0b038', transform: 'translateY(-4px)' },
                 textTransform: 'none',
-                py: 2,
+                py: 3,
                 fontWeight: 700,
-                fontSize: '1.1rem',
-                boxShadow: '0 4px 12px rgba(244, 197, 66, 0.4)',
+                fontSize: '1.25rem',
+                boxShadow: '0 8px 24px rgba(244, 197, 66, 0.4)',
                 transition: 'all 0.3s ease',
+                borderRadius: 3,
               }}
             >
-              Réparation Urgente
+              Je suis un Client
             </Button>
           </Grid>
-          <Grid item xs={12} sm={6} md={4}>
-            <Button
-              fullWidth
-              variant="contained"
-              size="large"
-              startIcon={<ScheduleIcon />}
-              onClick={() => {
-                if (user?.role === 'CLIENT') {
-                  navigate('/client/search');
-                } else if (!user) {
-                  navigate('/register?role=CLIENT');
-                } else {
-                  navigate('/client/search');
-                }
-              }}
-              sx={{
-                bgcolor: 'white',
-                color: '#032B5A',
-                '&:hover': { bgcolor: '#f5f5f5', transform: 'translateY(-2px)' },
-                textTransform: 'none',
-                py: 2,
-                fontWeight: 700,
-                fontSize: '1.1rem',
-                boxShadow: '0 4px 12px rgba(255, 255, 255, 0.3)',
-                transition: 'all 0.3s ease',
-              }}
-            >
-              Réserver Maintenant
-            </Button>
-          </Grid>
-          <Grid item xs={12} sm={6} md={4}>
+          <Grid item xs={12} sm={6}>
             <Button
               fullWidth
               variant="outlined"
               size="large"
-              startIcon={<RequestQuoteIcon />}
               onClick={() => {
-                if (user?.role === 'CLIENT') {
-                  navigate('/client/diagnosis');
+                if (user?.role === 'TECHNICIAN') {
+                  navigate('/technician/dashboard');
                 } else if (!user) {
-                  navigate('/register?role=CLIENT');
+                  navigate('/technicien/abonnement');
                 } else {
-                  navigate('/client/diagnosis');
+                  navigate('/technicien/abonnement');
                 }
               }}
               sx={{
-                borderColor: '#F4C542',
-                borderWidth: 2,
-                color: '#F4C542',
+                borderColor: 'white',
+                borderWidth: 3,
+                color: 'white',
                 '&:hover': {
                   borderColor: '#F4C542',
                   bgcolor: 'rgba(244, 197, 66, 0.1)',
-                  transform: 'translateY(-2px)',
+                  transform: 'translateY(-4px)',
                 },
                 textTransform: 'none',
-                py: 2,
+                py: 3,
                 fontWeight: 700,
-                fontSize: '1.1rem',
+                fontSize: '1.25rem',
+                boxShadow: '0 8px 24px rgba(255, 255, 255, 0.2)',
                 transition: 'all 0.3s ease',
+                borderRadius: 3,
               }}
             >
-              Demander un Devis
+              Je suis un Technicien
             </Button>
           </Grid>
         </Grid>

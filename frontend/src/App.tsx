@@ -10,6 +10,7 @@ import ResetPasswordPage from './pages/auth/ResetPasswordPage';
 import ClientProfile from './pages/client/ClientProfile';
 import ClientBookings from './pages/client/ClientBookings';
 import SearchTechnicians from './pages/client/SearchTechnicians';
+import RecherchePage from './pages/client/RecherchePage';
 import CreateBooking from './pages/client/CreateBooking';
 import PaymentPage from './pages/client/PaymentPage';
 import BookingRecapPage from './pages/client/BookingRecapPage';
@@ -22,6 +23,8 @@ import TechnicianJobs from './pages/technician/TechnicianJobs';
 import TechnicianProfile from './pages/technician/TechnicianProfile';
 import TechnicianAnalytics from './pages/technician/TechnicianAnalytics';
 import SubscriptionPage from './pages/technician/SubscriptionPage';
+import TechnicianSubscriptionPage from './pages/technician/TechnicianSubscriptionPage';
+import TechnicianRegisterPage from './pages/technician/TechnicianRegisterPage';
 import SubscriptionPaymentPage from './pages/technician/SubscriptionPaymentPage';
 import AdminDashboard from './pages/admin/AdminDashboard';
 import AdminTechnicians from './pages/admin/AdminTechnicians';
@@ -97,6 +100,24 @@ function App() {
           <ProtectedRoute allowedRoles={['CLIENT']}>
             <Layout>
               <SearchTechnicians />
+            </Layout>
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/recherche"
+        element={
+          <Layout>
+            <RecherchePage />
+          </Layout>
+        }
+      />
+      <Route
+        path="/booking"
+        element={
+          <ProtectedRoute allowedRoles={['CLIENT']}>
+            <Layout>
+              <CreateBooking />
             </Layout>
           </ProtectedRoute>
         }
@@ -187,6 +208,22 @@ function App() {
               <TechnicianJobs />
             </Layout>
           </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/technicien/abonnement"
+        element={
+          <Layout>
+            <TechnicianSubscriptionPage />
+          </Layout>
+        }
+      />
+      <Route
+        path="/technicien/register"
+        element={
+          <Layout>
+            <TechnicianRegisterPage />
+          </Layout>
         }
       />
       <Route
