@@ -310,7 +310,9 @@ const RegisterPage: React.FC = () => {
                   </Box>
                 }
               />
-            </RadioGroup>
+                </RadioGroup>
+              </>
+            )}
 
             <Divider sx={{ mb: 3, borderColor: '#e0e0e0' }} />
 
