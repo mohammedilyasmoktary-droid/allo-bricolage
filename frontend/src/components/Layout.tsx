@@ -45,6 +45,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
     if (!user) {
       return [
         { label: 'Accueil', path: '/' },
+        { label: 'Rechercher', path: '/search' },
         { label: 'Connexion', path: '/login' },
         { label: 'Inscription', path: '/register' },
       ];
@@ -54,7 +55,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
       case 'CLIENT':
         return [
           { label: 'Accueil', path: '/' },
-          { label: 'Rechercher', path: '/client/search' },
+          { label: 'Rechercher', path: '/search' },
           { label: 'Mes réservations', path: '/client/bookings' },
           { label: 'Profil', path: '/client/profile' },
         ];
