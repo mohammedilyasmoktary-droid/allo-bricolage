@@ -68,7 +68,14 @@ const SearchTechnicians: React.FC = () => {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const { user } = useAuth();
-  const [city, setCity] = useState(user?.city || '');
+  const [city, setCity] = useState('');
+  
+  // Set city from user if available, otherwise leave empty
+  useEffect(() => {
+    if (user?.city) {
+      setCity(user.city);
+    }
+  }, [user]);
   const [category, setCategory] = useState('');
   const [technicians, setTechnicians] = useState<Technician[]>([]);
   const [filteredTechnicians, setFilteredTechnicians] = useState<Technician[]>([]);
