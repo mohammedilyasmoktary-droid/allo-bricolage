@@ -35,6 +35,7 @@ import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import Rating from '@mui/material/Rating';
 import DeleteIcon from '@mui/icons-material/Delete';
+import TechnicianAvailabilityCalendar from '../../components/TechnicianAvailabilityCalendar';
 
 const CreateBooking: React.FC = () => {
   const navigate = useNavigate();
@@ -300,24 +301,27 @@ const CreateBooking: React.FC = () => {
         </Alert>
       )}
 
-      {/* Form Card */}
-      <Card
-        sx={{
-          boxShadow: 3,
-          borderRadius: 3,
-          border: '1px solid #e0e0e0',
-          overflow: 'hidden',
-        }}
-      >
-        <CardContent sx={{ p: { xs: 3, md: 4 } }}>
-          {error && (
-            <Alert severity="error" sx={{ mb: 3, borderRadius: 2 }} onClose={() => setError('')}>
-              {error}
-            </Alert>
-          )}
+      {/* Form and Calendar Layout */}
+      <Grid container spacing={3}>
+        {/* Form Card - Left Side */}
+        <Grid item xs={12} md={8}>
+          <Card
+            sx={{
+              boxShadow: 3,
+              borderRadius: 3,
+              border: '1px solid #e0e0e0',
+              overflow: 'hidden',
+            }}
+          >
+            <CardContent sx={{ p: { xs: 3, md: 4 } }}>
+              {error && (
+                <Alert severity="error" sx={{ mb: 3, borderRadius: 2 }} onClose={() => setError('')}>
+                  {error}
+                </Alert>
+              )}
 
-          <form onSubmit={handleSubmit}>
-            <Grid container spacing={3}>
+              <form onSubmit={handleSubmit}>
+                <Grid container spacing={3}>
               {/* Service Category */}
               <Grid item xs={12}>
                 <FormControl fullWidth required error={!!fieldErrors.categoryId}>
@@ -442,31 +446,6 @@ const CreateBooking: React.FC = () => {
                 />
               </Grid>
 
-              {/* Date and Time */}
-              <Grid item xs={12} md={6}>
-                <TextField
-                  fullWidth
-                  label="Date et heure préférée (optionnel)"
-                  name="scheduledDateTime"
-                  type="datetime-local"
-                  value={formData.scheduledDateTime}
-                  onChange={(e) => {
-                    handleChange(e);
-                    setFieldErrors({ ...fieldErrors, scheduledDateTime: '' });
-                  }}
-                  InputLabelProps={{ shrink: true }}
-                  error={!!fieldErrors.scheduledDateTime}
-                  helperText={fieldErrors.scheduledDateTime || 'Laissez vide pour une intervention rapide'}
-                  InputProps={{
-                    startAdornment: <CalendarTodayIcon sx={{ mr: 1, color: 'text.secondary' }} />,
-                  }}
-                  sx={{
-                    '& .MuiOutlinedInput-root': {
-                      borderRadius: 2,
-                    },
-                  }}
-                />
-              </Grid>
 
               {/* Photo Upload */}
               <Grid item xs={12}>
@@ -702,10 +681,26 @@ const CreateBooking: React.FC = () => {
               >
                 Annuler
               </Button>
-            </Box>
-          </form>
-        </CardContent>
-      </Card>
+                </Box>
+              </form>
+            </CardContent>
+          </Card>
+        </Grid>
+
+        {/* Calendar Card - Right Side */}
+        <Grid item xs={12} md={4}>
+          {technician && (
+            <TechnicianAvailabilityCalendar
+              technicianId={technician.id}
+              selectedDateTime={formData.scheduledDateTime || ''}
+              onDateTimeSelect={(dateTime) => {
+                setFormData({ ...formData, scheduledDateTime: dateTime });
+                setFieldErrors({ ...fieldErrors, scheduledDateTime: '' });
+              }}
+            />
+          )}
+        </Grid>
+      </Grid>
     </Box>
   );
 };
