@@ -24,9 +24,10 @@ router.get('/available', async (req, res) => {
       where.user = { city: city as string };
     }
 
+    // Find category record if category filter is provided
+    let categoryRecord = null;
     if (category) {
-      // Find category by ID or name
-      const categoryRecord = await prisma.serviceCategory.findFirst({
+      categoryRecord = await prisma.serviceCategory.findFirst({
         where: {
           OR: [
             { id: category as string },
@@ -36,7 +37,8 @@ router.get('/available', async (req, res) => {
       });
 
       if (categoryRecord) {
-        where.skills = { has: categoryRecord.name };
+        // For MySQL JSON arrays, try Prisma's 'has' filter
+        where.skills = { has: categoryRecord.name } as any;
       }
     }
 
@@ -45,7 +47,7 @@ router.get('/available', async (req, res) => {
       where.skills = { hasSome: skillArray };
     }
 
-    const technicians = await prisma.technicianProfile.findMany({
+    let technicians = await prisma.technicianProfile.findMany({
       where,
       include: {
         user: {
@@ -77,6 +79,15 @@ router.get('/available', async (req, res) => {
         averageRating: 'desc',
       },
     });
+
+    // If category filter was applied, ensure it worked by filtering in memory as fallback
+    if (categoryRecord) {
+      // Filter in memory to ensure category match (fallback if Prisma filter didn't work)
+      technicians = technicians.filter((tech: any) => {
+        const skills = Array.isArray(tech.skills) ? tech.skills : JSON.parse(tech.skills || '[]');
+        return skills.includes(categoryRecord!.name);
+      });
+    }
 
     // Ensure profilePictureUrl is included in response
     technicians.forEach((tech: any) => {

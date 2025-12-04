@@ -95,20 +95,7 @@ const SearchTechnicians: React.FC = () => {
   const [priceRange, setPriceRange] = useState<[number, number]>([0, 500]);
   const [showFilters, setShowFilters] = useState(false);
 
-  // Read URL params on mount
-  useEffect(() => {
-    const categoryParam = searchParams.get('category');
-    const urgentParam = searchParams.get('urgent');
-    const autoSearchParam = searchParams.get('autoSearch');
-
-    if (categoryParam) {
-      setCategory(categoryParam);
-    }
-    if (urgentParam === 'true') {
-      setIsUrgent(true);
-    }
-  }, [searchParams]);
-
+  // Load categories on mount
   useEffect(() => {
     const loadCategories = async () => {
       try {
@@ -121,9 +108,22 @@ const SearchTechnicians: React.FC = () => {
     loadCategories();
   }, []);
 
-  // Auto-load technicians on page load
+  // Read URL params on mount and set state
   useEffect(() => {
-    const loadInitialTechnicians = async () => {
+    const categoryParam = searchParams.get('category');
+    const urgentParam = searchParams.get('urgent');
+
+    if (categoryParam) {
+      setCategory(categoryParam);
+    }
+    if (urgentParam === 'true') {
+      setIsUrgent(true);
+    }
+  }, [searchParams]);
+
+  // Auto-load technicians when category or city changes (including from URL params)
+  useEffect(() => {
+    const loadTechnicians = async () => {
       setLoading(true);
       try {
         const data = await techniciansApi.getAvailable(city || undefined, category || undefined);
@@ -135,16 +135,9 @@ const SearchTechnicians: React.FC = () => {
         setLoading(false);
       }
     };
-    loadInitialTechnicians();
-  }, []); // Only run once on mount
-
-  // Auto-search when category is provided in URL
-  useEffect(() => {
-    const autoSearchParam = searchParams.get('autoSearch');
-    if (autoSearchParam === 'true' && category) {
-      handleSearch();
-    }
-  }, [category, searchParams]);
+    
+    loadTechnicians();
+  }, [category, city]); // Re-run when category or city changes
 
   const handleSearch = async () => {
     setLoading(true);
