@@ -14,7 +14,6 @@ import {
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import HeroBanner from '../components/HeroBanner';
-import LiveTechnicians from '../components/LiveTechnicians';
 import { techniciansApi, Technician } from '../api/technicians';
 import { categoriesApi, Category } from '../api/categories';
 import { normalizeImageUrl } from '../utils/imageUrl';
@@ -1009,12 +1008,6 @@ const HomePage: React.FC = () => {
         </Container>
       </Box>
 
-      {/* Live Technicians Section */}
-      <Box sx={{ py: { xs: 7, md: 11 }, bgcolor: '#fafbfc' }}>
-        <Container maxWidth="lg">
-          <LiveTechnicians />
-        </Container>
-      </Box>
     </Box>
   );
 };
