@@ -375,6 +375,20 @@ const HomePage: React.FC = () => {
       {/* Platform Statistics Section */}
       <Box sx={{ py: { xs: 7, md: 11 }, bgcolor: 'white' }}>
         <Container maxWidth="lg">
+          <Box sx={{ textAlign: 'center', mb: { xs: 5, md: 6 } }}>
+            <Typography
+              variant="h3"
+              component="h2"
+              sx={{
+                fontWeight: 700,
+                color: '#032B5A',
+                mb: 3,
+                fontSize: { xs: '1.75rem', md: '2.5rem' }
+              }}
+            >
+              Allo Bricolage en Chiffres
+            </Typography>
+          </Box>
           <Box sx={{ textAlign: 'center', mb: { xs: 6, md: 8 }, maxWidth: 900, mx: 'auto' }}>
             <Typography
               variant="body1"
