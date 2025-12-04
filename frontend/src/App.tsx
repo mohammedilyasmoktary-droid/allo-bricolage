@@ -10,7 +10,6 @@ import ResetPasswordPage from './pages/auth/ResetPasswordPage';
 import ClientProfile from './pages/client/ClientProfile';
 import ClientBookings from './pages/client/ClientBookings';
 import SearchTechnicians from './pages/client/SearchTechnicians';
-import RecherchePage from './pages/client/RecherchePage';
 import CreateBooking from './pages/client/CreateBooking';
 import PaymentPage from './pages/client/PaymentPage';
 import BookingRecapPage from './pages/client/BookingRecapPage';
