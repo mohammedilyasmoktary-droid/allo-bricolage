@@ -178,55 +178,72 @@ const CreateBooking: React.FC = () => {
   };
 
   return (
-    <Box sx={{ maxWidth: 1000, mx: 'auto', px: { xs: 2, md: 0 }, py: 4 }}>
+    <Box sx={{ maxWidth: 1400, mx: 'auto', px: { xs: 2, md: 3 }, py: { xs: 3, md: 5 }, bgcolor: '#fafbfc' }}>
       {/* Header */}
-      <Box sx={{ mb: 4, display: 'flex', alignItems: 'center', gap: 2 }}>
+      <Box sx={{ mb: 5, display: 'flex', alignItems: 'center', gap: 2 }}>
         <IconButton
           onClick={() => navigate(-1)}
           sx={{
-            bgcolor: '#f5f5f5',
-            '&:hover': { bgcolor: '#e0e0e0' },
+            bgcolor: 'white',
+            border: '1px solid #e8eaed',
+            boxShadow: '0 1px 3px rgba(0,0,0,0.05)',
+            '&:hover': { 
+              bgcolor: '#f8f9fa',
+              borderColor: '#F4C542',
+              transform: 'translateX(-2px)',
+            },
+            transition: 'all 0.2s ease',
           }}
         >
-          <ArrowBackIcon />
+          <ArrowBackIcon sx={{ color: '#032B5A' }} />
         </IconButton>
-        <Typography variant="h4" component="h1" sx={{ fontWeight: 700, color: '#032B5A' }}>
-          Créer une réservation
-        </Typography>
+        <Box>
+          <Typography variant="h4" component="h1" sx={{ fontWeight: 700, color: '#032B5A', mb: 0.5 }}>
+            Créer une réservation
+          </Typography>
+          <Typography variant="body2" sx={{ color: 'text.secondary', fontWeight: 500 }}>
+            Remplissez les informations ci-dessous pour finaliser votre demande
+          </Typography>
+        </Box>
       </Box>
 
       {/* Technician Card */}
       {technician && (
         <Card
           sx={{
-            mb: 4,
-            boxShadow: 3,
-            borderRadius: 3,
-            border: '1px solid #e0e0e0',
+            mb: 5,
+            boxShadow: '0 2px 8px rgba(3, 43, 90, 0.08)',
+            borderRadius: 4,
+            border: '1px solid #e8eaed',
             overflow: 'hidden',
+            bgcolor: 'white',
+            transition: 'all 0.3s ease',
+            '&:hover': {
+              boxShadow: '0 4px 16px rgba(3, 43, 90, 0.12)',
+            },
           }}
         >
-          <CardContent sx={{ p: 3 }}>
-            <Box sx={{ display: 'flex', alignItems: 'center', gap: 3 }}>
+          <CardContent sx={{ p: { xs: 3, md: 4 } }}>
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 4 }}>
               <Avatar
                 src={technician.profilePictureUrl}
                 alt={technician.user?.name}
                 sx={{
-                  width: 80,
-                  height: 80,
+                  width: 100,
+                  height: 100,
                   bgcolor: '#032B5A',
                   color: '#F4C542',
-                  fontSize: 32,
+                  fontSize: 40,
                   fontWeight: 700,
-                  border: '3px solid #F4C542',
-                  boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
+                  border: '4px solid #F4C542',
+                  boxShadow: '0 4px 16px rgba(244, 197, 66, 0.3)',
                 }}
               >
                 {technician.user?.name?.charAt(0).toUpperCase()}
               </Avatar>
               <Box sx={{ flexGrow: 1 }}>
-                <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 1 }}>
-                  <Typography variant="h5" sx={{ fontWeight: 700, color: '#032B5A' }}>
+                <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 1.5 }}>
+                  <Typography variant="h5" sx={{ fontWeight: 700, color: '#032B5A', fontSize: '1.5rem' }}>
                     {technician.user?.name}
                   </Typography>
                   {technician.subscriptions && technician.subscriptions.length > 0 && technician.subscriptions[0].plan === 'PREMIUM' && (
@@ -238,26 +255,31 @@ const CreateBooking: React.FC = () => {
                         color: '#032B5A',
                         fontWeight: 700,
                         fontSize: '0.75rem',
+                        height: 24,
+                        px: 1,
                       }}
                     />
                   )}
                 </Box>
-                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1 }}>
+                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, mb: 1.5 }}>
                   <Rating value={technician.averageRating} readOnly precision={0.1} size="small" sx={{ color: '#F4C542' }} />
-                  <Typography variant="body2" sx={{ fontWeight: 600, color: '#032B5A' }}>
+                  <Typography variant="body1" sx={{ fontWeight: 600, color: '#032B5A', fontSize: '0.95rem' }}>
                     {technician.averageRating.toFixed(1)}/5
                   </Typography>
                 </Box>
-                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1, color: 'text.secondary' }}>
-                  <WorkIcon sx={{ fontSize: 18 }} />
-                  <Typography variant="body2">
-                    {technician.yearsOfExperience} ans d'expérience
-                  </Typography>
-                  <Box sx={{ mx: 1 }}>•</Box>
-                  <LocationOnIcon sx={{ fontSize: 18 }} />
-                  <Typography variant="body2">{technician.user?.city}</Typography>
+                <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 2, color: 'text.secondary' }}>
+                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                    <WorkIcon sx={{ fontSize: 18, color: '#666' }} />
+                    <Typography variant="body2" sx={{ fontWeight: 500 }}>
+                      {technician.yearsOfExperience} ans d'expérience
+                    </Typography>
+                  </Box>
+                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                    <LocationOnIcon sx={{ fontSize: 18, color: '#666' }} />
+                    <Typography variant="body2" sx={{ fontWeight: 500 }}>{technician.user?.city}</Typography>
+                  </Box>
                 </Box>
-                <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.75, mt: 1.5 }}>
+                <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1, mt: 2 }}>
                   {technician.skills.slice(0, 4).map((skill, index) => (
                     <Chip
                       key={index}
@@ -267,8 +289,15 @@ const CreateBooking: React.FC = () => {
                         bgcolor: '#f8f9fa',
                         color: '#032B5A',
                         fontWeight: 600,
-                        fontSize: '0.75rem',
-                        border: '1px solid #e0e0e0',
+                        fontSize: '0.8rem',
+                        border: '1px solid #e8eaed',
+                        height: 28,
+                        '&:hover': {
+                          bgcolor: '#F4C542',
+                          color: '#032B5A',
+                          borderColor: '#F4C542',
+                        },
+                        transition: 'all 0.2s ease',
                       }}
                     />
                   ))}
@@ -283,19 +312,23 @@ const CreateBooking: React.FC = () => {
       {isUrgent && (
         <Alert
           severity="warning"
-          icon={<FlashOnIcon />}
+          icon={<FlashOnIcon sx={{ fontSize: 24 }} />}
           sx={{
-            mb: 3,
-            bgcolor: '#fff3cd',
+            mb: 4,
+            bgcolor: '#fffbf0',
             border: '2px solid #F4C542',
-            borderRadius: 2,
-            boxShadow: '0 2px 8px rgba(244, 197, 66, 0.2)',
+            borderRadius: 3,
+            boxShadow: '0 2px 12px rgba(244, 197, 66, 0.15)',
+            py: 1.5,
+            '& .MuiAlert-message': {
+              width: '100%',
+            },
           }}
         >
-          <Typography variant="body1" sx={{ fontWeight: 700, color: '#032B5A' }}>
+          <Typography variant="body1" sx={{ fontWeight: 700, color: '#032B5A', mb: 0.5 }}>
             ⚡ Demande urgente
           </Typography>
-          <Typography variant="body2" sx={{ mt: 0.5 }}>
+          <Typography variant="body2" sx={{ color: '#666', lineHeight: 1.6 }}>
             Un supplément de 100 MAD sera ajouté au prix final. Un technicien sera dépêché dans l'heure suivant la confirmation.
           </Typography>
         </Alert>
@@ -307,50 +340,81 @@ const CreateBooking: React.FC = () => {
         <Grid item xs={12} md={8}>
           <Card
             sx={{
-              boxShadow: 3,
-              borderRadius: 3,
-              border: '1px solid #e0e0e0',
+              boxShadow: '0 2px 8px rgba(3, 43, 90, 0.08)',
+              borderRadius: 4,
+              border: '1px solid #e8eaed',
               overflow: 'hidden',
+              bgcolor: 'white',
             }}
           >
-            <CardContent sx={{ p: { xs: 3, md: 4 } }}>
+            <CardContent sx={{ p: { xs: 4, md: 5 } }}>
               {error && (
-                <Alert severity="error" sx={{ mb: 3, borderRadius: 2 }} onClose={() => setError('')}>
+                <Alert 
+                  severity="error" 
+                  sx={{ 
+                    mb: 4, 
+                    borderRadius: 3,
+                    boxShadow: '0 2px 8px rgba(211, 47, 47, 0.1)',
+                  }} 
+                  onClose={() => setError('')}
+                >
                   {error}
                 </Alert>
               )}
 
               <form onSubmit={handleSubmit}>
-                <Grid container spacing={3}>
+                <Grid container spacing={4}>
               {/* Service Category */}
               <Grid item xs={12}>
+                <Box sx={{ mb: 1 }}>
+                  <Typography variant="subtitle2" sx={{ fontWeight: 600, color: '#032B5A', mb: 1.5, fontSize: '0.95rem' }}>
+                    Catégorie de service <span style={{ color: '#d32f2f' }}>*</span>
+                  </Typography>
+                </Box>
                 <FormControl fullWidth required error={!!fieldErrors.categoryId}>
-                  <InputLabel sx={{ color: fieldErrors.categoryId ? 'error.main' : 'inherit' }}>
-                    Catégorie de service *
-                  </InputLabel>
                   <Select
                     value={formData.categoryId}
                     onChange={(e) => {
                       setFormData({ ...formData, categoryId: e.target.value as string });
                       setFieldErrors({ ...fieldErrors, categoryId: '' });
                     }}
-                    label="Catégorie de service *"
+                    displayEmpty
                     sx={{
-                      borderRadius: 2,
-                      '& .MuiOutlinedInput-notchedOutline': {
-                        borderColor: fieldErrors.categoryId ? 'error.main' : undefined,
+                      borderRadius: 3,
+                      bgcolor: '#fafbfc',
+                      border: fieldErrors.categoryId ? '2px solid #d32f2f' : '1px solid #e8eaed',
+                      '&:hover': {
+                        borderColor: fieldErrors.categoryId ? '#d32f2f' : '#F4C542',
+                        bgcolor: 'white',
                       },
+                      '&.Mui-focused': {
+                        borderColor: fieldErrors.categoryId ? '#d32f2f' : '#F4C542',
+                        bgcolor: 'white',
+                      },
+                      '& .MuiOutlinedInput-notchedOutline': {
+                        border: 'none',
+                      },
+                      '& .MuiSelect-select': {
+                        py: 1.75,
+                        px: 2,
+                        fontSize: '0.95rem',
+                        fontWeight: 500,
+                        color: formData.categoryId ? '#032B5A' : '#9e9e9e',
+                      },
+                      transition: 'all 0.2s ease',
                     }}
                   >
-                    <MenuItem value="">Sélectionner une catégorie</MenuItem>
+                    <MenuItem value="" disabled>
+                      <Typography sx={{ color: '#9e9e9e' }}>Sélectionner une catégorie</Typography>
+                    </MenuItem>
                     {categories.map((cat) => (
-                      <MenuItem key={cat.id} value={cat.id}>
-                        {cat.name}
+                      <MenuItem key={cat.id} value={cat.id} sx={{ py: 1.5 }}>
+                        <Typography sx={{ fontWeight: 500, color: '#032B5A' }}>{cat.name}</Typography>
                       </MenuItem>
                     ))}
                   </Select>
                   {fieldErrors.categoryId && (
-                    <Typography variant="caption" color="error" sx={{ mt: 0.5, ml: 1.75, display: 'block' }}>
+                    <Typography variant="caption" color="error" sx={{ mt: 1, ml: 1, display: 'block', fontWeight: 500 }}>
                       {fieldErrors.categoryId}
                     </Typography>
                   )}
@@ -359,9 +423,13 @@ const CreateBooking: React.FC = () => {
 
               {/* Description */}
               <Grid item xs={12}>
+                <Box sx={{ mb: 1 }}>
+                  <Typography variant="subtitle2" sx={{ fontWeight: 600, color: '#032B5A', mb: 1.5, fontSize: '0.95rem' }}>
+                    Description du problème <span style={{ color: '#d32f2f' }}>*</span>
+                  </Typography>
+                </Box>
                 <TextField
                   fullWidth
-                  label="Description du problème *"
                   name="description"
                   value={formData.description}
                   onChange={(e) => {
@@ -369,52 +437,114 @@ const CreateBooking: React.FC = () => {
                     setFieldErrors({ ...fieldErrors, description: '' });
                   }}
                   multiline
-                  rows={5}
+                  rows={6}
                   required
                   error={!!fieldErrors.description}
                   helperText={fieldErrors.description || 'Décrivez en détail le problème à résoudre (minimum 10 caractères)'}
                   placeholder="Ex: Fuite d'eau dans la salle de bain, robinet qui coule en permanence..."
                   InputProps={{
-                    startAdornment: <DescriptionIcon sx={{ mr: 1, color: 'text.secondary' }} />,
+                    startAdornment: (
+                      <Box sx={{ mr: 1.5, mt: 2, alignSelf: 'flex-start' }}>
+                        <DescriptionIcon sx={{ color: '#9e9e9e', fontSize: 22 }} />
+                      </Box>
+                    ),
                   }}
                   sx={{
+                    bgcolor: '#fafbfc',
+                    borderRadius: 3,
                     '& .MuiOutlinedInput-root': {
-                      borderRadius: 2,
+                      borderRadius: 3,
+                      border: fieldErrors.description ? '2px solid #d32f2f' : '1px solid #e8eaed',
+                      '&:hover': {
+                        borderColor: fieldErrors.description ? '#d32f2f' : '#F4C542',
+                        bgcolor: 'white',
+                      },
+                      '&.Mui-focused': {
+                        borderColor: fieldErrors.description ? '#d32f2f' : '#F4C542',
+                        bgcolor: 'white',
+                      },
+                      '& fieldset': {
+                        border: 'none',
+                      },
                     },
+                    '& .MuiInputBase-input': {
+                      py: 2,
+                      px: 0,
+                      fontSize: '0.95rem',
+                      lineHeight: 1.6,
+                      color: '#032B5A',
+                      '&::placeholder': {
+                        color: '#9e9e9e',
+                        opacity: 1,
+                      },
+                    },
+                    '& .MuiFormHelperText-root': {
+                      mt: 1.5,
+                      ml: 0,
+                      fontSize: '0.85rem',
+                      fontWeight: 500,
+                    },
+                    transition: 'all 0.2s ease',
                   }}
                 />
               </Grid>
 
               {/* City and Address */}
               <Grid item xs={12} md={6}>
+                <Box sx={{ mb: 1 }}>
+                  <Typography variant="subtitle2" sx={{ fontWeight: 600, color: '#032B5A', mb: 1.5, fontSize: '0.95rem' }}>
+                    Ville <span style={{ color: '#d32f2f' }}>*</span>
+                  </Typography>
+                </Box>
                 <FormControl fullWidth required error={!!fieldErrors.city}>
-                  <InputLabel sx={{ color: fieldErrors.city ? 'error.main' : 'inherit' }}>
-                    Ville *
-                  </InputLabel>
                   <Select
                     value={formData.city}
                     onChange={(e) => {
                       setFormData({ ...formData, city: e.target.value });
                       setFieldErrors({ ...fieldErrors, city: '' });
                     }}
-                    label="Ville *"
-                    startAdornment={<LocationOnIcon sx={{ mr: 1, ml: 1.5, color: 'text.secondary' }} />}
+                    displayEmpty
+                    startAdornment={
+                      <Box sx={{ ml: 2, mr: 1 }}>
+                        <LocationOnIcon sx={{ color: '#9e9e9e', fontSize: 20 }} />
+                      </Box>
+                    }
                     sx={{
-                      borderRadius: 2,
-                      '& .MuiOutlinedInput-notchedOutline': {
-                        borderColor: fieldErrors.city ? 'error.main' : undefined,
+                      borderRadius: 3,
+                      bgcolor: '#fafbfc',
+                      border: fieldErrors.city ? '2px solid #d32f2f' : '1px solid #e8eaed',
+                      '&:hover': {
+                        borderColor: fieldErrors.city ? '#d32f2f' : '#F4C542',
+                        bgcolor: 'white',
                       },
+                      '&.Mui-focused': {
+                        borderColor: fieldErrors.city ? '#d32f2f' : '#F4C542',
+                        bgcolor: 'white',
+                      },
+                      '& .MuiOutlinedInput-notchedOutline': {
+                        border: 'none',
+                      },
+                      '& .MuiSelect-select': {
+                        py: 1.75,
+                        px: 0,
+                        fontSize: '0.95rem',
+                        fontWeight: 500,
+                        color: formData.city ? '#032B5A' : '#9e9e9e',
+                      },
+                      transition: 'all 0.2s ease',
                     }}
                   >
-                    <MenuItem value="">Sélectionner une ville</MenuItem>
+                    <MenuItem value="" disabled>
+                      <Typography sx={{ color: '#9e9e9e' }}>Sélectionner une ville</Typography>
+                    </MenuItem>
                     {MOROCCAN_CITIES.map((city) => (
-                      <MenuItem key={city} value={city}>
-                        {city}
+                      <MenuItem key={city} value={city} sx={{ py: 1.5 }}>
+                        <Typography sx={{ fontWeight: 500, color: '#032B5A' }}>{city}</Typography>
                       </MenuItem>
                     ))}
                   </Select>
                   {fieldErrors.city && (
-                    <Typography variant="caption" color="error" sx={{ mt: 0.5, ml: 1.75, display: 'block' }}>
+                    <Typography variant="caption" color="error" sx={{ mt: 1, ml: 1, display: 'block', fontWeight: 500 }}>
                       {fieldErrors.city}
                     </Typography>
                   )}
@@ -422,9 +552,13 @@ const CreateBooking: React.FC = () => {
               </Grid>
 
               <Grid item xs={12} md={6}>
+                <Box sx={{ mb: 1 }}>
+                  <Typography variant="subtitle2" sx={{ fontWeight: 600, color: '#032B5A', mb: 1.5, fontSize: '0.95rem' }}>
+                    Adresse complète <span style={{ color: '#d32f2f' }}>*</span>
+                  </Typography>
+                </Box>
                 <TextField
                   fullWidth
-                  label="Adresse complète *"
                   name="address"
                   value={formData.address}
                   onChange={(e) => {
@@ -436,12 +570,48 @@ const CreateBooking: React.FC = () => {
                   helperText={fieldErrors.address || 'Numéro, rue, quartier, ville...'}
                   placeholder="Ex: 123 Rue Mohammed V, Quartier Maarif..."
                   InputProps={{
-                    startAdornment: <LocationOnIcon sx={{ mr: 1, color: 'text.secondary' }} />,
+                    startAdornment: (
+                      <Box sx={{ mr: 1.5 }}>
+                        <LocationOnIcon sx={{ color: '#9e9e9e', fontSize: 20 }} />
+                      </Box>
+                    ),
                   }}
                   sx={{
+                    bgcolor: '#fafbfc',
+                    borderRadius: 3,
                     '& .MuiOutlinedInput-root': {
-                      borderRadius: 2,
+                      borderRadius: 3,
+                      border: fieldErrors.address ? '2px solid #d32f2f' : '1px solid #e8eaed',
+                      '&:hover': {
+                        borderColor: fieldErrors.address ? '#d32f2f' : '#F4C542',
+                        bgcolor: 'white',
+                      },
+                      '&.Mui-focused': {
+                        borderColor: fieldErrors.address ? '#d32f2f' : '#F4C542',
+                        bgcolor: 'white',
+                      },
+                      '& fieldset': {
+                        border: 'none',
+                      },
                     },
+                    '& .MuiInputBase-input': {
+                      py: 1.75,
+                      px: 0,
+                      fontSize: '0.95rem',
+                      fontWeight: 500,
+                      color: '#032B5A',
+                      '&::placeholder': {
+                        color: '#9e9e9e',
+                        opacity: 1,
+                      },
+                    },
+                    '& .MuiFormHelperText-root': {
+                      mt: 1.5,
+                      ml: 0,
+                      fontSize: '0.85rem',
+                      fontWeight: 500,
+                    },
+                    transition: 'all 0.2s ease',
                   }}
                 />
               </Grid>
@@ -449,16 +619,22 @@ const CreateBooking: React.FC = () => {
 
               {/* Photo Upload */}
               <Grid item xs={12}>
+                <Box sx={{ mb: 1 }}>
+                  <Typography variant="subtitle2" sx={{ fontWeight: 600, color: '#032B5A', mb: 1.5, fontSize: '0.95rem' }}>
+                    Photos du problème <span style={{ color: '#d32f2f' }}>*</span>
+                  </Typography>
+                </Box>
                 <Paper
                   sx={{
-                    p: 3,
-                    border: fieldErrors.photos ? '2px dashed #d32f2f' : '2px dashed #e0e0e0',
-                    borderRadius: 3,
-                    bgcolor: fieldErrors.photos ? 'rgba(211, 47, 47, 0.04)' : '#fafafa',
-                    transition: 'all 0.3s',
+                    p: 4,
+                    border: fieldErrors.photos ? '2px dashed #d32f2f' : '2px dashed #d1d5db',
+                    borderRadius: 4,
+                    bgcolor: fieldErrors.photos ? 'rgba(211, 47, 47, 0.02)' : '#fafbfc',
+                    transition: 'all 0.3s ease',
                     '&:hover': {
                       borderColor: fieldErrors.photos ? '#d32f2f' : '#F4C542',
-                      bgcolor: fieldErrors.photos ? 'rgba(211, 47, 47, 0.06)' : '#f8f9fa',
+                      bgcolor: fieldErrors.photos ? 'rgba(211, 47, 47, 0.04)' : 'white',
+                      boxShadow: '0 4px 12px rgba(244, 197, 66, 0.1)',
                     },
                   }}
                 >
@@ -473,32 +649,55 @@ const CreateBooking: React.FC = () => {
                       setFieldErrors({ ...fieldErrors, photos: '' });
                     }}
                   />
-                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 2 }}>
-                    <PhotoCameraIcon sx={{ color: '#032B5A', fontSize: 28 }} />
+                  <Box sx={{ display: 'flex', alignItems: 'flex-start', gap: 3, mb: selectedFiles.length > 0 ? 3 : 0 }}>
+                    <Box
+                      sx={{
+                        width: 56,
+                        height: 56,
+                        borderRadius: 3,
+                        bgcolor: '#F4C542',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        flexShrink: 0,
+                        boxShadow: '0 2px 8px rgba(244, 197, 66, 0.2)',
+                      }}
+                    >
+                      <PhotoCameraIcon sx={{ color: '#032B5A', fontSize: 28 }} />
+                    </Box>
                     <Box sx={{ flexGrow: 1 }}>
-                      <Typography variant="subtitle1" sx={{ fontWeight: 600, color: '#032B5A', mb: 0.5 }}>
-                        Photos du problème
+                      <Typography variant="subtitle1" sx={{ fontWeight: 600, color: '#032B5A', mb: 1, fontSize: '1rem' }}>
+                        Ajoutez des photos
                       </Typography>
-                      <Typography variant="body2" color="text.secondary">
+                      <Typography variant="body2" sx={{ color: '#666', mb: 2.5, lineHeight: 1.6 }}>
                         Ajoutez jusqu'à 5 photos pour aider le technicien à comprendre le problème
                       </Typography>
+                      <label htmlFor="photo-upload">
+                        <Button
+                          variant="contained"
+                          component="span"
+                          startIcon={<PhotoCameraIcon />}
+                          sx={{
+                            textTransform: 'none',
+                            bgcolor: '#032B5A',
+                            color: 'white',
+                            '&:hover': { 
+                              bgcolor: '#021d3f',
+                              transform: 'translateY(-1px)',
+                              boxShadow: '0 4px 12px rgba(3, 43, 90, 0.2)',
+                            },
+                            borderRadius: 3,
+                            px: 3,
+                            py: 1.25,
+                            fontWeight: 600,
+                            fontSize: '0.9rem',
+                            transition: 'all 0.2s ease',
+                          }}
+                        >
+                          {selectedFiles.length > 0 ? 'Modifier les photos' : 'Choisir des photos'} ({selectedFiles.length}/5)
+                        </Button>
+                      </label>
                     </Box>
-                    <label htmlFor="photo-upload">
-                      <Button
-                        variant="outlined"
-                        component="span"
-                        startIcon={<PhotoCameraIcon />}
-                        sx={{
-                          textTransform: 'none',
-                          borderColor: '#032B5A',
-                          color: '#032B5A',
-                          '&:hover': { borderColor: '#021d3f', bgcolor: 'rgba(3, 43, 90, 0.05)' },
-                          borderRadius: 2,
-                        }}
-                      >
-                        {selectedFiles.length > 0 ? 'Modifier' : 'Ajouter'} ({selectedFiles.length}/5)
-                      </Button>
-                    </label>
                   </Box>
 
                   {fieldErrors.photos && (
@@ -508,18 +707,24 @@ const CreateBooking: React.FC = () => {
                   )}
 
                   {previewUrls.length > 0 && (
-                    <Box sx={{ mt: 3 }}>
-                      <Grid container spacing={2}>
+                    <Box sx={{ mt: 3, pt: 3, borderTop: '1px solid #e8eaed' }}>
+                      <Typography variant="body2" sx={{ fontWeight: 600, color: '#032B5A', mb: 2 }}>
+                        Photos sélectionnées ({previewUrls.length}/5)
+                      </Typography>
+                      <Grid container spacing={2.5}>
                         {previewUrls.map((url, index) => (
                           <Grid item xs={6} sm={4} md={2.4} key={index}>
                             <Box
                               sx={{
                                 position: 'relative',
-                                borderRadius: 2,
+                                borderRadius: 3,
                                 overflow: 'hidden',
-                                border: '2px solid #e0e0e0',
+                                border: '2px solid #e8eaed',
+                                transition: 'all 0.2s ease',
                                 '&:hover': {
                                   borderColor: '#F4C542',
+                                  transform: 'translateY(-2px)',
+                                  boxShadow: '0 4px 12px rgba(244, 197, 66, 0.2)',
                                 },
                               }}
                             >
@@ -529,7 +734,7 @@ const CreateBooking: React.FC = () => {
                                 alt={`Preview ${index + 1}`}
                                 sx={{
                                   width: '100%',
-                                  height: 120,
+                                  height: 140,
                                   objectFit: 'cover',
                                   display: 'block',
                                 }}
@@ -539,11 +744,15 @@ const CreateBooking: React.FC = () => {
                                 onClick={() => removePhoto(index)}
                                 sx={{
                                   position: 'absolute',
-                                  top: 4,
-                                  right: 4,
-                                  bgcolor: 'rgba(0,0,0,0.6)',
+                                  top: 8,
+                                  right: 8,
+                                  bgcolor: 'rgba(0,0,0,0.7)',
                                   color: 'white',
-                                  '&:hover': { bgcolor: 'rgba(0,0,0,0.8)' },
+                                  '&:hover': { 
+                                    bgcolor: 'rgba(211, 47, 47, 0.9)',
+                                    transform: 'scale(1.1)',
+                                  },
+                                  transition: 'all 0.2s ease',
                                 }}
                               >
                                 <DeleteIcon fontSize="small" />
@@ -562,51 +771,78 @@ const CreateBooking: React.FC = () => {
             {showSummary && (
               <Card
                 sx={{
-                  mt: 4,
+                  mt: 5,
                   mb: 3,
-                  bgcolor: '#f8f9fa',
+                  bgcolor: '#fafbfc',
                   border: '2px solid #F4C542',
-                  borderRadius: 3,
-                  boxShadow: 2,
+                  borderRadius: 4,
+                  boxShadow: '0 4px 16px rgba(244, 197, 66, 0.15)',
+                  overflow: 'hidden',
                 }}
               >
-                <CardContent sx={{ p: 3 }}>
-                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 3 }}>
-                    <CheckCircleIcon sx={{ color: '#4caf50', fontSize: 28 }} />
-                    <Typography variant="h6" sx={{ fontWeight: 700, color: '#032B5A' }}>
-                      Récapitulatif de la réservation
-                    </Typography>
+                <CardContent sx={{ p: 4 }}>
+                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 3 }}>
+                    <Box
+                      sx={{
+                        width: 48,
+                        height: 48,
+                        borderRadius: 3,
+                        bgcolor: '#4caf50',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        boxShadow: '0 2px 8px rgba(76, 175, 80, 0.2)',
+                      }}
+                    >
+                      <CheckCircleIcon sx={{ color: 'white', fontSize: 28 }} />
+                    </Box>
+                    <Box>
+                      <Typography variant="h6" sx={{ fontWeight: 700, color: '#032B5A', mb: 0.25 }}>
+                        Récapitulatif
+                      </Typography>
+                      <Typography variant="caption" sx={{ color: '#666', fontWeight: 500 }}>
+                        Vérifiez les informations avant de confirmer
+                      </Typography>
+                    </Box>
                   </Box>
-                  <Divider sx={{ mb: 3 }} />
-                  <Grid container spacing={2}>
+                  <Divider sx={{ mb: 4, borderColor: '#e8eaed' }} />
+                  <Grid container spacing={3}>
                     <Grid item xs={12} md={6}>
-                      <Typography variant="body2" color="text.secondary" sx={{ mb: 0.5 }}>
+                      <Typography variant="caption" sx={{ color: '#666', mb: 1, display: 'block', fontWeight: 600, textTransform: 'uppercase', letterSpacing: 0.5, fontSize: '0.75rem' }}>
                         Technicien
                       </Typography>
-                      <Typography variant="body1" sx={{ fontWeight: 600, color: '#032B5A' }}>
+                      <Typography variant="body1" sx={{ fontWeight: 600, color: '#032B5A', fontSize: '1rem' }}>
                         {technician?.user?.name || 'N/A'}
                       </Typography>
                     </Grid>
                     <Grid item xs={12} md={6}>
-                      <Typography variant="body2" color="text.secondary" sx={{ mb: 0.5 }}>
+                      <Typography variant="caption" sx={{ color: '#666', mb: 1, display: 'block', fontWeight: 600, textTransform: 'uppercase', letterSpacing: 0.5, fontSize: '0.75rem' }}>
                         Service
                       </Typography>
-                      <Typography variant="body1" sx={{ fontWeight: 600, color: '#032B5A' }}>
+                      <Typography variant="body1" sx={{ fontWeight: 600, color: '#032B5A', fontSize: '1rem' }}>
                         {categories.find(c => c.id === formData.categoryId)?.name || 'N/A'}
                       </Typography>
                     </Grid>
                     <Grid item xs={12}>
-                      <Typography variant="body2" color="text.secondary" sx={{ mb: 0.5 }}>
+                      <Typography variant="caption" sx={{ color: '#666', mb: 1, display: 'block', fontWeight: 600, textTransform: 'uppercase', letterSpacing: 0.5, fontSize: '0.75rem' }}>
                         Adresse
                       </Typography>
-                      <Typography variant="body1" sx={{ fontWeight: 600, color: '#032B5A' }}>
+                      <Typography variant="body1" sx={{ fontWeight: 600, color: '#032B5A', fontSize: '1rem' }}>
                         {formData.address}, {formData.city}
                       </Typography>
                     </Grid>
                     {isUrgent && (
                       <Grid item xs={12}>
-                        <Alert severity="warning" sx={{ borderRadius: 2, bgcolor: '#fff3cd' }}>
-                          <Typography variant="body2" sx={{ fontWeight: 600 }}>
+                        <Alert 
+                          severity="warning" 
+                          sx={{ 
+                            borderRadius: 3, 
+                            bgcolor: '#fffbf0',
+                            border: '1px solid #F4C542',
+                            boxShadow: '0 2px 8px rgba(244, 197, 66, 0.1)',
+                          }}
+                        >
+                          <Typography variant="body2" sx={{ fontWeight: 600, color: '#032B5A' }}>
                             ⚡ Demande urgente: +100 MAD
                           </Typography>
                         </Alert>
@@ -618,7 +854,7 @@ const CreateBooking: React.FC = () => {
             )}
 
             {/* Action Buttons */}
-            <Box sx={{ display: 'flex', gap: 2, mt: 4, flexWrap: 'wrap' }}>
+            <Box sx={{ display: 'flex', gap: 2, mt: 5, pt: 4, borderTop: '1px solid #e8eaed', flexWrap: 'wrap' }}>
               <Button
                 type="submit"
                 variant="contained"
@@ -629,18 +865,27 @@ const CreateBooking: React.FC = () => {
                   color: '#032B5A',
                   '&:hover': {
                     bgcolor: showSummary ? '#45a049' : '#e0b038',
+                    transform: 'translateY(-2px)',
+                    boxShadow: '0 6px 20px rgba(244, 197, 66, 0.3)',
+                  },
+                  '&:disabled': {
+                    bgcolor: '#e0e0e0',
+                    color: '#9e9e9e',
                   },
                   textTransform: 'none',
-                  minWidth: 200,
-                  py: 1.5,
-                  borderRadius: 2,
+                  minWidth: 220,
+                  py: 1.75,
+                  px: 4,
+                  borderRadius: 3,
                   fontWeight: 700,
-                  boxShadow: 2,
+                  fontSize: '1rem',
+                  boxShadow: '0 4px 12px rgba(244, 197, 66, 0.25)',
+                  transition: 'all 0.2s ease',
                 }}
               >
                 {loading ? (
                   <>
-                    <CircularProgress size={20} sx={{ mr: 1, color: '#032B5A' }} />
+                    <CircularProgress size={20} sx={{ mr: 1.5, color: '#032B5A' }} />
                     Création...
                   </>
                 ) : showSummary ? (
@@ -656,11 +901,19 @@ const CreateBooking: React.FC = () => {
                   sx={{
                     textTransform: 'none',
                     borderColor: '#032B5A',
+                    borderWidth: 2,
                     color: '#032B5A',
-                    '&:hover': { borderColor: '#021d3f', bgcolor: 'rgba(3, 43, 90, 0.05)' },
-                    borderRadius: 2,
-                    py: 1.5,
-                    minWidth: 120,
+                    '&:hover': { 
+                      borderColor: '#021d3f', 
+                      bgcolor: 'rgba(3, 43, 90, 0.05)',
+                      transform: 'translateY(-1px)',
+                    },
+                    borderRadius: 3,
+                    py: 1.75,
+                    px: 3,
+                    minWidth: 140,
+                    fontWeight: 600,
+                    transition: 'all 0.2s ease',
                   }}
                 >
                   Modifier
@@ -671,12 +924,19 @@ const CreateBooking: React.FC = () => {
                 onClick={() => navigate('/client/bookings')}
                 sx={{
                   textTransform: 'none',
-                  borderColor: '#9e9e9e',
-                  color: '#9e9e9e',
-                  '&:hover': { borderColor: '#757575', bgcolor: 'rgba(158, 158, 158, 0.05)' },
-                  borderRadius: 2,
-                  py: 1.5,
-                  minWidth: 120,
+                  borderColor: '#d1d5db',
+                  color: '#666',
+                  '&:hover': { 
+                    borderColor: '#9e9e9e', 
+                    bgcolor: 'rgba(158, 158, 158, 0.05)',
+                    color: '#424242',
+                  },
+                  borderRadius: 3,
+                  py: 1.75,
+                  px: 3,
+                  minWidth: 140,
+                  fontWeight: 600,
+                  transition: 'all 0.2s ease',
                 }}
               >
                 Annuler

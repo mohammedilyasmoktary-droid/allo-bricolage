@@ -139,20 +139,39 @@ const TechnicianAvailabilityCalendar: React.FC<TechnicianAvailabilityCalendarPro
   return (
     <Card
       sx={{
-        boxShadow: 3,
-        borderRadius: 3,
-        border: '1px solid #e0e0e0',
+        boxShadow: '0 2px 8px rgba(3, 43, 90, 0.08)',
+        borderRadius: 4,
+        border: '1px solid #e8eaed',
         height: '100%',
         position: 'sticky',
         top: 20,
+        bgcolor: 'white',
       }}
     >
-      <CardContent sx={{ p: 3 }}>
-        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 3 }}>
-          <CalendarTodayIcon sx={{ color: '#F4C542', fontSize: 28 }} />
-          <Typography variant="h6" sx={{ fontWeight: 700, color: '#032B5A' }}>
-            Choisir la date et l'heure
-          </Typography>
+      <CardContent sx={{ p: { xs: 3, md: 4 } }}>
+        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, mb: 4 }}>
+          <Box
+            sx={{
+              width: 48,
+              height: 48,
+              borderRadius: 3,
+              bgcolor: '#F4C542',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              boxShadow: '0 2px 8px rgba(244, 197, 66, 0.2)',
+            }}
+          >
+            <CalendarTodayIcon sx={{ color: '#032B5A', fontSize: 26 }} />
+          </Box>
+          <Box>
+            <Typography variant="h6" sx={{ fontWeight: 700, color: '#032B5A', mb: 0.25, fontSize: '1.25rem' }}>
+              Date et heure
+            </Typography>
+            <Typography variant="caption" sx={{ color: '#666', fontWeight: 500 }}>
+              Sélectionnez un créneau disponible
+            </Typography>
+          </Box>
         </Box>
 
         {loading ? (
@@ -162,20 +181,35 @@ const TechnicianAvailabilityCalendar: React.FC<TechnicianAvailabilityCalendarPro
         ) : (
           <>
             {/* Date Selection */}
-            <Box sx={{ mb: 3 }}>
-              <Typography variant="subtitle2" sx={{ fontWeight: 600, mb: 2, color: '#032B5A' }}>
+            <Box sx={{ mb: 4 }}>
+              <Typography variant="subtitle2" sx={{ fontWeight: 600, mb: 2.5, color: '#032B5A', fontSize: '0.95rem' }}>
                 Sélectionnez une date
               </Typography>
               <Box
                 sx={{
                   display: 'grid',
                   gridTemplateColumns: 'repeat(7, 1fr)',
-                  gap: 1,
-                  maxHeight: 300,
+                  gap: 1.5,
+                  maxHeight: 320,
                   overflowY: 'auto',
-                  p: 1,
-                  bgcolor: '#f8f9fa',
-                  borderRadius: 2,
+                  p: 2,
+                  bgcolor: '#fafbfc',
+                  borderRadius: 3,
+                  border: '1px solid #e8eaed',
+                  '&::-webkit-scrollbar': {
+                    width: '6px',
+                  },
+                  '&::-webkit-scrollbar-track': {
+                    bgcolor: '#f5f5f5',
+                    borderRadius: 3,
+                  },
+                  '&::-webkit-scrollbar-thumb': {
+                    bgcolor: '#d1d5db',
+                    borderRadius: 3,
+                    '&:hover': {
+                      bgcolor: '#9e9e9e',
+                    },
+                  },
                 }}
               >
                 {days.map((day, index) => {
@@ -190,10 +224,10 @@ const TechnicianAvailabilityCalendar: React.FC<TechnicianAvailabilityCalendarPro
                       onClick={() => handleDateSelect(day)}
                       disabled={isUnavailable || isPast}
                       sx={{
-                        minWidth: 40,
-                        height: 50,
+                        minWidth: 44,
+                        height: 64,
                         p: 0,
-                        borderRadius: 2,
+                        borderRadius: 3,
                         bgcolor: isSelected
                           ? '#F4C542'
                           : isUnavailable
@@ -212,26 +246,50 @@ const TechnicianAvailabilityCalendar: React.FC<TechnicianAvailabilityCalendarPro
                           ? '2px solid #F4C542'
                           : isUnavailable
                           ? '2px solid #d32f2f'
-                          : '1px solid #e0e0e0',
+                          : '1px solid #e8eaed',
+                        boxShadow: isSelected ? '0 2px 8px rgba(244, 197, 66, 0.2)' : 'none',
                         '&:hover': {
                           bgcolor: isUnavailable || isPast
                             ? undefined
                             : isSelected
                             ? '#e0b038'
-                            : 'rgba(244, 197, 66, 0.1)',
+                            : 'rgba(244, 197, 66, 0.08)',
+                          borderColor: isUnavailable || isPast
+                            ? undefined
+                            : isSelected
+                            ? '#F4C542'
+                            : '#F4C542',
+                          transform: isUnavailable || isPast ? undefined : 'translateY(-2px)',
+                          boxShadow: isUnavailable || isPast ? 'none' : '0 4px 12px rgba(244, 197, 66, 0.15)',
                         },
                         '&:disabled': {
                           color: isUnavailable ? '#d32f2f' : '#9e9e9e',
+                          bgcolor: isUnavailable ? '#ffebee' : '#f5f5f5',
                         },
-                        fontSize: '0.75rem',
-                        fontWeight: isSelected || isToday ? 700 : 500,
+                        transition: 'all 0.2s ease',
                       }}
                     >
-                      <Box sx={{ textAlign: 'center' }}>
-                        <Typography variant="caption" sx={{ display: 'block', fontSize: '0.65rem' }}>
+                      <Box sx={{ textAlign: 'center', width: '100%' }}>
+                        <Typography 
+                          variant="caption" 
+                          sx={{ 
+                            display: 'block', 
+                            fontSize: '0.7rem',
+                            fontWeight: 600,
+                            mb: 0.5,
+                            opacity: isPast ? 0.5 : 1,
+                          }}
+                        >
                           {format(day, 'EEE')}
                         </Typography>
-                        <Typography variant="body2" sx={{ fontSize: '0.9rem' }}>
+                        <Typography 
+                          variant="body1" 
+                          sx={{ 
+                            fontSize: '1.1rem',
+                            fontWeight: isSelected || isToday ? 700 : 600,
+                            opacity: isPast ? 0.5 : 1,
+                          }}
+                        >
                           {format(day, 'd')}
                         </Typography>
                       </Box>
@@ -243,12 +301,19 @@ const TechnicianAvailabilityCalendar: React.FC<TechnicianAvailabilityCalendarPro
 
             {/* Time Selection */}
             {selectedDate && (
-              <Box sx={{ mb: 3 }}>
-                <Typography variant="subtitle2" sx={{ fontWeight: 600, mb: 2, color: '#032B5A' }}>
+              <Box sx={{ mb: 4 }}>
+                <Typography variant="subtitle2" sx={{ fontWeight: 600, mb: 2.5, color: '#032B5A', fontSize: '0.95rem' }}>
                   Sélectionnez une heure
                 </Typography>
                 {isDateUnavailable(selectedDate) ? (
-                  <Alert severity="warning" sx={{ borderRadius: 2 }}>
+                  <Alert 
+                    severity="warning" 
+                    sx={{ 
+                      borderRadius: 3,
+                      bgcolor: '#fffbf0',
+                      border: '1px solid #F4C542',
+                    }}
+                  >
                     Cette date n'est pas disponible
                   </Alert>
                 ) : (
@@ -256,12 +321,27 @@ const TechnicianAvailabilityCalendar: React.FC<TechnicianAvailabilityCalendarPro
                     sx={{
                       display: 'grid',
                       gridTemplateColumns: 'repeat(3, 1fr)',
-                      gap: 1,
-                      maxHeight: 200,
+                      gap: 1.5,
+                      maxHeight: 240,
                       overflowY: 'auto',
-                      p: 1,
-                      bgcolor: '#f8f9fa',
-                      borderRadius: 2,
+                      p: 2,
+                      bgcolor: '#fafbfc',
+                      borderRadius: 3,
+                      border: '1px solid #e8eaed',
+                      '&::-webkit-scrollbar': {
+                        width: '6px',
+                      },
+                      '&::-webkit-scrollbar-track': {
+                        bgcolor: '#f5f5f5',
+                        borderRadius: 3,
+                      },
+                      '&::-webkit-scrollbar-thumb': {
+                        bgcolor: '#d1d5db',
+                        borderRadius: 3,
+                        '&:hover': {
+                          bgcolor: '#9e9e9e',
+                        },
+                      },
                     }}
                   >
                     {timeSlots.map((time) => {
@@ -273,9 +353,9 @@ const TechnicianAvailabilityCalendar: React.FC<TechnicianAvailabilityCalendarPro
                           key={time}
                           onClick={() => handleTimeSelect(time)}
                           disabled={isUnavailable}
-                          startIcon={<AccessTimeIcon sx={{ fontSize: 16 }} />}
+                          startIcon={<AccessTimeIcon sx={{ fontSize: 18 }} />}
                           sx={{
-                            borderRadius: 2,
+                            borderRadius: 3,
                             bgcolor: isSelected ? '#F4C542' : isUnavailable ? '#ffebee' : 'white',
                             color: isSelected
                               ? '#032B5A'
@@ -286,20 +366,31 @@ const TechnicianAvailabilityCalendar: React.FC<TechnicianAvailabilityCalendarPro
                               ? '2px solid #F4C542'
                               : isUnavailable
                               ? '2px solid #d32f2f'
-                              : '1px solid #e0e0e0',
+                              : '1px solid #e8eaed',
+                            boxShadow: isSelected ? '0 2px 8px rgba(244, 197, 66, 0.2)' : 'none',
+                            py: 1.25,
                             '&:hover': {
                               bgcolor: isUnavailable
                                 ? undefined
                                 : isSelected
                                 ? '#e0b038'
-                                : 'rgba(244, 197, 66, 0.1)',
+                                : 'rgba(244, 197, 66, 0.08)',
+                              borderColor: isUnavailable
+                                ? undefined
+                                : isSelected
+                                ? '#F4C542'
+                                : '#F4C542',
+                              transform: isUnavailable ? undefined : 'translateY(-1px)',
+                              boxShadow: isUnavailable ? 'none' : '0 4px 12px rgba(244, 197, 66, 0.15)',
                             },
                             '&:disabled': {
                               color: '#d32f2f',
+                              bgcolor: '#ffebee',
                             },
-                            fontSize: '0.85rem',
-                            fontWeight: isSelected ? 700 : 500,
+                            fontSize: '0.9rem',
+                            fontWeight: isSelected ? 700 : 600,
                             textTransform: 'none',
+                            transition: 'all 0.2s ease',
                           }}
                         >
                           {time}
@@ -312,36 +403,37 @@ const TechnicianAvailabilityCalendar: React.FC<TechnicianAvailabilityCalendarPro
             )}
 
             {/* Legend */}
-            <Box sx={{ mt: 3, pt: 2, borderTop: '1px solid #e0e0e0' }}>
-              <Typography variant="caption" sx={{ fontWeight: 600, mb: 1, display: 'block', color: '#032B5A' }}>
-                Légende:
+            <Box sx={{ mt: 4, pt: 3, borderTop: '1px solid #e8eaed' }}>
+              <Typography variant="caption" sx={{ fontWeight: 600, mb: 2, display: 'block', color: '#032B5A', fontSize: '0.85rem' }}>
+                Légende
               </Typography>
-              <Box sx={{ display: 'flex', flexDirection: 'column', gap: 0.5 }}>
-                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+              <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1.5 }}>
+                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
                   <Box
                     sx={{
-                      width: 16,
-                      height: 16,
-                      borderRadius: 1,
+                      width: 20,
+                      height: 20,
+                      borderRadius: 2,
                       bgcolor: '#F4C542',
-                      border: '1px solid #e0e0e0',
+                      border: '1px solid #e8eaed',
+                      boxShadow: '0 1px 3px rgba(244, 197, 66, 0.2)',
                     }}
                   />
-                  <Typography variant="caption" color="text.secondary">
+                  <Typography variant="caption" sx={{ color: '#666', fontWeight: 500, fontSize: '0.85rem' }}>
                     Disponible
                   </Typography>
                 </Box>
-                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
                   <Box
                     sx={{
-                      width: 16,
-                      height: 16,
-                      borderRadius: 1,
+                      width: 20,
+                      height: 20,
+                      borderRadius: 2,
                       bgcolor: '#ffebee',
                       border: '2px solid #d32f2f',
                     }}
                   />
-                  <Typography variant="caption" color="text.secondary">
+                  <Typography variant="caption" sx={{ color: '#666', fontWeight: 500, fontSize: '0.85rem' }}>
                     Indisponible
                   </Typography>
                 </Box>
@@ -349,9 +441,18 @@ const TechnicianAvailabilityCalendar: React.FC<TechnicianAvailabilityCalendarPro
             </Box>
 
             {selectedDate && selectedTime && (
-              <Alert severity="success" sx={{ mt: 2, borderRadius: 2 }}>
-                <Typography variant="body2" sx={{ fontWeight: 600 }}>
-                  Date sélectionnée: {format(selectedDate, 'EEEE d MMMM yyyy')} à {selectedTime}
+              <Alert 
+                severity="success" 
+                sx={{ 
+                  mt: 3, 
+                  borderRadius: 3,
+                  bgcolor: '#f1f8f4',
+                  border: '1px solid #4caf50',
+                  boxShadow: '0 2px 8px rgba(76, 175, 80, 0.1)',
+                }}
+              >
+                <Typography variant="body2" sx={{ fontWeight: 600, color: '#2e7d32' }}>
+                  ✓ {format(selectedDate, 'EEEE d MMMM yyyy')} à {selectedTime}
                 </Typography>
               </Alert>
             )}
