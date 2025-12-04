@@ -178,7 +178,7 @@ const CreateBooking: React.FC = () => {
   };
 
   return (
-    <Box sx={{ maxWidth: 1400, mx: 'auto', px: { xs: 2, md: 3 }, py: { xs: 3, md: 5 }, bgcolor: '#fafbfc' }}>
+    <Box sx={{ maxWidth: 1600, mx: 'auto', px: { xs: 2, md: 4 }, py: { xs: 3, md: 5 }, bgcolor: '#fafbfc', minHeight: '100vh' }}>
       {/* Header */}
       <Box sx={{ mb: 5, display: 'flex', alignItems: 'center', gap: 2 }}>
         <IconButton
