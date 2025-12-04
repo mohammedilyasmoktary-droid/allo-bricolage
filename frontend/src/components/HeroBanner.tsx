@@ -11,26 +11,27 @@ const HeroBanner: React.FC = () => {
     <Box
       sx={{
         width: '100%',
-        minHeight: { xs: '450px', md: '550px' },
+        minHeight: { xs: '550px', md: '650px' },
         background: '#032B5A',
         borderRadius: 2,
-        mb: 4,
+        mb: 6,
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
-        py: { xs: 5, md: 6 },
+        py: { xs: 8, md: 10 },
         px: { xs: 3, md: 4 },
       }}
     >
-      <Box sx={{ textAlign: 'center', maxWidth: 800, mx: 'auto' }}>
+      <Box sx={{ textAlign: 'center', maxWidth: 900, mx: 'auto', width: '100%' }}>
         <Typography
           variant="h1"
           component="h1"
           sx={{
             fontWeight: 700,
             color: 'white',
-            mb: 2,
-            fontSize: { xs: '2.25rem', md: '3rem' },
+            mb: 3,
+            fontSize: { xs: '2.5rem', md: '3.5rem' },
+            lineHeight: 1.2,
           }}
         >
           Besoin d'un Technicien?
@@ -39,16 +40,17 @@ const HeroBanner: React.FC = () => {
           variant="h6"
           sx={{
             color: '#F4C542',
-            mb: 5,
+            mb: 6,
             fontWeight: 400,
-            fontSize: { xs: '1rem', md: '1.25rem' },
+            fontSize: { xs: '1.1rem', md: '1.35rem' },
+            lineHeight: 1.5,
           }}
         >
           Trouvez le professionnel qu'il vous faut en quelques clics
         </Typography>
 
         {/* CTA Buttons */}
-        <Grid container spacing={2} justifyContent="center" sx={{ mb: 5, maxWidth: 600, mx: 'auto' }}>
+        <Grid container spacing={3} justifyContent="center" sx={{ mb: 6, maxWidth: 700, mx: 'auto' }}>
           <Grid item xs={12} sm={6}>
             <Button
               fullWidth
@@ -62,9 +64,9 @@ const HeroBanner: React.FC = () => {
                 color: '#032B5A',
                 '&:hover': { bgcolor: '#e0b038' },
                 textTransform: 'none',
-                py: 2,
+                py: 2.5,
                 fontWeight: 600,
-                fontSize: '1.1rem',
+                fontSize: { xs: '1rem', md: '1.15rem' },
                 borderRadius: 2,
               }}
             >
@@ -94,9 +96,9 @@ const HeroBanner: React.FC = () => {
                   bgcolor: 'rgba(244, 197, 66, 0.1)',
                 },
                 textTransform: 'none',
-                py: 2,
+                py: 2.5,
                 fontWeight: 600,
-                fontSize: '1.1rem',
+                fontSize: { xs: '1rem', md: '1.15rem' },
                 borderRadius: 2,
               }}
             >
@@ -106,29 +108,29 @@ const HeroBanner: React.FC = () => {
         </Grid>
 
         {/* Quick Service Icons */}
-        <Box>
-          <Typography variant="body2" sx={{ color: 'rgba(255,255,255,0.7)', mb: 2 }}>
+        <Box sx={{ mt: 4 }}>
+          <Typography variant="body1" sx={{ color: 'rgba(255,255,255,0.8)', mb: 3, fontSize: { xs: '0.95rem', md: '1rem' } }}>
             Services populaires:
           </Typography>
-          <Box sx={{ display: 'flex', gap: 1.5, justifyContent: 'center', flexWrap: 'wrap' }}>
+          <Box sx={{ display: 'flex', gap: 2, justifyContent: 'center', flexWrap: 'wrap' }}>
             {['Plomberie', 'Électricité', 'Peinture', 'Climatisation', 'Petits travaux', 'Serrurerie'].map((service) => (
               <Button
                 key={service}
                 variant="text"
-                size="small"
+                size="medium"
                 onClick={() => {
                   navigate(`/search?service=${service}`);
                 }}
                 sx={{
                   color: 'white',
-                  border: '1px solid rgba(255,255,255,0.2)',
-                  borderRadius: 1.5,
-                  px: 2,
-                  py: 0.75,
+                  border: '1px solid rgba(255,255,255,0.25)',
+                  borderRadius: 2,
+                  px: 3,
+                  py: 1,
                   textTransform: 'none',
-                  fontSize: '0.875rem',
+                  fontSize: { xs: '0.875rem', md: '0.95rem' },
                   '&:hover': {
-                    bgcolor: 'rgba(244, 197, 66, 0.15)',
+                    bgcolor: 'rgba(244, 197, 66, 0.2)',
                     borderColor: '#F4C542',
                   },
                 }}
