@@ -56,19 +56,15 @@ const TechnicianAvailabilityCalendar: React.FC<TechnicianAvailabilityCalendarPro
       
       setLoading(true);
       try {
-        // Get all bookings for this technician
+        // Get all bookings and filter for this technician's unavailable times
+        // Only include bookings with scheduledDateTime that are not cancelled/declined
         const allBookings = await bookingsApi.getAll();
         const technicianBookings = allBookings.filter(
           (booking) =>
             booking.technicianId === technicianId &&
             booking.scheduledDateTime &&
             booking.status !== 'CANCELLED' &&
-            booking.status !== 'DECLINED' &&
-            (booking.status === 'ACCEPTED' ||
-              booking.status === 'ON_THE_WAY' ||
-              booking.status === 'IN_PROGRESS' ||
-              booking.status === 'COMPLETED' ||
-              booking.status === 'PENDING')
+            booking.status !== 'DECLINED'
         );
         setUnavailableBookings(technicianBookings);
       } catch (error) {
