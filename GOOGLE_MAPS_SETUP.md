@@ -1,77 +1,99 @@
-# 🗺️ Google Maps Integration Setup
+# Google Maps API Setup Guide
 
-## Step 1: Get Google Maps API Key
+## Overview
+The search page already has Google Maps integration. You just need to add your API key to enable the map functionality.
+
+## Step 1: Get a Google Maps API Key
 
 1. Go to [Google Cloud Console](https://console.cloud.google.com/)
 2. Create a new project or select an existing one
-3. Enable the **Maps JavaScript API**:
-   - Go to "APIs & Services" > "Library"
-   - Search for "Maps JavaScript API"
-   - Click "Enable"
+3. Enable the following APIs:
+   - **Maps JavaScript API** (required)
+   - **Geocoding API** (optional, for better address handling)
+   - **Places API** (optional, for location search)
 
-4. Create an API Key:
-   - Go to "APIs & Services" > "Credentials"
-   - Click "Create Credentials" > "API Key"
-   - Copy your API key
-
-5. (Optional) Restrict the API key:
-   - Click on your API key to edit it
+4. Go to **Credentials** → **Create Credentials** → **API Key**
+5. Copy your API key
+6. (Recommended) Restrict your API key:
+   - Click on the API key to edit it
    - Under "Application restrictions", select "HTTP referrers"
-   - Add: `localhost:*` and your production domain
-   - Under "API restrictions", select "Restrict key"
-   - Choose "Maps JavaScript API"
+   - Add your domains:
+     - `localhost:*` (for local development)
+     - `*.vercel.app/*` (for Vercel deployment)
+     - `yourdomain.com/*` (if you have a custom domain)
+   - Under "API restrictions", select "Restrict key" and choose:
+     - Maps JavaScript API
+     - Geocoding API (if enabled)
+     - Places API (if enabled)
 
-## Step 2: Add API Key to Frontend
+## Step 2: Add API Key to Local Environment
 
-1. Create or update `frontend/.env`:
-   ```env
-   VITE_GOOGLE_MAPS_API_KEY=your_actual_api_key_here
+1. Open `frontend/.env` file (create it if it doesn't exist)
+2. Add the following line:
    ```
-
-2. Restart your frontend development server:
-   ```bash
-   cd frontend
-   npm run dev
+   VITE_GOOGLE_MAPS_API_KEY=your_api_key_here
    ```
+3. Replace `your_api_key_here` with your actual API key
+4. Save the file
+5. Restart your development server if it's running
 
-## Step 3: Verify
+## Step 3: Add API Key to Vercel
 
-1. Go to the "Rechercher" (Search) page
-2. Search for technicians
-3. Click the "Carte" (Map) tab
-4. You should see a map with technician markers
+1. Go to your Vercel project dashboard
+2. Navigate to **Settings** → **Environment Variables**
+3. Click **Add New**
+4. Add:
+   - **Name**: `VITE_GOOGLE_MAPS_API_KEY`
+   - **Value**: Your Google Maps API key
+   - **Environment**: Select all (Production, Preview, Development)
+5. Click **Save**
+6. Redeploy your application for the changes to take effect
 
-## Features
+## Step 4: Verify It Works
 
-- ✅ Interactive map showing technician locations
-- ✅ Markers with technician initials
-- ✅ Click markers to see technician info
-- ✅ Click "Voir le profil" to view full profile
-- ✅ Automatic centering based on search results
-- ✅ Supports all Moroccan cities
+1. Start your development server: `npm run dev`
+2. Navigate to the search page (`/search`)
+3. Click on the "Carte" (Map) tab
+4. You should see a map with markers for each technician's city
+
+## Current Implementation
+
+The map component (`TechnicianMap.tsx`) already:
+- ✅ Shows markers for each technician's city
+- ✅ Displays technician info when clicking a marker
+- ✅ Centers the map based on visible technicians
+- ✅ Shows custom markers with technician initials
+- ✅ Handles multiple technicians in the same city
 
 ## Troubleshooting
 
-**Map doesn't show:**
+### Map not showing
+- Check that `VITE_GOOGLE_MAPS_API_KEY` is set in your `.env` file
+- Verify the API key is correct
 - Check browser console for errors
-- Verify API key is correct in `.env`
-- Make sure "Maps JavaScript API" is enabled
-- Check API key restrictions allow your domain
+- Ensure Maps JavaScript API is enabled in Google Cloud Console
 
-**Markers not appearing:**
-- Verify technicians have city information
-- Check that city names match the coordinates file
+### "API key not configured" message
+- Make sure the environment variable name is exactly `VITE_GOOGLE_MAPS_API_KEY`
+- Restart your dev server after adding the key
+- For Vercel, redeploy after adding the environment variable
 
-## Cost
+### Billing issues
+- Google Maps API has a free tier (usually $200/month credit)
+- Monitor usage in Google Cloud Console
+- Set up billing alerts if needed
 
-Google Maps JavaScript API has a free tier:
-- $200 free credit per month
-- First 28,000 map loads free
+## Cost Considerations
+
+Google Maps JavaScript API pricing:
+- First 28,000 map loads per month: FREE
 - After that: $7 per 1,000 loads
 
-For development, you'll likely stay within the free tier.
+For most applications, the free tier is sufficient.
 
+## Security Best Practices
 
-
-
-
+1. **Always restrict your API key** in Google Cloud Console
+2. **Use HTTP referrer restrictions** to limit which domains can use the key
+3. **Don't commit your API key** to version control (it's already in .gitignore)
+4. **Rotate keys** if you suspect they've been compromised
