@@ -1,656 +1,651 @@
-import React, { useState, useEffect } from 'react';
-import { Box, Typography, Button, Grid, Card, CardContent, CircularProgress, CardMedia, Chip } from '@mui/material';
+import React from 'react';
+import { 
+  Box, 
+  Typography, 
+  Button, 
+  Grid, 
+  Card, 
+  CardContent, 
+  Chip,
+  Avatar,
+  Rating,
+  Container
+} from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
-import { categoriesApi, Category } from '../api/categories';
 import HeroBanner from '../components/HeroBanner';
 import LiveTechnicians from '../components/LiveTechnicians';
-import TechnicianShowcase from '../components/TechnicianShowcase';
-import ReviewFeed from '../components/ReviewFeed';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
+import VerifiedUserIcon from '@mui/icons-material/VerifiedUser';
+import SecurityIcon from '@mui/icons-material/Security';
 import StarIcon from '@mui/icons-material/Star';
-import PaymentIcon from '@mui/icons-material/Payment';
-import PlumbingIcon from '@mui/icons-material/Plumbing';
-import ElectricalServicesIcon from '@mui/icons-material/ElectricalServices';
-import BrushIcon from '@mui/icons-material/Brush';
-import AcUnitIcon from '@mui/icons-material/AcUnit';
-import LocalFireDepartmentIcon from '@mui/icons-material/LocalFireDepartment';
-import SquareFootIcon from '@mui/icons-material/SquareFoot';
-import LockIcon from '@mui/icons-material/Lock';
-import HandymanIcon from '@mui/icons-material/Handyman';
-import KitchenIcon from '@mui/icons-material/Kitchen';
-import ConstructionIcon from '@mui/icons-material/Construction';
+import SearchIcon from '@mui/icons-material/Search';
+import PersonIcon from '@mui/icons-material/Person';
+import CalendarTodayIcon from '@mui/icons-material/CalendarToday';
 import BuildIcon from '@mui/icons-material/Build';
+import TrendingUpIcon from '@mui/icons-material/TrendingUp';
+import PeopleIcon from '@mui/icons-material/People';
+import ThumbUpIcon from '@mui/icons-material/ThumbUp';
+import AccessTimeIcon from '@mui/icons-material/AccessTime';
 
 const HomePage: React.FC = () => {
   const navigate = useNavigate();
   const { user } = useAuth();
-  const [categories, setCategories] = useState<Category[]>([]);
-  const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    const loadCategories = async () => {
-      try {
-        const data = await categoriesApi.getAll();
-        // Filter to show only the 8 most important service categories
-        const importantCategories = [
-          'Plomberie',
-          'Électricité',
-          'Climatisation',
-          'Chauffage',
-          'Peinture',
-          'Serrurerie',
-          'Menuiserie',
-          'Maçonnerie',
-        ];
-        const filtered = data.filter((cat) => importantCategories.includes(cat.name));
-        setCategories(filtered);
-      } catch (error) {
-        console.error('Failed to load categories:', error);
-        // Set empty array on error to prevent crash
-        setCategories([]);
-      } finally {
-        setLoading(false);
-      }
-    };
-    loadCategories();
-  }, []);
+  // Testimonials data
+  const testimonials = [
+    {
+      name: 'Ahmed B.',
+      rating: 5,
+      text: 'Service rapide et professionnel, je recommande !',
+      city: 'Casablanca'
+    },
+    {
+      name: 'Fatima L.',
+      rating: 5,
+      text: 'Technicien ponctuel et travail de qualité.',
+      city: 'Rabat'
+    },
+    {
+      name: 'Mohamed K.',
+      rating: 5,
+      text: 'Excellent service, très satisfait du résultat final.',
+      city: 'Marrakech'
+    },
+    {
+      name: 'Aicha M.',
+      rating: 5,
+      text: 'Plateforme fiable, technicien compétent et à l\'heure.',
+      city: 'Fès'
+    }
+  ];
 
+  // Statistics data
+  const statistics = [
+    { value: '+5000', label: 'Clients satisfaits', icon: <PeopleIcon /> },
+    { value: '+300', label: 'Techniciens vérifiés', icon: <VerifiedUserIcon /> },
+    { value: '98%', label: 'Taux de satisfaction', icon: <ThumbUpIcon /> },
+    { value: '24h', label: 'Délai moyen d\'intervention', icon: <AccessTimeIcon /> }
+  ];
 
-  // Get icon for each service category
-  const getCategoryIcon = (name: string) => {
-    const iconMap: Record<string, React.ReactNode> = {
-      'Plomberie': <PlumbingIcon sx={{ fontSize: 48, color: '#032B5A' }} />,
-      'Électricité': <ElectricalServicesIcon sx={{ fontSize: 48, color: '#032B5A' }} />,
-      'Peinture': <BrushIcon sx={{ fontSize: 48, color: '#032B5A' }} />,
-      'Climatisation': <AcUnitIcon sx={{ fontSize: 48, color: '#032B5A' }} />,
-      'Chauffage': <LocalFireDepartmentIcon sx={{ fontSize: 48, color: '#032B5A' }} />,
-      'Carrelage': <SquareFootIcon sx={{ fontSize: 48, color: '#032B5A' }} />,
-      'Serrurerie': <LockIcon sx={{ fontSize: 48, color: '#032B5A' }} />,
-      'Petits travaux': <HandymanIcon sx={{ fontSize: 48, color: '#032B5A' }} />,
-      'Équipements': <KitchenIcon sx={{ fontSize: 48, color: '#032B5A' }} />,
-      'Maçonnerie': <ConstructionIcon sx={{ fontSize: 48, color: '#032B5A' }} />,
-      'Menuiserie': <ConstructionIcon sx={{ fontSize: 48, color: '#032B5A' }} />,
-    };
-    return iconMap[name] || <BuildIcon sx={{ fontSize: 48, color: '#032B5A' }} />;
-  };
+  // How it works steps
+  const steps = [
+    {
+      number: 1,
+      title: 'Choisissez un service',
+      description: 'Sélectionnez le type de service dont vous avez besoin',
+      icon: <SearchIcon />
+    },
+    {
+      number: 2,
+      title: 'Sélectionnez un technicien',
+      description: 'Parcourez les profils et choisissez le professionnel idéal',
+      icon: <PersonIcon />
+    },
+    {
+      number: 3,
+      title: 'Réservez la date et l\'heure',
+      description: 'Planifiez votre intervention selon vos disponibilités',
+      icon: <CalendarTodayIcon />
+    },
+    {
+      number: 4,
+      title: 'Le technicien intervient rapidement',
+      description: 'Votre technicien arrive à l\'heure et effectue le travail',
+      icon: <BuildIcon />
+    }
+  ];
 
   return (
-    <Box sx={{ pb: 6 }}>
+    <Box sx={{ pb: { xs: 4, md: 8 } }}>
       {/* Hero Banner */}
       <HeroBanner />
 
-      {/* Live Technicians Section */}
-      <Box sx={{ mb: 8 }}>
-        <LiveTechnicians />
+      {/* Why Choose AlloBricolage Section */}
+      <Box sx={{ py: { xs: 6, md: 10 }, bgcolor: '#fafbfc' }}>
+        <Container maxWidth="lg">
+          <Box sx={{ textAlign: 'center', mb: { xs: 5, md: 7 } }}>
+            <Typography
+              variant="h3"
+              component="h2"
+              sx={{
+                fontWeight: 700,
+                color: '#032B5A',
+                mb: 2,
+                fontSize: { xs: '1.75rem', md: '2.5rem' }
+              }}
+            >
+              Pourquoi choisir Allo Bricolage ?
+            </Typography>
+            <Typography
+              variant="body1"
+              sx={{
+                color: 'text.secondary',
+                maxWidth: 700,
+                mx: 'auto',
+                fontSize: { xs: '0.95rem', md: '1.1rem' }
+              }}
+            >
+              La plateforme de confiance pour tous vos besoins de maintenance et réparation au Maroc
+            </Typography>
+          </Box>
+
+          <Grid container spacing={{ xs: 3, md: 4 }}>
+            <Grid item xs={12} md={4}>
+              <Card
+                sx={{
+                  height: '100%',
+                  textAlign: 'center',
+                  p: { xs: 3, md: 4 },
+                  border: '1px solid #e8eaed',
+                  borderRadius: 3,
+                  bgcolor: 'white',
+                  transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+                  boxShadow: '0 2px 8px rgba(0,0,0,0.08)',
+                  '&:hover': {
+                    transform: 'translateY(-8px)',
+                    boxShadow: '0 12px 32px rgba(3, 43, 90, 0.15)',
+                    borderColor: '#F4C542',
+                  },
+                }}
+              >
+                <Box
+                  sx={{
+                    width: { xs: 70, md: 90 },
+                    height: { xs: 70, md: 90 },
+                    borderRadius: '50%',
+                    bgcolor: '#F4C542',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    mx: 'auto',
+                    mb: 3,
+                    boxShadow: '0 4px 16px rgba(244, 197, 66, 0.3)',
+                  }}
+                >
+                  <CheckCircleIcon sx={{ fontSize: { xs: 40, md: 50 }, color: '#032B5A' }} />
+                </Box>
+                <Typography
+                  variant="h5"
+                  gutterBottom
+                  sx={{
+                    fontWeight: 700,
+                    color: '#032B5A',
+                    mb: 2,
+                    fontSize: { xs: '1.15rem', md: '1.35rem' }
+                  }}
+                >
+                  Garantie Satisfait ou Refait
+                </Typography>
+                <Typography
+                  variant="body1"
+                  color="text.secondary"
+                  sx={{
+                    lineHeight: 1.8,
+                    fontSize: { xs: '0.9rem', md: '1rem' }
+                  }}
+                >
+                  Nous garantissons un travail conforme, ou nous revenons gratuitement.
+                </Typography>
+              </Card>
+            </Grid>
+
+            <Grid item xs={12} md={4}>
+              <Card
+                sx={{
+                  height: '100%',
+                  textAlign: 'center',
+                  p: { xs: 3, md: 4 },
+                  border: '1px solid #e8eaed',
+                  borderRadius: 3,
+                  bgcolor: 'white',
+                  transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+                  boxShadow: '0 2px 8px rgba(0,0,0,0.08)',
+                  '&:hover': {
+                    transform: 'translateY(-8px)',
+                    boxShadow: '0 12px 32px rgba(3, 43, 90, 0.15)',
+                    borderColor: '#F4C542',
+                  },
+                }}
+              >
+                <Box
+                  sx={{
+                    width: { xs: 70, md: 90 },
+                    height: { xs: 70, md: 90 },
+                    borderRadius: '50%',
+                    bgcolor: '#F4C542',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    mx: 'auto',
+                    mb: 3,
+                    boxShadow: '0 4px 16px rgba(244, 197, 66, 0.3)',
+                  }}
+                >
+                  <VerifiedUserIcon sx={{ fontSize: { xs: 40, md: 50 }, color: '#032B5A' }} />
+                </Box>
+                <Typography
+                  variant="h5"
+                  gutterBottom
+                  sx={{
+                    fontWeight: 700,
+                    color: '#032B5A',
+                    mb: 2,
+                    fontSize: { xs: '1.15rem', md: '1.35rem' }
+                  }}
+                >
+                  Techniciens Vérifiés
+                </Typography>
+                <Typography
+                  variant="body1"
+                  color="text.secondary"
+                  sx={{
+                    lineHeight: 1.8,
+                    fontSize: { xs: '0.9rem', md: '1rem' }
+                  }}
+                >
+                  Chaque technicien est contrôlé : documents, expérience, et évaluations.
+                </Typography>
+              </Card>
+            </Grid>
+
+            <Grid item xs={12} md={4}>
+              <Card
+                sx={{
+                  height: '100%',
+                  textAlign: 'center',
+                  p: { xs: 3, md: 4 },
+                  border: '1px solid #e8eaed',
+                  borderRadius: 3,
+                  bgcolor: 'white',
+                  transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+                  boxShadow: '0 2px 8px rgba(0,0,0,0.08)',
+                  '&:hover': {
+                    transform: 'translateY(-8px)',
+                    boxShadow: '0 12px 32px rgba(3, 43, 90, 0.15)',
+                    borderColor: '#F4C542',
+                  },
+                }}
+              >
+                <Box
+                  sx={{
+                    width: { xs: 70, md: 90 },
+                    height: { xs: 70, md: 90 },
+                    borderRadius: '50%',
+                    bgcolor: '#F4C542',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    mx: 'auto',
+                    mb: 3,
+                    boxShadow: '0 4px 16px rgba(244, 197, 66, 0.3)',
+                  }}
+                >
+                  <SecurityIcon sx={{ fontSize: { xs: 40, md: 50 }, color: '#032B5A' }} />
+                </Box>
+                <Typography
+                  variant="h5"
+                  gutterBottom
+                  sx={{
+                    fontWeight: 700,
+                    color: '#032B5A',
+                    mb: 2,
+                    fontSize: { xs: '1.15rem', md: '1.35rem' }
+                  }}
+                >
+                  Assurance Responsabilité Civile
+                </Typography>
+                <Typography
+                  variant="body1"
+                  color="text.secondary"
+                  sx={{
+                    lineHeight: 1.8,
+                    fontSize: { xs: '0.9rem', md: '1rem' }
+                  }}
+                >
+                  Vos travaux sont couverts en cas de dommages.
+                </Typography>
+              </Card>
+            </Grid>
+          </Grid>
+        </Container>
       </Box>
 
-      {/* Services Catalog Section */}
-      <Box sx={{ mb: 10 }}>
-        <Typography variant="h4" component="h2" gutterBottom sx={{ fontWeight: 600, mb: 1, color: '#032B5A', textAlign: 'center' }}>
-          Nos Services
-        </Typography>
-        <Typography variant="body1" sx={{ mb: 4, textAlign: 'center', color: 'text.secondary', maxWidth: 600, mx: 'auto' }}>
-          Découvrez notre large gamme de services de maintenance et réparation
-        </Typography>
-        {loading ? (
-          <Box display="flex" justifyContent="center" py={4}>
-            <CircularProgress />
+      {/* Platform Statistics Section */}
+      <Box sx={{ py: { xs: 6, md: 10 }, bgcolor: 'white' }}>
+        <Container maxWidth="lg">
+          <Box sx={{ textAlign: 'center', mb: { xs: 5, md: 7 } }}>
+            <Typography
+              variant="h3"
+              component="h2"
+              sx={{
+                fontWeight: 700,
+                color: '#032B5A',
+                mb: 2,
+                fontSize: { xs: '1.75rem', md: '2.5rem' }
+              }}
+            >
+              Allo Bricolage en Chiffres
+            </Typography>
+            <Typography
+              variant="body1"
+              sx={{
+                color: 'text.secondary',
+                maxWidth: 700,
+                mx: 'auto',
+                fontSize: { xs: '0.95rem', md: '1.1rem' }
+              }}
+            >
+              Des résultats qui parlent d'eux-mêmes
+            </Typography>
           </Box>
-        ) : (
-          <Grid container spacing={3}>
-            {categories.map((category, index) => (
-              <Grid item xs={12} sm={6} md={4} lg={3} key={category.id}>
+
+          <Grid container spacing={{ xs: 2, md: 4 }}>
+            {statistics.map((stat, index) => (
+              <Grid item xs={6} md={3} key={index}>
                 <Card
                   sx={{
                     height: '100%',
-                    display: 'flex',
-                    flexDirection: 'column',
-                    transition: 'transform 0.3s, box-shadow 0.3s',
+                    textAlign: 'center',
+                    p: { xs: 2.5, md: 4 },
+                    border: '1px solid #e8eaed',
+                    borderRadius: 3,
+                    bgcolor: 'white',
+                    transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+                    boxShadow: '0 2px 8px rgba(0,0,0,0.08)',
                     '&:hover': {
-                      transform: 'translateY(-8px)',
-                      boxShadow: '0 8px 24px rgba(3, 43, 90, 0.15)',
+                      transform: 'translateY(-6px)',
+                      boxShadow: '0 12px 32px rgba(3, 43, 90, 0.15)',
+                      borderColor: '#F4C542',
                     },
-                    cursor: 'pointer',
-                    border: '1px solid #e0e0e0',
-                    borderRadius: 2,
-                    overflow: 'hidden',
-                  }}
-                  onClick={() => {
-                    if (user?.role === 'CLIENT') {
-                      navigate(`/service/${category.id}`);
-                    } else if (!user) {
-                      navigate('/register');
-                    }
                   }}
                 >
-                  <Box 
-                    sx={{ 
-                      height: 140, 
-                      bgcolor: '#f8f9fa', 
-                      display: 'flex', 
-                      alignItems: 'center', 
+                  <Box
+                    sx={{
+                      width: { xs: 60, md: 80 },
+                      height: { xs: 60, md: 80 },
+                      borderRadius: '50%',
+                      bgcolor: '#F4C542',
+                      display: 'flex',
+                      alignItems: 'center',
                       justifyContent: 'center',
-                      borderBottom: '2px solid #e0e0e0',
+                      mx: 'auto',
+                      mb: 2,
+                      boxShadow: '0 4px 16px rgba(244, 197, 66, 0.3)',
                     }}
                   >
-                    <Box
-                      sx={{
-                        width: 90,
-                        height: 90,
-                        borderRadius: '50%',
-                        bgcolor: '#F4C542',
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        boxShadow: '0 4px 12px rgba(244, 197, 66, 0.3)',
-                      }}
-                    >
-                      {getCategoryIcon(category.name)}
-                    </Box>
+                    {React.cloneElement(stat.icon, {
+                      sx: { fontSize: { xs: 32, md: 42 }, color: '#032B5A' }
+                    })}
                   </Box>
-                  <CardContent sx={{ flexGrow: 1, textAlign: 'center', p: 3 }}>
-                    <Typography variant="h6" gutterBottom sx={{ fontWeight: 600, color: '#032B5A', mb: 1.5 }}>
-                      {category.name}
-                    </Typography>
-                    {category.description && (
-                      <Typography variant="body2" color="text.secondary" sx={{ mb: 2.5, minHeight: 48 }}>
-                        {category.description}
-                      </Typography>
-                    )}
-                    <Button
-                      variant="contained"
-                      fullWidth
-                      sx={{
-                        bgcolor: '#032B5A',
-                        color: 'white',
-                        '&:hover': { bgcolor: '#021d3f' },
-                        textTransform: 'none',
-                        mt: 'auto',
-                        fontWeight: 500,
-                        py: 1,
-                      }}
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        if (user?.role === 'CLIENT') {
-                          navigate(`/service/${category.id}`);
-                        } else if (!user) {
-                          navigate('/register');
-                        }
-                      }}
-                    >
-                      Réserver
-                    </Button>
-                  </CardContent>
+                  <Typography
+                    variant="h3"
+                    sx={{
+                      fontWeight: 800,
+                      color: '#032B5A',
+                      mb: 1,
+                      fontSize: { xs: '1.75rem', md: '2.5rem' }
+                    }}
+                  >
+                    {stat.value}
+                  </Typography>
+                  <Typography
+                    variant="body1"
+                    sx={{
+                      color: 'text.secondary',
+                      fontWeight: 500,
+                      fontSize: { xs: '0.85rem', md: '1rem' }
+                    }}
+                  >
+                    {stat.label}
+                  </Typography>
                 </Card>
               </Grid>
             ))}
           </Grid>
-        )}
+        </Container>
       </Box>
 
-      {/* Technician Showcase Section */}
-      <Box sx={{ mb: 10 }}>
-        <TechnicianShowcase />
-      </Box>
+      {/* How It Works Section */}
+      <Box sx={{ py: { xs: 6, md: 10 }, bgcolor: '#fafbfc' }}>
+        <Container maxWidth="lg">
+          <Box sx={{ textAlign: 'center', mb: { xs: 5, md: 7 } }}>
+            <Typography
+              variant="h3"
+              component="h2"
+              sx={{
+                fontWeight: 700,
+                color: '#032B5A',
+                mb: 2,
+                fontSize: { xs: '1.75rem', md: '2.5rem' }
+              }}
+            >
+              Comment ça marche ?
+            </Typography>
+            <Typography
+              variant="body1"
+              sx={{
+                color: 'text.secondary',
+                maxWidth: 700,
+                mx: 'auto',
+                fontSize: { xs: '0.95rem', md: '1.1rem' }
+              }}
+            >
+              Quatre étapes simples pour obtenir le service dont vous avez besoin
+            </Typography>
+          </Box>
 
-      {/* Review Feed Section */}
-      <Box sx={{ mb: 10 }}>
-        <ReviewFeed />
-      </Box>
-
-      {/* Subscription Plans Section */}
-      {(!user || user.role === 'TECHNICIAN') && (
-        <Box sx={{ mb: 10, py: 6, bgcolor: '#f8f9fa', borderRadius: 3, px: 3 }}>
-          <Typography
-            variant="h4"
-            component="h2"
-            gutterBottom
-            sx={{ fontWeight: 600, mb: 2, color: '#032B5A', textAlign: 'center' }}
-          >
-            Plans d'Abonnement pour Techniciens
-          </Typography>
-          <Typography
-            variant="body1"
-            sx={{ mb: 4, textAlign: 'center', color: 'text.secondary', maxWidth: 800, mx: 'auto' }}
-          >
-            Choisissez le plan qui correspond à vos besoins et développez votre activité
-          </Typography>
-
-          <Grid container spacing={4} sx={{ maxWidth: 1200, mx: 'auto', mt: 2 }}>
-            {/* Free Trial Plan */}
-            <Grid item xs={12} md={4}>
-              <Card
-                sx={{
-                  height: '100%',
-                  display: 'flex',
-                  flexDirection: 'column',
-                  border: '2px solid #e0e0e0',
-                  borderRadius: 3,
-                  transition: 'transform 0.3s, box-shadow 0.3s',
-                  '&:hover': {
-                    transform: 'translateY(-8px)',
-                    boxShadow: '0 12px 24px rgba(0,0,0,0.15)',
-                  },
-                }}
-              >
-                <CardContent sx={{ flexGrow: 1, p: 4 }}>
-                  <Box sx={{ textAlign: 'center', mb: 3 }}>
-                    <Chip
-                      label="Essai Gratuit"
-                      sx={{
-                        bgcolor: '#032B5A',
-                        color: 'white',
-                        fontWeight: 600,
-                        mb: 2,
-                        px: 2,
-                        py: 0.5,
-                      }}
-                    />
-                    <Typography variant="h3" sx={{ color: '#032B5A', fontWeight: 700, mb: 1 }}>
-                      0 MAD
-                    </Typography>
-                    <Typography variant="body2" color="text.secondary">
-                      7 jours d'essai
-                    </Typography>
-                  </Box>
-
-                  <Box sx={{ mb: 3 }}>
-                    {[
-                      '7 jours d\'essai gratuit',
-                      'Maximum 3 demandes',
-                      'Listage standard',
-                      'Support de base',
-                    ].map((benefit, index) => (
-                      <Box key={index} sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1.5 }}>
-                        <CheckCircleIcon sx={{ fontSize: 20, color: '#032B5A' }} />
-                        <Typography variant="body2">{benefit}</Typography>
-                      </Box>
-                    ))}
-                  </Box>
-
-                  <Button
-                    fullWidth
-                    variant="outlined"
-                    onClick={() => {
-                      if (user?.role === 'TECHNICIAN') {
-                        navigate('/technician/subscription');
-                      } else {
-                        navigate('/register?role=TECHNICIAN');
-                      }
-                    }}
-                    sx={{
-                      borderColor: '#032B5A',
-                      color: '#032B5A',
-                      '&:hover': {
-                        borderColor: '#021d3f',
-                        bgcolor: 'rgba(3, 43, 90, 0.05)',
-                      },
-                      textTransform: 'none',
-                      py: 1.5,
-                      fontWeight: 600,
-                      mt: 'auto',
-                    }}
-                  >
-                    Commencer l'essai
-                  </Button>
-                </CardContent>
-              </Card>
-            </Grid>
-
-            {/* Basic Plan */}
-            <Grid item xs={12} md={4}>
-              <Card
-                sx={{
-                  height: '100%',
-                  display: 'flex',
-                  flexDirection: 'column',
-                  border: '2px solid #F4C542',
-                  borderRadius: 3,
-                  position: 'relative',
-                  transition: 'transform 0.3s, box-shadow 0.3s',
-                  '&:hover': {
-                    transform: 'translateY(-8px)',
-                    boxShadow: '0 12px 24px rgba(244, 197, 66, 0.3)',
-                  },
-                }}
-              >
-                <Box
+          <Grid container spacing={{ xs: 3, md: 4 }}>
+            {steps.map((step, index) => (
+              <Grid item xs={12} sm={6} md={3} key={index}>
+                <Card
                   sx={{
-                    position: 'absolute',
-                    top: -12,
-                    right: 20,
-                    bgcolor: '#F4C542',
-                    color: '#032B5A',
-                    px: 2,
-                    py: 0.5,
-                    borderRadius: 2,
-                    fontSize: '0.75rem',
-                    fontWeight: 600,
+                    height: '100%',
+                    textAlign: 'center',
+                    p: { xs: 3, md: 4 },
+                    border: '1px solid #e8eaed',
+                    borderRadius: 3,
+                    bgcolor: 'white',
+                    transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+                    boxShadow: '0 2px 8px rgba(0,0,0,0.08)',
+                    position: 'relative',
+                    '&:hover': {
+                      transform: 'translateY(-8px)',
+                      boxShadow: '0 12px 32px rgba(3, 43, 90, 0.15)',
+                      borderColor: '#F4C542',
+                    },
                   }}
                 >
-                  Populaire
-                </Box>
-                <CardContent sx={{ flexGrow: 1, p: 4 }}>
-                  <Box sx={{ textAlign: 'center', mb: 3 }}>
-                    <Chip
-                      label="Basique"
-                      sx={{
-                        bgcolor: '#F4C542',
-                        color: '#032B5A',
-                        fontWeight: 600,
-                        mb: 2,
-                        px: 2,
-                        py: 0.5,
-                      }}
-                    />
-                    <Typography variant="h3" sx={{ color: '#032B5A', fontWeight: 700, mb: 1 }}>
-                      99 MAD
-                    </Typography>
-                    <Typography variant="body2" color="text.secondary">
-                      par mois
-                    </Typography>
-                  </Box>
-
-                  <Box sx={{ mb: 3 }}>
-                    {[
-                      'Demandes illimitées',
-                      'Listage normal',
-                      'Support standard',
-                      'Accès complet à la plateforme',
-                    ].map((benefit, index) => (
-                      <Box key={index} sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1.5 }}>
-                        <CheckCircleIcon sx={{ fontSize: 20, color: '#F4C542' }} />
-                        <Typography variant="body2">{benefit}</Typography>
-                      </Box>
-                    ))}
-                  </Box>
-
-                  <Button
-                    fullWidth
-                    variant="contained"
-                    onClick={() => {
-                      if (user?.role === 'TECHNICIAN') {
-                        navigate('/technician/subscription');
-                      } else {
-                        navigate('/register?role=TECHNICIAN');
-                      }
-                    }}
+                  <Box
                     sx={{
+                      position: 'absolute',
+                      top: -20,
+                      left: '50%',
+                      transform: 'translateX(-50%)',
+                      width: 40,
+                      height: 40,
+                      borderRadius: '50%',
                       bgcolor: '#F4C542',
-                      color: '#032B5A',
-                      '&:hover': {
-                        bgcolor: '#e0b038',
-                      },
-                      textTransform: 'none',
-                      py: 1.5,
-                      fontWeight: 600,
-                      mt: 'auto',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      boxShadow: '0 4px 12px rgba(244, 197, 66, 0.4)',
+                      zIndex: 1,
                     }}
                   >
-                    Choisir Basique
-                  </Button>
-                </CardContent>
-              </Card>
-            </Grid>
+                    <Typography
+                      sx={{
+                        color: '#032B5A',
+                        fontWeight: 800,
+                        fontSize: '1.25rem'
+                      }}
+                    >
+                      {step.number}
+                    </Typography>
+                  </Box>
+                  <Box
+                    sx={{
+                      width: { xs: 70, md: 90 },
+                      height: { xs: 70, md: 90 },
+                      borderRadius: '50%',
+                      bgcolor: '#032B5A',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      mx: 'auto',
+                      mb: 3,
+                      mt: 2,
+                      boxShadow: '0 4px 16px rgba(3, 43, 90, 0.2)',
+                    }}
+                  >
+                    {React.cloneElement(step.icon, {
+                      sx: { fontSize: { xs: 40, md: 50 }, color: '#F4C542' }
+                    })}
+                  </Box>
+                  <Typography
+                    variant="h6"
+                    gutterBottom
+                    sx={{
+                      fontWeight: 700,
+                      color: '#032B5A',
+                      mb: 1.5,
+                      fontSize: { xs: '1.05rem', md: '1.2rem' }
+                    }}
+                  >
+                    {step.title}
+                  </Typography>
+                  <Typography
+                    variant="body2"
+                    color="text.secondary"
+                    sx={{
+                      lineHeight: 1.7,
+                      fontSize: { xs: '0.85rem', md: '0.95rem' }
+                    }}
+                  >
+                    {step.description}
+                  </Typography>
+                </Card>
+              </Grid>
+            ))}
+          </Grid>
+        </Container>
+      </Box>
 
-            {/* Premium Plan */}
-            <Grid item xs={12} md={4}>
-              <Card
-                sx={{
-                  height: '100%',
-                  display: 'flex',
-                  flexDirection: 'column',
-                  border: '2px solid #032B5A',
-                  borderRadius: 3,
-                  bgcolor: 'rgba(3, 43, 90, 0.02)',
-                  position: 'relative',
-                  transition: 'transform 0.3s, box-shadow 0.3s',
-                  '&:hover': {
-                    transform: 'translateY(-8px)',
-                    boxShadow: '0 12px 24px rgba(3, 43, 90, 0.2)',
-                  },
-                }}
-              >
-                <Box
+      {/* Customer Reviews Section */}
+      <Box sx={{ py: { xs: 6, md: 10 }, bgcolor: 'white' }}>
+        <Container maxWidth="lg">
+          <Box sx={{ textAlign: 'center', mb: { xs: 5, md: 7 } }}>
+            <Typography
+              variant="h3"
+              component="h2"
+              sx={{
+                fontWeight: 700,
+                color: '#032B5A',
+                mb: 2,
+                fontSize: { xs: '1.75rem', md: '2.5rem' }
+              }}
+            >
+              Ce que disent nos clients
+            </Typography>
+            <Typography
+              variant="body1"
+              sx={{
+                color: 'text.secondary',
+                maxWidth: 700,
+                mx: 'auto',
+                fontSize: { xs: '0.95rem', md: '1.1rem' }
+              }}
+            >
+              Découvrez les témoignages de nos clients satisfaits
+            </Typography>
+          </Box>
+
+          <Grid container spacing={{ xs: 2, md: 3 }}>
+            {testimonials.map((testimonial, index) => (
+              <Grid item xs={12} sm={6} md={3} key={index}>
+                <Card
                   sx={{
-                    position: 'absolute',
-                    top: -12,
-                    right: 20,
-                    bgcolor: '#032B5A',
-                    color: '#F4C542',
-                    px: 2,
-                    py: 0.5,
-                    borderRadius: 2,
-                    fontSize: '0.75rem',
-                    fontWeight: 600,
+                    height: '100%',
+                    p: { xs: 2.5, md: 3.5 },
+                    border: '1px solid #e8eaed',
+                    borderRadius: 3,
+                    bgcolor: 'white',
+                    transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+                    boxShadow: '0 2px 8px rgba(0,0,0,0.08)',
                     display: 'flex',
-                    alignItems: 'center',
-                    gap: 0.5,
+                    flexDirection: 'column',
+                    '&:hover': {
+                      transform: 'translateY(-6px)',
+                      boxShadow: '0 12px 32px rgba(3, 43, 90, 0.15)',
+                      borderColor: '#F4C542',
+                    },
                   }}
                 >
-                  <StarIcon sx={{ fontSize: 16 }} />
-                  Premium
-                </Box>
-                <CardContent sx={{ flexGrow: 1, p: 4 }}>
-                  <Box sx={{ textAlign: 'center', mb: 3 }}>
-                    <Chip
-                      label="Premium"
+                  <Box sx={{ mb: 2 }}>
+                    <Rating value={testimonial.rating} readOnly size="small" sx={{ color: '#F4C542', mb: 1.5 }} />
+                    <Typography
+                      variant="body1"
+                      sx={{
+                        color: '#032B5A',
+                        fontWeight: 500,
+                        fontSize: { xs: '0.9rem', md: '1rem' },
+                        lineHeight: 1.6,
+                        mb: 2,
+                      }}
+                    >
+                      "{testimonial.text}"
+                    </Typography>
+                  </Box>
+                  <Box sx={{ mt: 'auto', display: 'flex', alignItems: 'center', gap: 1.5 }}>
+                    <Avatar
                       sx={{
                         bgcolor: '#032B5A',
                         color: '#F4C542',
-                        fontWeight: 600,
-                        mb: 2,
-                        px: 2,
-                        py: 0.5,
+                        width: { xs: 36, md: 40 },
+                        height: { xs: 36, md: 40 },
+                        fontSize: { xs: '0.9rem', md: '1rem' },
+                        fontWeight: 700,
                       }}
-                    />
-                    <Typography variant="h3" sx={{ color: '#032B5A', fontWeight: 700, mb: 1 }}>
-                      199 MAD
-                    </Typography>
-                    <Typography variant="body2" color="text.secondary">
-                      par mois
-                    </Typography>
+                    >
+                      {testimonial.name.charAt(0)}
+                    </Avatar>
+                    <Box>
+                      <Typography
+                        variant="body2"
+                        sx={{
+                          fontWeight: 700,
+                          color: '#032B5A',
+                          fontSize: { xs: '0.85rem', md: '0.95rem' }
+                        }}
+                      >
+                        {testimonial.name}
+                      </Typography>
+                      <Typography
+                        variant="caption"
+                        sx={{
+                          color: 'text.secondary',
+                          fontSize: { xs: '0.75rem', md: '0.8rem' }
+                        }}
+                      >
+                        {testimonial.city}
+                      </Typography>
+                    </Box>
                   </Box>
-
-                  <Box sx={{ mb: 3 }}>
-                    {[
-                      'Demandes illimitées',
-                      'Listage prioritaire',
-                      'Badge "Premium"',
-                      'Accès aux statistiques',
-                      'Support prioritaire',
-                    ].map((benefit, index) => (
-                      <Box key={index} sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1.5 }}>
-                        <CheckCircleIcon sx={{ fontSize: 20, color: '#F4C542' }} />
-                        <Typography variant="body2" sx={{ fontWeight: index < 2 ? 500 : 400 }}>
-                          {benefit}
-                        </Typography>
-                      </Box>
-                    ))}
-                  </Box>
-
-                  <Button
-                    fullWidth
-                    variant="contained"
-                    onClick={() => {
-                      if (user?.role === 'TECHNICIAN') {
-                        navigate('/technician/subscription');
-                      } else {
-                        navigate('/register?role=TECHNICIAN');
-                      }
-                    }}
-                    sx={{
-                      bgcolor: '#032B5A',
-                      color: 'white',
-                      '&:hover': {
-                        bgcolor: '#021d3f',
-                      },
-                      textTransform: 'none',
-                      py: 1.5,
-                      fontWeight: 600,
-                      mt: 'auto',
-                    }}
-                  >
-                    Choisir Premium
-                  </Button>
-                </CardContent>
-              </Card>
-            </Grid>
+                </Card>
+              </Grid>
+            ))}
           </Grid>
+        </Container>
+      </Box>
 
-          <Box sx={{ textAlign: 'center', mt: 4 }}>
-            <Typography variant="body2" color="text.secondary">
-              Tous les plans incluent un essai gratuit de 7 jours • Annulation à tout moment
-            </Typography>
-          </Box>
-        </Box>
-      )}
-
-      {/* Features Section - Professional */}
-      <Box sx={{ mb: 10, py: 8, bgcolor: '#f8f9fa', borderRadius: 4, px: { xs: 3, md: 4 } }}>
-        <Box sx={{ textAlign: 'center', mb: 6 }}>
-          <Typography
-            variant="h4"
-            component="h2"
-            gutterBottom
-            sx={{ fontWeight: 700, mb: 2, color: '#032B5A' }}
-          >
-            Pourquoi choisir Allo Bricolage ?
-          </Typography>
-          <Typography variant="body1" sx={{ color: 'text.secondary', maxWidth: 700, mx: 'auto' }}>
-            La plateforme de confiance pour tous vos besoins de maintenance et réparation au Maroc
-          </Typography>
-        </Box>
-        <Grid container spacing={4} sx={{ maxWidth: 1200, mx: 'auto' }}>
-          <Grid item xs={12} md={4}>
-            <Card
-              sx={{
-                height: '100%',
-                textAlign: 'center',
-                p: 4,
-                border: '1px solid #e0e0e0',
-                borderRadius: 3,
-                transition: 'all 0.3s',
-                bgcolor: 'white',
-                '&:hover': {
-                  transform: 'translateY(-8px)',
-                  boxShadow: '0 12px 32px rgba(3, 43, 90, 0.15)',
-                  borderColor: '#F4C542',
-                },
-              }}
-            >
-              <Box
-                sx={{
-                  width: 80,
-                  height: 80,
-                  borderRadius: '50%',
-                  bgcolor: '#F4C542',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  mx: 'auto',
-                  mb: 3,
-                  boxShadow: '0 4px 16px rgba(244, 197, 66, 0.3)',
-                }}
-              >
-                <CheckCircleIcon sx={{ fontSize: 48, color: '#032B5A' }} />
-              </Box>
-              <Typography variant="h5" gutterBottom sx={{ fontWeight: 700, color: '#032B5A', mb: 2 }}>
-                Techniciens qualifiés
-              </Typography>
-              <Typography variant="body1" color="text.secondary" sx={{ lineHeight: 1.8 }}>
-                Tous nos techniciens sont vérifiés et certifiés pour garantir un service de qualité professionnelle
-              </Typography>
-            </Card>
-          </Grid>
-          <Grid item xs={12} md={4}>
-            <Card
-              sx={{
-                height: '100%',
-                textAlign: 'center',
-                p: 4,
-                border: '1px solid #e0e0e0',
-                borderRadius: 3,
-                transition: 'all 0.3s',
-                bgcolor: 'white',
-                '&:hover': {
-                  transform: 'translateY(-8px)',
-                  boxShadow: '0 12px 32px rgba(3, 43, 90, 0.15)',
-                  borderColor: '#F4C542',
-                },
-              }}
-            >
-              <Box
-                sx={{
-                  width: 80,
-                  height: 80,
-                  borderRadius: '50%',
-                  bgcolor: '#F4C542',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  mx: 'auto',
-                  mb: 3,
-                  boxShadow: '0 4px 16px rgba(244, 197, 66, 0.3)',
-                }}
-              >
-                <BuildIcon sx={{ fontSize: 48, color: '#032B5A' }} />
-              </Box>
-              <Typography variant="h5" gutterBottom sx={{ fontWeight: 700, color: '#032B5A', mb: 2 }}>
-                Services variés
-              </Typography>
-              <Typography variant="body1" color="text.secondary" sx={{ lineHeight: 1.8 }}>
-                Plomberie, électricité, menuiserie, peinture, climatisation et bien plus encore pour tous vos besoins
-              </Typography>
-            </Card>
-          </Grid>
-          <Grid item xs={12} md={4}>
-            <Card
-              sx={{
-                height: '100%',
-                textAlign: 'center',
-                p: 4,
-                border: '1px solid #e0e0e0',
-                borderRadius: 3,
-                transition: 'all 0.3s',
-                bgcolor: 'white',
-                '&:hover': {
-                  transform: 'translateY(-8px)',
-                  boxShadow: '0 12px 32px rgba(3, 43, 90, 0.15)',
-                  borderColor: '#F4C542',
-                },
-              }}
-            >
-              <Box
-                sx={{
-                  width: 80,
-                  height: 80,
-                  borderRadius: '50%',
-                  bgcolor: '#F4C542',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  mx: 'auto',
-                  mb: 3,
-                  boxShadow: '0 4px 16px rgba(244, 197, 66, 0.3)',
-                }}
-              >
-                <PaymentIcon sx={{ fontSize: 48, color: '#032B5A' }} />
-              </Box>
-              <Typography variant="h5" gutterBottom sx={{ fontWeight: 700, color: '#032B5A', mb: 2 }}>
-                Paiement sécurisé
-              </Typography>
-              <Typography variant="body1" color="text.secondary" sx={{ lineHeight: 1.8 }}>
-                Plusieurs méthodes de paiement disponibles (espèces, carte, virement, Wafacash) pour votre confort
-              </Typography>
-            </Card>
-          </Grid>
-        </Grid>
+      {/* Live Technicians Section */}
+      <Box sx={{ py: { xs: 6, md: 10 }, bgcolor: '#fafbfc' }}>
+        <Container maxWidth="lg">
+          <LiveTechnicians />
+        </Container>
       </Box>
     </Box>
   );
 };
 
 export default HomePage;
-

@@ -61,7 +61,7 @@ const HeroBanner: React.FC = () => {
             mx: 'auto',
           }}
         >
-          Trouvez le professionnel qu'il vous faut en quelques clics
+          Trouvez un professionnel certifié en quelques clics.
         </Typography>
 
         {/* CTA Buttons */}
