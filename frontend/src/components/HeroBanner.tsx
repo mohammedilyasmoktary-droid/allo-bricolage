@@ -71,13 +71,7 @@ const HeroBanner: React.FC = () => {
               variant="contained"
               size="large"
               onClick={() => {
-                if (user?.role === 'CLIENT') {
-                  navigate('/recherche');
-                } else if (!user) {
-                  navigate('/register?role=CLIENT');
-                } else {
-                  navigate('/recherche');
-                }
+                navigate('/recherche');
               }}
               sx={{
                 bgcolor: '#F4C542',
