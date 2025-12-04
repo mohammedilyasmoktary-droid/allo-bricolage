@@ -104,14 +104,6 @@ function App() {
         }
       />
       <Route
-        path="/recherche"
-        element={
-          <Layout>
-            <RecherchePage />
-          </Layout>
-        }
-      />
-      <Route
         path="/booking"
         element={
           <ProtectedRoute allowedRoles={['CLIENT']}>
