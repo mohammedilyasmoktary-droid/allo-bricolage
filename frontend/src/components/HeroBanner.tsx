@@ -71,7 +71,7 @@ const HeroBanner: React.FC = () => {
               variant="contained"
               size="large"
               onClick={() => {
-                navigate('/client/search');
+                navigate('/search');
               }}
               sx={{
                 bgcolor: '#F4C542',

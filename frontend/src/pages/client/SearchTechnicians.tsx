@@ -198,6 +198,22 @@ const SearchTechnicians: React.FC = () => {
   };
 
   const handleBook = (technician: Technician) => {
+    // If user is not logged in or not a client, redirect to sign up
+    if (!user || user.role !== 'CLIENT') {
+      const params = new URLSearchParams();
+      params.set('role', 'CLIENT');
+      params.set('technicianId', technician.id);
+      if (isUrgent) {
+        params.set('urgent', 'true');
+      }
+      if (category) {
+        params.set('categoryId', category);
+      }
+      navigate(`/register?${params.toString()}`);
+      return;
+    }
+    
+    // User is logged in as client, proceed to booking
     const params = new URLSearchParams();
     params.set('technicianId', technician.id);
     if (isUrgent) {

@@ -93,6 +93,15 @@ function App() {
           </ProtectedRoute>
         }
       />
+      {/* Public search page - accessible without login */}
+      <Route
+        path="/search"
+        element={
+          <Layout>
+            <SearchTechnicians />
+          </Layout>
+        }
+      />
       <Route
         path="/client/search"
         element={
