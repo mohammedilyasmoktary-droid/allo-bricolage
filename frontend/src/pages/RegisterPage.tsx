@@ -21,7 +21,7 @@ import {
   CircularProgress,
   Divider,
 } from '@mui/material';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { MOROCCAN_CITIES } from '../constants/cities';
 import PersonIcon from '@mui/icons-material/Person';
@@ -40,14 +40,21 @@ import ImageIcon from '@mui/icons-material/Image';
 
 const RegisterPage: React.FC = () => {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   const { register } = useAuth();
+  
+  // Get URL parameters
+  const roleParam = searchParams.get('role') as 'CLIENT' | 'TECHNICIAN' | null;
+  const technicianIdParam = searchParams.get('technicianId');
+  const categoryIdParam = searchParams.get('categoryId');
+  
   const [formData, setFormData] = useState({
     name: '',
     email: '',
     phone: '',
     password: '',
     city: '',
-    role: 'CLIENT' as 'CLIENT' | 'TECHNICIAN',
+    role: (roleParam || 'CLIENT') as 'CLIENT' | 'TECHNICIAN',
   });
   const [nationalIdCard, setNationalIdCard] = useState<File | null>(null);
   const [nationalIdPreview, setNationalIdPreview] = useState<string | null>(null);
@@ -115,7 +122,15 @@ const RegisterPage: React.FC = () => {
         // Regular registration without file
         await register(formData);
       }
-      navigate('/');
+      
+      // After successful registration, redirect based on URL parameters
+      if (technicianIdParam && categoryIdParam && formData.role === 'CLIENT') {
+        // Redirect to booking page with technician and category
+        navigate(`/booking?technicianId=${technicianIdParam}&categoryId=${categoryIdParam}`);
+      } else {
+        // Default redirect to home
+        navigate('/');
+      }
     } catch (err: any) {
       console.error('Registration error:', err);
       // Show more detailed error message
@@ -202,9 +217,17 @@ const RegisterPage: React.FC = () => {
               Inscription
             </Typography>
             <Typography variant="body2" color="text.secondary">
-              Créez votre compte pour commencer
+              {technicianIdParam && categoryIdParam 
+                ? 'Créez votre compte pour continuer vers la réservation'
+                : 'Créez votre compte pour commencer'}
             </Typography>
           </Box>
+
+          {technicianIdParam && categoryIdParam && (
+            <Alert severity="info" sx={{ mb: 3, borderRadius: 2 }}>
+              Vous allez être redirigé vers la page de réservation après votre inscription.
+            </Alert>
+          )}
 
           {error && (
             <Alert
@@ -224,43 +247,45 @@ const RegisterPage: React.FC = () => {
 
           <form onSubmit={handleSubmit}>
             {/* Role Selection */}
-            <FormLabel
-              component="legend"
-              sx={{
-                mb: 1.5,
-                fontWeight: 600,
-                color: '#032B5A',
-                fontSize: '0.95rem',
-              }}
-            >
-              Je suis
-            </FormLabel>
-            <RadioGroup
-              row
-              value={formData.role}
-              onChange={(e) => {
-                const newRole = e.target.value as 'CLIENT' | 'TECHNICIAN';
-                setFormData({ ...formData, role: newRole });
-                // Clear national ID card if switching to client
-                if (newRole === 'CLIENT') {
-                  setNationalIdCard(null);
-                  setNationalIdPreview(null);
-                }
-              }}
-              sx={{
-                mb: 3,
-                '& .MuiFormControlLabel-root': {
-                  flex: 1,
-                  mx: 0,
-                  '& .MuiRadio-root': {
+            {!roleParam && (
+              <>
+                <FormLabel
+                  component="legend"
+                  sx={{
+                    mb: 1.5,
+                    fontWeight: 600,
                     color: '#032B5A',
-                    '&.Mui-checked': {
-                      color: '#F4C542',
+                    fontSize: '0.95rem',
+                  }}
+                >
+                  Je suis
+                </FormLabel>
+                <RadioGroup
+                  row
+                  value={formData.role}
+                  onChange={(e) => {
+                    const newRole = e.target.value as 'CLIENT' | 'TECHNICIAN';
+                    setFormData({ ...formData, role: newRole });
+                    // Clear national ID card if switching to client
+                    if (newRole === 'CLIENT') {
+                      setNationalIdCard(null);
+                      setNationalIdPreview(null);
+                    }
+                  }}
+                  sx={{
+                    mb: 3,
+                    '& .MuiFormControlLabel-root': {
+                      flex: 1,
+                      mx: 0,
+                      '& .MuiRadio-root': {
+                        color: '#032B5A',
+                        '&.Mui-checked': {
+                          color: '#F4C542',
+                        },
+                      },
                     },
-                  },
-                },
-              }}
-            >
+                  }}
+                >
               <FormControlLabel
                 value="CLIENT"
                 control={<Radio />}

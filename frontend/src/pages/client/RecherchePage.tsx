@@ -79,19 +79,10 @@ const RecherchePage: React.FC = () => {
     setSelectedTechnician(technician);
   };
 
-  const handleContinueToBooking = () => {
-    if (!user) {
-      // Redirect to login if not authenticated
-      navigate('/login?redirect=/recherche');
-      return;
-    }
-    if (user.role !== 'CLIENT') {
-      // Redirect to home if not a client
-      navigate('/');
-      return;
-    }
+  const handleContinueToSignUp = () => {
     if (selectedTechnician && selectedCategory) {
-      navigate(`/booking?technicianId=${selectedTechnician.id}&categoryId=${selectedCategory}`);
+      // Redirect to sign up page with technician and category info
+      navigate(`/register?role=CLIENT&technicianId=${selectedTechnician.id}&categoryId=${selectedCategory}`);
     }
   };
 
@@ -251,16 +242,14 @@ const RecherchePage: React.FC = () => {
                   <Typography variant="body1" sx={{ color: 'text.secondary' }}>
                     {selectedTechnician.user?.name} - {categories.find(c => c.id === selectedCategory)?.name}
                   </Typography>
-                  {!user && (
-                    <Alert severity="info" sx={{ mt: 2, borderRadius: 2 }}>
-                      Vous devez vous connecter pour continuer vers la réservation
-                    </Alert>
-                  )}
+                  <Alert severity="info" sx={{ mt: 2, borderRadius: 2 }}>
+                    {user ? 'Vous allez être redirigé vers la page de réservation après inscription' : 'Créez un compte pour continuer vers la réservation'}
+                  </Alert>
                 </Box>
                 <Button
                   variant="contained"
                   size="large"
-                  onClick={handleContinueToBooking}
+                  onClick={handleContinueToSignUp}
                   sx={{
                     bgcolor: '#F4C542',
                     color: '#032B5A',
@@ -272,7 +261,7 @@ const RecherchePage: React.FC = () => {
                     borderRadius: 2,
                   }}
                 >
-                  {user ? 'Continuer vers la réservation' : 'Se connecter pour continuer'}
+                  {user ? 'Continuer vers la réservation' : 'Créer un compte pour continuer'}
                 </Button>
               </Box>
             </Card>
