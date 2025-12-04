@@ -417,17 +417,16 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
       </Drawer>
 
       {/* Main Content */}
-      <Container 
-        maxWidth="lg" 
+      <Box
         sx={{ 
           flex: 1, 
           py: { xs: 3, md: 4 }, 
-          px: { xs: 2, md: 3 },
+          px: 0,
           minHeight: 'calc(100vh - 200px)',
         }}
       >
         {children}
-      </Container>
+      </Box>
 
       {/* Footer */}
       <Box
