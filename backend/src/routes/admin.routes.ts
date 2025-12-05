@@ -105,44 +105,116 @@ router.delete('/technicians/:id', async (req, res) => {
   try {
     const technician = await prisma.technicianProfile.findUnique({
       where: { id: req.params.id },
-      include: { user: true },
+      include: { 
+        user: true,
+        subscriptions: {
+          include: {
+            payments: true,
+          },
+        },
+      },
     });
 
     if (!technician) {
       return res.status(404).json({ error: 'Technician not found' });
     }
 
-    // Delete related data first (cascade delete should handle this, but being explicit)
-    await prisma.serviceRequest.deleteMany({
-      where: { technicianId: technician.id },
-    });
+    const userId = technician.userId;
 
-    await prisma.review.deleteMany({
-      where: { revieweeId: technician.id },
-    });
+    // Delete in correct order to handle foreign key constraints
+    
+    // 1. Delete subscription payments first (they reference subscriptions)
+    const subscriptionIds = technician.subscriptions.map(sub => sub.id);
+    if (subscriptionIds.length > 0) {
+      await prisma.subscriptionPayment.deleteMany({
+        where: { subscriptionId: { in: subscriptionIds } },
+      });
+    }
 
-    await prisma.document.deleteMany({
-      where: { technicianProfileId: technician.id },
-    });
-
+    // 2. Delete subscriptions
     await prisma.subscription.deleteMany({
       where: { technicianProfileId: technician.id },
     });
 
-    // Delete technician profile
+    // 3. Delete reviews where this user is the reviewee (reviews reference User, not TechnicianProfile)
+    await prisma.review.deleteMany({
+      where: { revieweeId: userId },
+    });
+
+    // 4. Delete reviews where this user is the reviewer (if any)
+    await prisma.review.deleteMany({
+      where: { reviewerId: userId },
+    });
+
+    // 5. Delete chat messages (they reference User)
+    await prisma.chatMessage.deleteMany({
+      where: {
+        OR: [
+          { senderId: userId },
+          { receiverId: userId },
+        ],
+      },
+    });
+
+    // 6. Delete gallery images (they reference User)
+    await prisma.galleryImage.updateMany({
+      where: { technicianId: userId },
+      data: { technicianId: null },
+    });
+
+    // 7. Delete diagnosis requests (they reference User)
+    await prisma.diagnosisRequest.deleteMany({
+      where: { clientId: userId },
+    });
+
+    // 8. Update service requests to set technicianId and technicianProfileId to null
+    // (onDelete: SetNull in schema, but we need to do it explicitly)
+    await prisma.serviceRequest.updateMany({
+      where: { 
+        OR: [
+          { technicianId: userId },
+          { technicianProfileId: technician.id },
+        ],
+      },
+      data: {
+        technicianId: null,
+        technicianProfileId: null,
+      },
+    });
+
+    // 9. Delete notifications
+    await prisma.notification.deleteMany({
+      where: { userId: userId },
+    });
+
+    // 10. Delete password reset tokens
+    await prisma.passwordResetToken.deleteMany({
+      where: { userId: userId },
+    });
+
+    // 11. Delete documents (cascade should handle this, but being explicit)
+    await prisma.technicianDocument.deleteMany({
+      where: { technicianProfileId: technician.id },
+    });
+
+    // 12. Delete technician profile (this will cascade delete due to onDelete: Cascade)
     await prisma.technicianProfile.delete({
       where: { id: req.params.id },
     });
 
-    // Delete user account
+    // 13. Finally, delete user account (this will cascade delete remaining relations)
     await prisma.user.delete({
-      where: { id: technician.userId },
+      where: { id: userId },
     });
 
     res.json({ message: 'Technician deleted successfully' });
   } catch (error: any) {
     console.error('Delete technician error:', error);
-    res.status(500).json({ error: 'Failed to delete technician' });
+    console.error('Error details:', error.message, error.code, error.meta);
+    res.status(500).json({ 
+      error: 'Failed to delete technician',
+      message: error.message || 'An error occurred while deleting the technician',
+    });
   }
 });
 
