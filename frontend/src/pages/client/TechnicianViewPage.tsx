@@ -13,8 +13,15 @@ import {
   CircularProgress,
   Divider,
   Paper,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogContentText,
+  DialogActions,
+  Alert,
 } from '@mui/material';
 import { techniciansApi, Technician } from '../../api/technicians';
+import { adminApi } from '../../api/admin';
 import { useAuth } from '../../contexts/AuthContext';
 import LocationOnIcon from '@mui/icons-material/LocationOn';
 import PhoneIcon from '@mui/icons-material/Phone';
@@ -22,6 +29,8 @@ import EmailIcon from '@mui/icons-material/Email';
 import StarIcon from '@mui/icons-material/Star';
 import WorkIcon from '@mui/icons-material/Work';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
+import DeleteIcon from '@mui/icons-material/Delete';
+import WarningIcon from '@mui/icons-material/Warning';
 
 const TechnicianViewPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -29,6 +38,11 @@ const TechnicianViewPage: React.FC = () => {
   const { user } = useAuth();
   const [technician, setTechnician] = useState<Technician | null>(null);
   const [loading, setLoading] = useState(true);
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [deleting, setDeleting] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  const isAdmin = user?.role === 'ADMIN';
 
   useEffect(() => {
     const loadTechnician = async () => {
@@ -54,6 +68,33 @@ const TechnicianViewPage: React.FC = () => {
     navigate(`/client/bookings/create?technicianId=${id}`);
   };
 
+  const handleDeleteClick = () => {
+    setDeleteDialogOpen(true);
+  };
+
+  const handleDeleteConfirm = async () => {
+    if (!id) return;
+    setDeleting(true);
+    setError(null);
+    try {
+      await adminApi.deleteTechnician(id);
+      setDeleteDialogOpen(false);
+      navigate('/admin/technicians', { 
+        state: { message: 'Technicien supprimé avec succès' } 
+      });
+    } catch (err: any) {
+      console.error('Failed to delete technician:', err);
+      setError(err.response?.data?.error || 'Erreur lors de la suppression du technicien');
+    } finally {
+      setDeleting(false);
+    }
+  };
+
+  const handleDeleteCancel = () => {
+    setDeleteDialogOpen(false);
+    setError(null);
+  };
+
   if (loading) {
     return (
       <Box display="flex" justifyContent="center" alignItems="center" minHeight="400px">
@@ -76,9 +117,9 @@ const TechnicianViewPage: React.FC = () => {
   }
 
   return (
-    <Box>
+    <Box sx={{ bgcolor: '#fafbfc', minHeight: '100vh', py: 3 }}>
       {/* Header Section */}
-      <Card sx={{ mb: 4, overflow: 'hidden' }}>
+      <Card sx={{ mb: 4, overflow: 'hidden', borderRadius: 3, boxShadow: '0 2px 8px rgba(0,0,0,0.08)' }}>
         <Box
           sx={{
             height: 200,
@@ -116,11 +157,11 @@ const TechnicianViewPage: React.FC = () => {
             </Avatar>
           )}
         </Box>
-        <CardContent sx={{ p: 4 }}>
+        <CardContent sx={{ p: 4, bgcolor: 'white' }}>
           <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 3 }}>
-            <Box>
-              <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 1 }}>
-                <Typography variant="h4" sx={{ fontWeight: 600, color: '#032B5A' }}>
+            <Box sx={{ flex: 1 }}>
+              <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 1, flexWrap: 'wrap' }}>
+                <Typography variant="h4" sx={{ fontWeight: 700, color: '#032B5A', fontSize: { xs: '1.75rem', md: '2rem' } }}>
                   {technician.user?.name}
                 </Typography>
                 {technician.verificationStatus === 'APPROVED' && (
@@ -129,7 +170,7 @@ const TechnicianViewPage: React.FC = () => {
                     label="Vérifié"
                     color="success"
                     size="small"
-                    sx={{ fontWeight: 500 }}
+                    sx={{ fontWeight: 600, fontSize: '0.875rem' }}
                   />
                 )}
                 {technician.isOnline && (
@@ -137,7 +178,7 @@ const TechnicianViewPage: React.FC = () => {
                     label="En ligne"
                     color="success"
                     size="small"
-                    sx={{ fontWeight: 500 }}
+                    sx={{ fontWeight: 600, fontSize: '0.875rem' }}
                   />
                 )}
                 {technician.subscriptions && technician.subscriptions[0]?.plan === 'PREMIUM' && (
@@ -146,18 +187,19 @@ const TechnicianViewPage: React.FC = () => {
                     sx={{
                       bgcolor: '#F4C542',
                       color: '#032B5A',
-                      fontWeight: 600,
+                      fontWeight: 700,
+                      fontSize: '0.875rem',
                     }}
                     size="small"
                   />
                 )}
               </Box>
-              <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 2 }}>
-                <Rating value={technician.averageRating} readOnly precision={0.5} />
-                <Typography variant="h6" sx={{ fontWeight: 600, color: '#032B5A' }}>
+              <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 2, flexWrap: 'wrap' }}>
+                <Rating value={technician.averageRating} readOnly precision={0.5} size="large" />
+                <Typography variant="h6" sx={{ fontWeight: 700, color: '#032B5A' }}>
                   {technician.averageRating.toFixed(1)}
                 </Typography>
-                <Typography variant="body2" color="text.secondary" sx={{ ml: 1 }}>
+                <Typography variant="body2" color="text.secondary" sx={{ ml: 1, fontWeight: 500 }}>
                   ({technician.yearsOfExperience} ans d'expérience)
                 </Typography>
               </Box>
@@ -166,32 +208,56 @@ const TechnicianViewPage: React.FC = () => {
                   icon={<LocationOnIcon />}
                   label={technician.user?.city}
                   size="small"
-                  sx={{ bgcolor: '#f5f5f5' }}
+                  sx={{ bgcolor: '#f8f9fa', fontWeight: 500, border: '1px solid #e8eaed' }}
                 />
                 <Chip
                   icon={<WorkIcon />}
                   label={`${technician.yearsOfExperience} ans d'expérience`}
                   size="small"
-                  sx={{ bgcolor: '#f5f5f5' }}
+                  sx={{ bgcolor: '#f8f9fa', fontWeight: 500, border: '1px solid #e8eaed' }}
                 />
               </Box>
             </Box>
-            <Button
-              variant="contained"
-              size="large"
-              onClick={handleBookNow}
-              sx={{
-                bgcolor: '#032B5A',
-                '&:hover': { bgcolor: '#021d3f' },
-                textTransform: 'none',
-                fontWeight: 600,
-                px: 4,
-                py: 1.5,
-                fontSize: '1.1rem',
-              }}
-            >
-              Réserver maintenant
-            </Button>
+            {!isAdmin && (
+              <Button
+                variant="contained"
+                size="large"
+                onClick={handleBookNow}
+                sx={{
+                  bgcolor: '#032B5A',
+                  '&:hover': { bgcolor: '#021d3f' },
+                  textTransform: 'none',
+                  fontWeight: 600,
+                  px: 4,
+                  py: 1.5,
+                  fontSize: '1.1rem',
+                  borderRadius: 2,
+                  boxShadow: '0 4px 12px rgba(3, 43, 90, 0.3)',
+                }}
+              >
+                Réserver maintenant
+              </Button>
+            )}
+            {isAdmin && (
+              <Button
+                variant="contained"
+                color="error"
+                size="large"
+                startIcon={<DeleteIcon />}
+                onClick={handleDeleteClick}
+                sx={{
+                  textTransform: 'none',
+                  fontWeight: 600,
+                  px: 3,
+                  py: 1.5,
+                  fontSize: '1rem',
+                  borderRadius: 2,
+                  boxShadow: '0 4px 12px rgba(244, 67, 54, 0.3)',
+                }}
+              >
+                Supprimer le technicien
+              </Button>
+            )}
           </Box>
         </CardContent>
       </Card>
@@ -200,12 +266,12 @@ const TechnicianViewPage: React.FC = () => {
         {/* Left Column */}
         <Grid item xs={12} md={8}>
           {/* Skills Section */}
-          <Card sx={{ mb: 3 }}>
-            <CardContent>
-              <Typography variant="h6" gutterBottom sx={{ fontWeight: 600, color: '#032B5A', mb: 2 }}>
+          <Card sx={{ mb: 3, borderRadius: 3, boxShadow: '0 2px 8px rgba(0,0,0,0.08)', border: '1px solid #e8eaed' }}>
+            <CardContent sx={{ p: 3 }}>
+              <Typography variant="h6" gutterBottom sx={{ fontWeight: 700, color: '#032B5A', mb: 2.5, fontSize: '1.25rem' }}>
                 Compétences
               </Typography>
-              <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1 }}>
+              <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1.5 }}>
                 {technician.skills.map((skill, index) => (
                   <Chip
                     key={index}
@@ -213,7 +279,10 @@ const TechnicianViewPage: React.FC = () => {
                     sx={{
                       bgcolor: '#F4C542',
                       color: '#032B5A',
-                      fontWeight: 500,
+                      fontWeight: 600,
+                      fontSize: '0.875rem',
+                      height: 32,
+                      borderRadius: 2,
                     }}
                   />
                 ))}
@@ -223,12 +292,12 @@ const TechnicianViewPage: React.FC = () => {
 
           {/* Bio Section */}
           {technician.bio && (
-            <Card sx={{ mb: 3 }}>
-              <CardContent>
-                <Typography variant="h6" gutterBottom sx={{ fontWeight: 600, color: '#032B5A', mb: 2 }}>
+            <Card sx={{ mb: 3, borderRadius: 3, boxShadow: '0 2px 8px rgba(0,0,0,0.08)', border: '1px solid #e8eaed' }}>
+              <CardContent sx={{ p: 3 }}>
+                <Typography variant="h6" gutterBottom sx={{ fontWeight: 700, color: '#032B5A', mb: 2.5, fontSize: '1.25rem' }}>
                   À propos
                 </Typography>
-                <Typography variant="body1" color="text.secondary" sx={{ lineHeight: 1.8 }}>
+                <Typography variant="body1" color="text.secondary" sx={{ lineHeight: 1.8, fontSize: '1rem' }}>
                   {technician.bio}
                 </Typography>
               </CardContent>
@@ -236,19 +305,19 @@ const TechnicianViewPage: React.FC = () => {
           )}
 
           {/* Pricing Section */}
-          <Card>
-            <CardContent>
-              <Typography variant="h6" gutterBottom sx={{ fontWeight: 600, color: '#032B5A', mb: 2 }}>
+          <Card sx={{ borderRadius: 3, boxShadow: '0 2px 8px rgba(0,0,0,0.08)', border: '1px solid #e8eaed' }}>
+            <CardContent sx={{ p: 3 }}>
+              <Typography variant="h6" gutterBottom sx={{ fontWeight: 700, color: '#032B5A', mb: 2.5, fontSize: '1.25rem' }}>
                 Tarifs
               </Typography>
-              <Grid container spacing={2}>
+              <Grid container spacing={2.5}>
                 {technician.hourlyRate && (
                   <Grid item xs={12} sm={6}>
-                    <Paper sx={{ p: 2, bgcolor: '#f5f5f5' }}>
-                      <Typography variant="body2" color="text.secondary" gutterBottom>
+                    <Paper sx={{ p: 2.5, bgcolor: '#f8f9fa', borderRadius: 2, border: '1px solid #e8eaed' }}>
+                      <Typography variant="body2" color="text.secondary" gutterBottom sx={{ fontWeight: 500, mb: 1 }}>
                         Tarif horaire
                       </Typography>
-                      <Typography variant="h5" sx={{ fontWeight: 600, color: '#F4C542' }}>
+                      <Typography variant="h5" sx={{ fontWeight: 700, color: '#F4C542' }}>
                         {technician.hourlyRate} MAD/h
                       </Typography>
                     </Paper>
@@ -256,11 +325,11 @@ const TechnicianViewPage: React.FC = () => {
                 )}
                 {technician.basePrice && (
                   <Grid item xs={12} sm={6}>
-                    <Paper sx={{ p: 2, bgcolor: '#f5f5f5' }}>
-                      <Typography variant="body2" color="text.secondary" gutterBottom>
+                    <Paper sx={{ p: 2.5, bgcolor: '#f8f9fa', borderRadius: 2, border: '1px solid #e8eaed' }}>
+                      <Typography variant="body2" color="text.secondary" gutterBottom sx={{ fontWeight: 500, mb: 1 }}>
                         Prix de base
                       </Typography>
-                      <Typography variant="h5" sx={{ fontWeight: 600, color: '#F4C542' }}>
+                      <Typography variant="h5" sx={{ fontWeight: 700, color: '#F4C542' }}>
                         {technician.basePrice} MAD
                       </Typography>
                     </Paper>
@@ -268,7 +337,7 @@ const TechnicianViewPage: React.FC = () => {
                 )}
                 {!technician.hourlyRate && !technician.basePrice && (
                   <Grid item xs={12}>
-                    <Typography variant="body1" color="text.secondary">
+                    <Typography variant="body1" color="text.secondary" sx={{ fontWeight: 500 }}>
                       Tarifs sur devis
                     </Typography>
                   </Grid>
@@ -280,59 +349,124 @@ const TechnicianViewPage: React.FC = () => {
 
         {/* Right Column */}
         <Grid item xs={12} md={4}>
-          <Card sx={{ position: 'sticky', top: 20 }}>
-            <CardContent>
-              <Typography variant="h6" gutterBottom sx={{ fontWeight: 600, color: '#032B5A', mb: 3 }}>
+          <Card sx={{ position: 'sticky', top: 20, borderRadius: 3, boxShadow: '0 2px 8px rgba(0,0,0,0.08)', border: '1px solid #e8eaed' }}>
+            <CardContent sx={{ p: 3 }}>
+              <Typography variant="h6" gutterBottom sx={{ fontWeight: 700, color: '#032B5A', mb: 3, fontSize: '1.25rem' }}>
                 Contact
               </Typography>
               
               <Box sx={{ mb: 3 }}>
-                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 2 }}>
-                  <LocationOnIcon sx={{ color: '#032B5A' }} />
-                  <Typography variant="body2" color="text.secondary">
+                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, mb: 2.5 }}>
+                  <LocationOnIcon sx={{ color: '#032B5A', fontSize: 24 }} />
+                  <Typography variant="body2" color="text.secondary" sx={{ fontWeight: 500 }}>
                     {technician.user?.city}
                   </Typography>
                 </Box>
                 {technician.user?.phone && (
-                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 2 }}>
-                    <PhoneIcon sx={{ color: '#032B5A' }} />
-                    <Typography variant="body2" color="text.secondary">
+                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, mb: 2.5 }}>
+                    <PhoneIcon sx={{ color: '#032B5A', fontSize: 24 }} />
+                    <Typography variant="body2" color="text.secondary" sx={{ fontWeight: 500 }}>
                       {technician.user.phone}
                     </Typography>
                   </Box>
                 )}
                 {technician.user?.email && (
-                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                    <EmailIcon sx={{ color: '#032B5A' }} />
-                    <Typography variant="body2" color="text.secondary">
+                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
+                    <EmailIcon sx={{ color: '#032B5A', fontSize: 24 }} />
+                    <Typography variant="body2" color="text.secondary" sx={{ fontWeight: 500 }}>
                       {technician.user.email}
                     </Typography>
                   </Box>
                 )}
               </Box>
 
-              <Divider sx={{ my: 3 }} />
-
-              <Button
-                variant="contained"
-                fullWidth
-                size="large"
-                onClick={handleBookNow}
-                sx={{
-                  bgcolor: '#032B5A',
-                  '&:hover': { bgcolor: '#021d3f' },
-                  textTransform: 'none',
-                  fontWeight: 600,
-                  py: 1.5,
-                  fontSize: '1.1rem',
-                }}
-              >
-                Réserver ce technicien
-              </Button>
+              {!isAdmin && (
+                <>
+                  <Divider sx={{ my: 3 }} />
+                  <Button
+                    variant="contained"
+                    fullWidth
+                    size="large"
+                    onClick={handleBookNow}
+                    sx={{
+                      bgcolor: '#032B5A',
+                      '&:hover': { bgcolor: '#021d3f' },
+                      textTransform: 'none',
+                      fontWeight: 600,
+                      py: 1.5,
+                      fontSize: '1.1rem',
+                      borderRadius: 2,
+                      boxShadow: '0 4px 12px rgba(3, 43, 90, 0.3)',
+                    }}
+                  >
+                    Réserver ce technicien
+                  </Button>
+                </>
+              )}
             </CardContent>
           </Card>
         </Grid>
       </Grid>
+
+      {/* Delete Confirmation Dialog */}
+      <Dialog
+        open={deleteDialogOpen}
+        onClose={handleDeleteCancel}
+        maxWidth="sm"
+        fullWidth
+      >
+        <DialogTitle sx={{ display: 'flex', alignItems: 'center', gap: 1.5, color: '#d32f2f' }}>
+          <WarningIcon sx={{ fontSize: 28 }} />
+          <Typography variant="h6" sx={{ fontWeight: 700 }}>
+            Supprimer le technicien
+          </Typography>
+        </DialogTitle>
+        <DialogContent>
+          {error && (
+            <Alert severity="error" sx={{ mb: 2 }}>
+              {error}
+            </Alert>
+          )}
+          <DialogContentText sx={{ fontSize: '1rem', lineHeight: 1.7 }}>
+            Êtes-vous sûr de vouloir supprimer le technicien <strong>{technician.user?.name}</strong> ?
+            <br />
+            <br />
+            Cette action est <strong>irréversible</strong> et supprimera :
+            <ul style={{ marginTop: '8px', paddingLeft: '20px' }}>
+              <li>Le profil du technicien</li>
+              <li>Le compte utilisateur associé</li>
+              <li>Toutes les réservations liées</li>
+              <li>Tous les avis et documents</li>
+            </ul>
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions sx={{ p: 3, pt: 2 }}>
+          <Button
+            onClick={handleDeleteCancel}
+            disabled={deleting}
+            sx={{
+              textTransform: 'none',
+              fontWeight: 600,
+              color: '#032B5A',
+            }}
+          >
+            Annuler
+          </Button>
+          <Button
+            onClick={handleDeleteConfirm}
+            disabled={deleting}
+            variant="contained"
+            color="error"
+            startIcon={deleting ? <CircularProgress size={20} /> : <DeleteIcon />}
+            sx={{
+              textTransform: 'none',
+              fontWeight: 600,
+            }}
+          >
+            {deleting ? 'Suppression...' : 'Supprimer'}
+          </Button>
+        </DialogActions>
+      </Dialog>
     </Box>
   );
 };

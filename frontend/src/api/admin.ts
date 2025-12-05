@@ -40,6 +40,10 @@ export const adminApi = {
     return response.data;
   },
 
+  deleteTechnician: async (id: string): Promise<void> => {
+    await apiClient.delete(`/admin/technicians/${id}`);
+  },
+
   getBookings: async (params?: any): Promise<Booking[]> => {
     const queryParams = params ? new URLSearchParams(params).toString() : '';
     const url = queryParams ? `/admin/bookings?${queryParams}` : '/admin/bookings';

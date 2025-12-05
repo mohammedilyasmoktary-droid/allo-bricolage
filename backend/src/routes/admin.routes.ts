@@ -100,6 +100,52 @@ router.patch(
   }
 );
 
+// Delete technician (ADMIN only)
+router.delete('/technicians/:id', async (req, res) => {
+  try {
+    const technician = await prisma.technicianProfile.findUnique({
+      where: { id: req.params.id },
+      include: { user: true },
+    });
+
+    if (!technician) {
+      return res.status(404).json({ error: 'Technician not found' });
+    }
+
+    // Delete related data first (cascade delete should handle this, but being explicit)
+    await prisma.serviceRequest.deleteMany({
+      where: { technicianId: technician.id },
+    });
+
+    await prisma.review.deleteMany({
+      where: { revieweeId: technician.id },
+    });
+
+    await prisma.document.deleteMany({
+      where: { technicianProfileId: technician.id },
+    });
+
+    await prisma.subscription.deleteMany({
+      where: { technicianProfileId: technician.id },
+    });
+
+    // Delete technician profile
+    await prisma.technicianProfile.delete({
+      where: { id: req.params.id },
+    });
+
+    // Delete user account
+    await prisma.user.delete({
+      where: { id: technician.userId },
+    });
+
+    res.json({ message: 'Technician deleted successfully' });
+  } catch (error: any) {
+    console.error('Delete technician error:', error);
+    res.status(500).json({ error: 'Failed to delete technician' });
+  }
+});
+
 // Get all bookings
 router.get('/bookings', async (req, res) => {
   try {
