@@ -162,6 +162,138 @@ const HomePage: React.FC = () => {
       {/* Hero Banner */}
       <HeroBanner />
 
+      {/* Featured Services Section */}
+      <Box sx={{ py: { xs: 7, md: 11 }, bgcolor: 'white' }}>
+        <Container maxWidth="lg">
+          <Box sx={{ textAlign: 'center', mb: { xs: 5, md: 7 } }}>
+            <Typography
+              variant="h3"
+              component="h2"
+              sx={{
+                fontWeight: 700,
+                color: '#032B5A',
+                mb: 2,
+                fontSize: { xs: '1.75rem', md: '2.5rem' }
+              }}
+            >
+              Nos Services les Plus Demandés
+            </Typography>
+            <Typography
+              variant="body1"
+              sx={{
+                color: 'text.secondary',
+                maxWidth: 700,
+                mx: 'auto',
+                fontSize: { xs: '0.95rem', md: '1.1rem' }
+              }}
+            >
+              Découvrez nos services les plus populaires
+            </Typography>
+          </Box>
+
+          <Grid container spacing={{ xs: 3, md: 4 }}>
+            {featuredServices.map((service) => (
+              <Grid item xs={12} md={4} key={service.id}>
+                <Card
+                  sx={{
+                    height: '100%',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    border: '1px solid #e8eaed',
+                    borderRadius: 3,
+                    bgcolor: 'white',
+                    transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+                    boxShadow: '0 2px 8px rgba(0,0,0,0.08)',
+                    overflow: 'hidden',
+                    '&:hover': {
+                      transform: 'translateY(-8px)',
+                      boxShadow: '0 12px 32px rgba(3, 43, 90, 0.15)',
+                      borderColor: '#F4C542',
+                    },
+                  }}
+                >
+                  <Box
+                    sx={{
+                      height: 160,
+                      bgcolor: '#f8f9fa',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      borderBottom: '2px solid #e8eaed',
+                    }}
+                  >
+                    <Box
+                      sx={{
+                        width: 100,
+                        height: 100,
+                        borderRadius: '50%',
+                        bgcolor: '#F4C542',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        boxShadow: '0 4px 16px rgba(244, 197, 66, 0.3)',
+                      }}
+                    >
+                      {getServiceIcon(service.name)}
+                    </Box>
+                  </Box>
+                  <CardContent sx={{ flexGrow: 1, textAlign: 'center', p: { xs: 3, md: 4 } }}>
+                    <Typography
+                      variant="h5"
+                      gutterBottom
+                      sx={{
+                        fontWeight: 700,
+                        color: '#032B5A',
+                        mb: 2,
+                        fontSize: { xs: '1.15rem', md: '1.35rem' }
+                      }}
+                    >
+                      {service.name}
+                    </Typography>
+                    {service.description && (
+                      <Typography
+                        variant="body2"
+                        color="text.secondary"
+                        sx={{
+                          mb: 3,
+                          lineHeight: 1.7,
+                          fontSize: { xs: '0.9rem', md: '1rem' },
+                          minHeight: { xs: 48, md: 60 }
+                        }}
+                      >
+                        {service.description}
+                      </Typography>
+                    )}
+                    <Button
+                      variant="contained"
+                      fullWidth
+                      onClick={() => navigate(`/search?category=${service.id}`)}
+                      sx={{
+                        bgcolor: '#032B5A',
+                        color: 'white',
+                        '&:hover': {
+                          bgcolor: '#021d3f',
+                          transform: 'scale(1.02)',
+                        },
+                        textTransform: 'none',
+                        fontWeight: 600,
+                        py: 1.5,
+                        borderRadius: 2,
+                        fontSize: { xs: '0.9rem', md: '1rem' },
+                        boxShadow: '0 4px 12px rgba(3, 43, 90, 0.2)',
+                        transition: 'all 0.2s ease',
+                      }}
+                    >
+                      Réserver
+                    </Button>
+                  </CardContent>
+                </Card>
+              </Grid>
+            ))}
+          </Grid>
+        </Container>
+      </Box>
+
       {/* Why Choose AlloBricolage Section */}
       <Box sx={{ py: { xs: 7, md: 11 }, bgcolor: '#fafbfc' }}>
         <Container maxWidth="lg">
@@ -561,138 +693,6 @@ const HomePage: React.FC = () => {
                   >
                     {step.description}
                   </Typography>
-                </Card>
-              </Grid>
-            ))}
-          </Grid>
-        </Container>
-      </Box>
-
-      {/* Featured Services Section */}
-      <Box sx={{ py: { xs: 7, md: 11 }, bgcolor: 'white' }}>
-        <Container maxWidth="lg">
-          <Box sx={{ textAlign: 'center', mb: { xs: 5, md: 7 } }}>
-            <Typography
-              variant="h3"
-              component="h2"
-              sx={{
-                fontWeight: 700,
-                color: '#032B5A',
-                mb: 2,
-                fontSize: { xs: '1.75rem', md: '2.5rem' }
-              }}
-            >
-              Nos Services les Plus Demandés
-            </Typography>
-            <Typography
-              variant="body1"
-              sx={{
-                color: 'text.secondary',
-                maxWidth: 700,
-                mx: 'auto',
-                fontSize: { xs: '0.95rem', md: '1.1rem' }
-              }}
-            >
-              Découvrez nos services les plus populaires
-            </Typography>
-          </Box>
-
-          <Grid container spacing={{ xs: 3, md: 4 }}>
-            {featuredServices.map((service) => (
-              <Grid item xs={12} md={4} key={service.id}>
-                <Card
-                  sx={{
-                    height: '100%',
-                    display: 'flex',
-                    flexDirection: 'column',
-                    border: '1px solid #e8eaed',
-                    borderRadius: 3,
-                    bgcolor: 'white',
-                    transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
-                    boxShadow: '0 2px 8px rgba(0,0,0,0.08)',
-                    overflow: 'hidden',
-                    '&:hover': {
-                      transform: 'translateY(-8px)',
-                      boxShadow: '0 12px 32px rgba(3, 43, 90, 0.15)',
-                      borderColor: '#F4C542',
-                    },
-                  }}
-                >
-                  <Box
-                    sx={{
-                      height: 160,
-                      bgcolor: '#f8f9fa',
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      borderBottom: '2px solid #e8eaed',
-                    }}
-                  >
-                    <Box
-                      sx={{
-                        width: 100,
-                        height: 100,
-                        borderRadius: '50%',
-                        bgcolor: '#F4C542',
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        boxShadow: '0 4px 16px rgba(244, 197, 66, 0.3)',
-                      }}
-                    >
-                      {getServiceIcon(service.name)}
-                    </Box>
-                  </Box>
-                  <CardContent sx={{ flexGrow: 1, textAlign: 'center', p: { xs: 3, md: 4 } }}>
-                    <Typography
-                      variant="h5"
-                      gutterBottom
-                      sx={{
-                        fontWeight: 700,
-                        color: '#032B5A',
-                        mb: 2,
-                        fontSize: { xs: '1.15rem', md: '1.35rem' }
-                      }}
-                    >
-                      {service.name}
-                    </Typography>
-                    {service.description && (
-                      <Typography
-                        variant="body2"
-                        color="text.secondary"
-                        sx={{
-                          mb: 3,
-                          lineHeight: 1.7,
-                          fontSize: { xs: '0.9rem', md: '1rem' },
-                          minHeight: { xs: 48, md: 60 }
-                        }}
-                      >
-                        {service.description}
-                      </Typography>
-                    )}
-                    <Button
-                      variant="contained"
-                      fullWidth
-                      onClick={() => navigate(`/search?category=${service.id}`)}
-                      sx={{
-                        bgcolor: '#032B5A',
-                        color: 'white',
-                        '&:hover': {
-                          bgcolor: '#021d3f',
-                          transform: 'scale(1.02)',
-                        },
-                        textTransform: 'none',
-                        fontWeight: 600,
-                        py: 1.5,
-                        borderRadius: 2,
-                        fontSize: { xs: '0.9rem', md: '1rem' },
-                        boxShadow: '0 4px 12px rgba(3, 43, 90, 0.2)',
-                        transition: 'all 0.2s ease',
-                      }}
-                    >
-                      Réserver
-                    </Button>
-                  </CardContent>
                 </Card>
               </Grid>
             ))}
