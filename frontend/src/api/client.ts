@@ -2,10 +2,13 @@ import axios from 'axios';
 
 const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5001/api';
 
-// Log the API URL in development
-if (import.meta.env.DEV) {
-  console.log('🔗 API Base URL:', API_BASE_URL);
-  console.log('🔗 VITE_API_URL env:', import.meta.env.VITE_API_URL);
+// Log the API URL (always, for debugging)
+console.log('🔗 API Base URL:', API_BASE_URL);
+console.log('🔗 VITE_API_URL env:', import.meta.env.VITE_API_URL || 'NOT SET');
+
+// Warn if using default localhost in production
+if (import.meta.env.PROD && API_BASE_URL.includes('localhost')) {
+  console.warn('⚠️ WARNING: Using localhost API URL in production! Set VITE_API_URL environment variable.');
 }
 
 export const apiClient = axios.create({

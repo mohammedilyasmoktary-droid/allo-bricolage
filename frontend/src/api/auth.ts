@@ -46,15 +46,19 @@ export const authApi = {
       return response.data;
     } catch (error: any) {
       console.error('Login API error:', error);
+      console.error('API Base URL:', apiClient.defaults.baseURL);
+      
       // Re-throw with better error message
       if (error.response) {
         // Server responded with error
         console.error('Server error response:', error.response.data);
-        throw error;
+        const errorMessage = error.response.data?.error || error.response.data?.message || 'Erreur lors de la connexion';
+        throw new Error(errorMessage);
       } else if (error.request) {
         // Request made but no response
         console.error('No response received from server');
-        throw new Error('Impossible de se connecter au serveur. Vérifiez que le serveur backend est démarré.');
+        const apiUrl = apiClient.defaults.baseURL || 'non configuré';
+        throw new Error(`Impossible de se connecter au serveur backend (${apiUrl}). Vérifiez que le serveur est démarré et que l'URL est correctement configurée.`);
       } else {
         // Something else happened
         console.error('Request setup error:', error.message);
@@ -83,6 +87,8 @@ export const authApi = {
       return response.data;
     } catch (error: any) {
       console.error('Register API error:', error);
+      console.error('API Base URL:', apiClient.defaults.baseURL);
+      
       // Re-throw with better error message
       if (error.response) {
         // Server responded with error
@@ -92,7 +98,8 @@ export const authApi = {
       } else if (error.request) {
         // Request made but no response
         console.error('No response received from server');
-        throw new Error('Impossible de se connecter au serveur. Vérifiez que le serveur backend est démarré.');
+        const apiUrl = apiClient.defaults.baseURL || 'non configuré';
+        throw new Error(`Impossible de se connecter au serveur backend (${apiUrl}). Vérifiez que le serveur est démarré et que l'URL est correctement configurée.`);
       } else {
         // Something else happened
         console.error('Request setup error:', error.message);
