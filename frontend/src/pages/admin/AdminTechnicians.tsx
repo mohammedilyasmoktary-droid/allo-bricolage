@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import {
   Box,
   Typography,
@@ -51,6 +52,7 @@ interface Technician {
 }
 
 const AdminTechnicians: React.FC = () => {
+  const navigate = useNavigate();
   const [technicians, setTechnicians] = useState<Technician[]>([]);
   const [filteredTechnicians, setFilteredTechnicians] = useState<Technician[]>([]);
   const [loading, setLoading] = useState(true);
@@ -620,6 +622,7 @@ const AdminTechnicians: React.FC = () => {
                           <Tooltip title="Voir le profil">
                             <IconButton
                               size="small"
+                              onClick={() => navigate(`/technician/view/${tech.id}`)}
                               sx={{
                                 bgcolor: '#032B5A',
                                 color: 'white',
