@@ -30,6 +30,10 @@ import FilterListIcon from '@mui/icons-material/FilterList';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import CancelIcon from '@mui/icons-material/Cancel';
 import VisibilityIcon from '@mui/icons-material/Visibility';
+import PeopleIcon from '@mui/icons-material/People';
+import VerifiedUserIcon from '@mui/icons-material/VerifiedUser';
+import PendingIcon from '@mui/icons-material/Pending';
+import BlockIcon from '@mui/icons-material/Block';
 import { adminApi } from '../../api/admin';
 
 interface Technician {
@@ -122,38 +126,59 @@ const AdminTechnicians: React.FC = () => {
   };
 
   return (
-    <Box sx={{ pb: 4 }}>
+    <Box sx={{ pb: 4, bgcolor: '#fafbfc', minHeight: '100vh', py: 3 }}>
       {/* Header Section */}
       <Box sx={{ mb: 4 }}>
-        <Typography
-          variant="h4"
-          component="h1"
-          sx={{
-            fontWeight: 700,
-            color: '#032B5A',
-            mb: 3,
-            fontSize: { xs: '1.75rem', md: '2rem' }
-          }}
-        >
-          Gestion des techniciens
-        </Typography>
+        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 4 }}>
+          <Typography
+            variant="h4"
+            component="h1"
+            sx={{
+              fontWeight: 700,
+              color: '#032B5A',
+              fontSize: { xs: '1.75rem', md: '2.25rem' }
+            }}
+          >
+            Gestion des techniciens
+          </Typography>
+        </Box>
 
         {/* Statistics Cards */}
         <Grid container spacing={3} sx={{ mb: 4 }}>
           <Grid item xs={6} sm={3}>
             <Card
               sx={{
-                bgcolor: '#032B5A',
-                color: 'white',
-                borderRadius: 2,
-                boxShadow: '0 4px 12px rgba(3, 43, 90, 0.2)',
+                bgcolor: 'white',
+                borderRadius: 3,
+                boxShadow: '0 2px 8px rgba(0,0,0,0.08)',
+                border: '1px solid #e8eaed',
+                transition: 'all 0.3s ease',
+                '&:hover': {
+                  transform: 'translateY(-4px)',
+                  boxShadow: '0 8px 24px rgba(3, 43, 90, 0.15)',
+                },
               }}
             >
-              <CardContent sx={{ p: 2.5 }}>
-                <Typography variant="h3" sx={{ fontWeight: 800, mb: 0.5 }}>
+              <CardContent sx={{ p: 3 }}>
+                <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 2 }}>
+                  <Box
+                    sx={{
+                      width: 56,
+                      height: 56,
+                      borderRadius: '50%',
+                      bgcolor: '#032B5A',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                    }}
+                  >
+                    <PeopleIcon sx={{ fontSize: 28, color: 'white' }} />
+                  </Box>
+                </Box>
+                <Typography variant="h3" sx={{ fontWeight: 800, mb: 0.5, color: '#032B5A' }}>
                   {stats.total}
                 </Typography>
-                <Typography variant="body2" sx={{ opacity: 0.9 }}>
+                <Typography variant="body2" sx={{ color: 'text.secondary', fontWeight: 500 }}>
                   Total
                 </Typography>
               </CardContent>
@@ -162,17 +187,37 @@ const AdminTechnicians: React.FC = () => {
           <Grid item xs={6} sm={3}>
             <Card
               sx={{
-                bgcolor: '#4caf50',
-                color: 'white',
-                borderRadius: 2,
-                boxShadow: '0 4px 12px rgba(76, 175, 80, 0.2)',
+                bgcolor: 'white',
+                borderRadius: 3,
+                boxShadow: '0 2px 8px rgba(0,0,0,0.08)',
+                border: '1px solid #e8eaed',
+                transition: 'all 0.3s ease',
+                '&:hover': {
+                  transform: 'translateY(-4px)',
+                  boxShadow: '0 8px 24px rgba(76, 175, 80, 0.15)',
+                },
               }}
             >
-              <CardContent sx={{ p: 2.5 }}>
-                <Typography variant="h3" sx={{ fontWeight: 800, mb: 0.5 }}>
+              <CardContent sx={{ p: 3 }}>
+                <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 2 }}>
+                  <Box
+                    sx={{
+                      width: 56,
+                      height: 56,
+                      borderRadius: '50%',
+                      bgcolor: '#4caf50',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                    }}
+                  >
+                    <VerifiedUserIcon sx={{ fontSize: 28, color: 'white' }} />
+                  </Box>
+                </Box>
+                <Typography variant="h3" sx={{ fontWeight: 800, mb: 0.5, color: '#4caf50' }}>
                   {stats.approved}
                 </Typography>
-                <Typography variant="body2" sx={{ opacity: 0.9 }}>
+                <Typography variant="body2" sx={{ color: 'text.secondary', fontWeight: 500 }}>
                   Approuvés
                 </Typography>
               </CardContent>
@@ -181,17 +226,37 @@ const AdminTechnicians: React.FC = () => {
           <Grid item xs={6} sm={3}>
             <Card
               sx={{
-                bgcolor: '#F4C542',
-                color: '#032B5A',
-                borderRadius: 2,
-                boxShadow: '0 4px 12px rgba(244, 197, 66, 0.2)',
+                bgcolor: 'white',
+                borderRadius: 3,
+                boxShadow: '0 2px 8px rgba(0,0,0,0.08)',
+                border: '1px solid #e8eaed',
+                transition: 'all 0.3s ease',
+                '&:hover': {
+                  transform: 'translateY(-4px)',
+                  boxShadow: '0 8px 24px rgba(244, 197, 66, 0.15)',
+                },
               }}
             >
-              <CardContent sx={{ p: 2.5 }}>
-                <Typography variant="h3" sx={{ fontWeight: 800, mb: 0.5 }}>
+              <CardContent sx={{ p: 3 }}>
+                <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 2 }}>
+                  <Box
+                    sx={{
+                      width: 56,
+                      height: 56,
+                      borderRadius: '50%',
+                      bgcolor: '#F4C542',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                    }}
+                  >
+                    <PendingIcon sx={{ fontSize: 28, color: '#032B5A' }} />
+                  </Box>
+                </Box>
+                <Typography variant="h3" sx={{ fontWeight: 800, mb: 0.5, color: '#F4C542' }}>
                   {stats.pending}
                 </Typography>
-                <Typography variant="body2" sx={{ opacity: 0.8 }}>
+                <Typography variant="body2" sx={{ color: 'text.secondary', fontWeight: 500 }}>
                   En attente
                 </Typography>
               </CardContent>
@@ -200,17 +265,37 @@ const AdminTechnicians: React.FC = () => {
           <Grid item xs={6} sm={3}>
             <Card
               sx={{
-                bgcolor: '#f44336',
-                color: 'white',
-                borderRadius: 2,
-                boxShadow: '0 4px 12px rgba(244, 67, 54, 0.2)',
+                bgcolor: 'white',
+                borderRadius: 3,
+                boxShadow: '0 2px 8px rgba(0,0,0,0.08)',
+                border: '1px solid #e8eaed',
+                transition: 'all 0.3s ease',
+                '&:hover': {
+                  transform: 'translateY(-4px)',
+                  boxShadow: '0 8px 24px rgba(244, 67, 54, 0.15)',
+                },
               }}
             >
-              <CardContent sx={{ p: 2.5 }}>
-                <Typography variant="h3" sx={{ fontWeight: 800, mb: 0.5 }}>
+              <CardContent sx={{ p: 3 }}>
+                <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 2 }}>
+                  <Box
+                    sx={{
+                      width: 56,
+                      height: 56,
+                      borderRadius: '50%',
+                      bgcolor: '#f44336',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                    }}
+                  >
+                    <BlockIcon sx={{ fontSize: 28, color: 'white' }} />
+                  </Box>
+                </Box>
+                <Typography variant="h3" sx={{ fontWeight: 800, mb: 0.5, color: '#f44336' }}>
                   {stats.rejected}
                 </Typography>
-                <Typography variant="body2" sx={{ opacity: 0.9 }}>
+                <Typography variant="body2" sx={{ color: 'text.secondary', fontWeight: 500 }}>
                   Rejetés
                 </Typography>
               </CardContent>
@@ -219,10 +304,18 @@ const AdminTechnicians: React.FC = () => {
         </Grid>
 
         {/* Search and Filter Bar */}
-        <Card sx={{ mb: 3, borderRadius: 2, boxShadow: '0 2px 8px rgba(0,0,0,0.08)' }}>
-          <CardContent sx={{ p: 3 }}>
-            <Grid container spacing={2} alignItems="center">
-              <Grid item xs={12} md={6}>
+        <Card
+          sx={{
+            mb: 3,
+            borderRadius: 3,
+            boxShadow: '0 2px 8px rgba(0,0,0,0.08)',
+            border: '1px solid #e8eaed',
+            bgcolor: 'white',
+          }}
+        >
+          <CardContent sx={{ p: 3.5 }}>
+            <Grid container spacing={3} alignItems="center">
+              <Grid item xs={12} md={7}>
                 <TextField
                   fullWidth
                   placeholder="Rechercher par nom, email, ville ou compétence..."
@@ -231,7 +324,7 @@ const AdminTechnicians: React.FC = () => {
                   InputProps={{
                     startAdornment: (
                       <InputAdornment position="start">
-                        <SearchIcon sx={{ color: 'text.secondary' }} />
+                        <SearchIcon sx={{ color: '#9e9e9e' }} />
                       </InputAdornment>
                     ),
                   }}
@@ -239,11 +332,16 @@ const AdminTechnicians: React.FC = () => {
                     '& .MuiOutlinedInput-root': {
                       borderRadius: 2,
                       bgcolor: '#fafbfc',
+                      border: '1px solid #e8eaed',
+                      transition: 'all 0.2s ease',
                       '&:hover': {
                         bgcolor: '#f5f5f5',
+                        borderColor: '#F4C542',
                       },
                       '&.Mui-focused': {
                         bgcolor: 'white',
+                        borderColor: '#F4C542',
+                        boxShadow: '0 0 0 3px rgba(244, 197, 66, 0.1)',
                       },
                     },
                   }}
@@ -251,7 +349,7 @@ const AdminTechnicians: React.FC = () => {
               </Grid>
               <Grid item xs={12} md={3}>
                 <FormControl fullWidth>
-                  <InputLabel>Statut</InputLabel>
+                  <InputLabel sx={{ color: '#032B5A', fontWeight: 500 }}>Statut</InputLabel>
                   <Select
                     value={statusFilter}
                     onChange={(e) => setStatusFilter(e.target.value)}
@@ -259,6 +357,13 @@ const AdminTechnicians: React.FC = () => {
                     sx={{
                       borderRadius: 2,
                       bgcolor: '#fafbfc',
+                      border: '1px solid #e8eaed',
+                      '&:hover': {
+                        borderColor: '#F4C542',
+                      },
+                      '&.Mui-focused': {
+                        borderColor: '#F4C542',
+                      },
                     }}
                   >
                     <MenuItem value="all">Tous</MenuItem>
@@ -268,10 +373,23 @@ const AdminTechnicians: React.FC = () => {
                   </Select>
                 </FormControl>
               </Grid>
-              <Grid item xs={12} md={3}>
-                <Typography variant="body2" color="text.secondary" sx={{ textAlign: { xs: 'left', md: 'right' } }}>
-                  {filteredTechnicians.length} technicien{filteredTechnicians.length > 1 ? 's' : ''} trouvé{filteredTechnicians.length > 1 ? 's' : ''}
-                </Typography>
+              <Grid item xs={12} md={2}>
+                <Box
+                  sx={{
+                    bgcolor: '#f8f9fa',
+                    borderRadius: 2,
+                    p: 1.5,
+                    textAlign: 'center',
+                    border: '1px solid #e8eaed',
+                  }}
+                >
+                  <Typography variant="h6" sx={{ fontWeight: 700, color: '#032B5A', mb: 0.5 }}>
+                    {filteredTechnicians.length}
+                  </Typography>
+                  <Typography variant="caption" color="text.secondary" sx={{ fontSize: '0.75rem' }}>
+                    technicien{filteredTechnicians.length > 1 ? 's' : ''}
+                  </Typography>
+                </Box>
               </Grid>
             </Grid>
           </CardContent>
@@ -287,21 +405,37 @@ const AdminTechnicians: React.FC = () => {
         <TableContainer
           component={Paper}
           sx={{
-            borderRadius: 2,
+            borderRadius: 3,
             boxShadow: '0 2px 8px rgba(0,0,0,0.08)',
+            border: '1px solid #e8eaed',
             overflow: 'hidden',
+            bgcolor: 'white',
           }}
         >
           <Table>
             <TableHead>
-              <TableRow sx={{ bgcolor: '#fafbfc' }}>
-                <TableCell sx={{ fontWeight: 700, color: '#032B5A', py: 2 }}>Technicien</TableCell>
-                <TableCell sx={{ fontWeight: 700, color: '#032B5A', py: 2 }}>Contact</TableCell>
-                <TableCell sx={{ fontWeight: 700, color: '#032B5A', py: 2 }}>Localisation</TableCell>
-                <TableCell sx={{ fontWeight: 700, color: '#032B5A', py: 2 }}>Compétences</TableCell>
-                <TableCell sx={{ fontWeight: 700, color: '#032B5A', py: 2 }}>Expérience</TableCell>
-                <TableCell sx={{ fontWeight: 700, color: '#032B5A', py: 2 }}>Statut</TableCell>
-                <TableCell sx={{ fontWeight: 700, color: '#032B5A', py: 2, textAlign: 'center' }}>Actions</TableCell>
+              <TableRow sx={{ bgcolor: '#fafbfc', borderBottom: '2px solid #e8eaed' }}>
+                <TableCell sx={{ fontWeight: 700, color: '#032B5A', py: 2.5, fontSize: '0.875rem', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
+                  Technicien
+                </TableCell>
+                <TableCell sx={{ fontWeight: 700, color: '#032B5A', py: 2.5, fontSize: '0.875rem', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
+                  Contact
+                </TableCell>
+                <TableCell sx={{ fontWeight: 700, color: '#032B5A', py: 2.5, fontSize: '0.875rem', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
+                  Localisation
+                </TableCell>
+                <TableCell sx={{ fontWeight: 700, color: '#032B5A', py: 2.5, fontSize: '0.875rem', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
+                  Compétences
+                </TableCell>
+                <TableCell sx={{ fontWeight: 700, color: '#032B5A', py: 2.5, fontSize: '0.875rem', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
+                  Expérience
+                </TableCell>
+                <TableCell sx={{ fontWeight: 700, color: '#032B5A', py: 2.5, fontSize: '0.875rem', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
+                  Statut
+                </TableCell>
+                <TableCell sx={{ fontWeight: 700, color: '#032B5A', py: 2.5, fontSize: '0.875rem', textTransform: 'uppercase', letterSpacing: '0.5px', textAlign: 'center' }}>
+                  Actions
+                </TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
@@ -322,43 +456,46 @@ const AdminTechnicians: React.FC = () => {
                         bgcolor: '#fafbfc',
                       },
                       borderBottom: '1px solid #e8eaed',
+                      transition: 'background-color 0.2s ease',
                     }}
                   >
-                    <TableCell>
-                      <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
+                    <TableCell sx={{ py: 2.5 }}>
+                      <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
                         <Avatar
                           sx={{
                             bgcolor: '#032B5A',
                             color: '#F4C542',
-                            width: 40,
-                            height: 40,
+                            width: 48,
+                            height: 48,
                             fontWeight: 700,
+                            fontSize: '1.1rem',
+                            boxShadow: '0 2px 8px rgba(3, 43, 90, 0.2)',
                           }}
                         >
                           {tech.user.name.charAt(0).toUpperCase()}
                         </Avatar>
-                        <Typography variant="body1" sx={{ fontWeight: 600, color: '#032B5A' }}>
+                        <Typography variant="body1" sx={{ fontWeight: 600, color: '#032B5A', fontSize: '0.95rem' }}>
                           {tech.user.name}
                         </Typography>
                       </Box>
                     </TableCell>
-                    <TableCell>
+                    <TableCell sx={{ py: 2.5 }}>
                       <Box>
-                        <Typography variant="body2" sx={{ mb: 0.5, color: '#032B5A' }}>
+                        <Typography variant="body2" sx={{ mb: 0.5, color: '#032B5A', fontWeight: 500 }}>
                           {tech.user.email}
                         </Typography>
-                        <Typography variant="caption" color="text.secondary">
+                        <Typography variant="caption" color="text.secondary" sx={{ fontSize: '0.8rem' }}>
                           {tech.user.phone}
                         </Typography>
                       </Box>
                     </TableCell>
-                    <TableCell>
-                      <Typography variant="body2" sx={{ fontWeight: 500 }}>
+                    <TableCell sx={{ py: 2.5 }}>
+                      <Typography variant="body2" sx={{ fontWeight: 500, color: '#032B5A' }}>
                         {tech.user.city}
                       </Typography>
                     </TableCell>
-                    <TableCell>
-                      <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5, maxWidth: 250 }}>
+                    <TableCell sx={{ py: 2.5 }}>
+                      <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.75, maxWidth: 280 }}>
                         {tech.skills.slice(0, 2).map((skill, idx) => (
                           <Chip
                             key={idx}
@@ -368,9 +505,10 @@ const AdminTechnicians: React.FC = () => {
                               bgcolor: '#f8f9fa',
                               color: '#032B5A',
                               fontSize: '0.75rem',
-                              fontWeight: 500,
+                              fontWeight: 600,
                               border: '1px solid #e8eaed',
-                              height: 24,
+                              height: 26,
+                              borderRadius: 1.5,
                             }}
                           />
                         ))}
@@ -382,19 +520,20 @@ const AdminTechnicians: React.FC = () => {
                               bgcolor: '#F4C542',
                               color: '#032B5A',
                               fontSize: '0.75rem',
-                              fontWeight: 600,
-                              height: 24,
+                              fontWeight: 700,
+                              height: 26,
+                              borderRadius: 1.5,
                             }}
                           />
                         )}
                       </Box>
                     </TableCell>
-                    <TableCell>
-                      <Typography variant="body2" sx={{ fontWeight: 500 }}>
+                    <TableCell sx={{ py: 2.5 }}>
+                      <Typography variant="body2" sx={{ fontWeight: 600, color: '#032B5A' }}>
                         {tech.yearsOfExperience} ans
                       </Typography>
                     </TableCell>
-                    <TableCell>
+                    <TableCell sx={{ py: 2.5 }}>
                       <Chip
                         label={getStatusLabel(tech.verificationStatus)}
                         size="small"
@@ -427,13 +566,14 @@ const AdminTechnicians: React.FC = () => {
                               : tech.verificationStatus === 'REJECTED'
                               ? '#f44336'
                               : '#F4C542',
+                          height: 28,
                           '& .MuiChip-icon': {
                             color: 'inherit',
                           },
                         }}
                       />
                     </TableCell>
-                    <TableCell>
+                    <TableCell sx={{ py: 2.5 }}>
                       <Box sx={{ display: 'flex', gap: 1, justifyContent: 'center' }}>
                         {tech.verificationStatus === 'PENDING' ? (
                           <>
@@ -444,9 +584,13 @@ const AdminTechnicians: React.FC = () => {
                                 sx={{
                                   bgcolor: '#4caf50',
                                   color: 'white',
+                                  width: 36,
+                                  height: 36,
                                   '&:hover': {
                                     bgcolor: '#388e3c',
+                                    transform: 'scale(1.1)',
                                   },
+                                  transition: 'all 0.2s ease',
                                 }}
                               >
                                 <CheckCircleIcon fontSize="small" />
@@ -459,9 +603,13 @@ const AdminTechnicians: React.FC = () => {
                                 sx={{
                                   bgcolor: '#f44336',
                                   color: 'white',
+                                  width: 36,
+                                  height: 36,
                                   '&:hover': {
                                     bgcolor: '#d32f2f',
+                                    transform: 'scale(1.1)',
                                   },
+                                  transition: 'all 0.2s ease',
                                 }}
                               >
                                 <CancelIcon fontSize="small" />
@@ -475,9 +623,13 @@ const AdminTechnicians: React.FC = () => {
                               sx={{
                                 bgcolor: '#032B5A',
                                 color: 'white',
+                                width: 36,
+                                height: 36,
                                 '&:hover': {
                                   bgcolor: '#021d3f',
+                                  transform: 'scale(1.1)',
                                 },
+                                transition: 'all 0.2s ease',
                               }}
                             >
                               <VisibilityIcon fontSize="small" />
