@@ -337,15 +337,15 @@ const UnifiedDashboard: React.FC = () => {
             <Box
               sx={{
                 bgcolor: '#032B5A',
-                p: 3,
+                p: { xs: 2, md: 3 },
                 background: 'linear-gradient(135deg, #032B5A 0%, #021d3f 100%)',
               }}
             >
-              <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+              <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, flexWrap: { xs: 'wrap', md: 'nowrap' } }}>
                 <Box
                   sx={{
-                    width: 56,
-                    height: 56,
+                    width: { xs: 48, md: 56 },
+                    height: { xs: 48, md: 56 },
                     borderRadius: 3,
                     bgcolor: '#F4C542',
                     display: 'flex',
@@ -354,7 +354,7 @@ const UnifiedDashboard: React.FC = () => {
                     boxShadow: '0 4px 16px rgba(244, 197, 66, 0.3)',
                   }}
                 >
-                  <BuildIcon sx={{ fontSize: 32, color: '#032B5A' }} />
+                  <BuildIcon sx={{ fontSize: { xs: 24, md: 32 }, color: '#032B5A' }} />
                 </Box>
                 <Box>
                   <Typography
@@ -362,19 +362,19 @@ const UnifiedDashboard: React.FC = () => {
                     sx={{
                       fontWeight: 700,
                       color: 'white',
-                      fontSize: '1.5rem',
+                      fontSize: { xs: '1.25rem', md: '1.5rem' },
                       mb: 0.5,
                     }}
                   >
                     Services Populaires
                   </Typography>
-                  <Typography variant="body2" sx={{ color: 'rgba(255,255,255,0.8)' }}>
+                  <Typography variant="body2" sx={{ color: 'rgba(255,255,255,0.8)', fontSize: { xs: '0.85rem', md: '0.875rem' } }}>
                     Découvrez nos services de maintenance et réparation
                   </Typography>
                 </Box>
               </Box>
             </Box>
-            <CardContent sx={{ p: 3 }}>
+            <CardContent sx={{ p: { xs: 2, md: 3 } }}>
               {loadingServices ? (
                 <Box sx={{ display: 'flex', justifyContent: 'center', py: 6 }}>
                   <CircularProgress sx={{ color: '#032B5A' }} />
