@@ -176,623 +176,356 @@ const HomePage: React.FC = () => {
       {/* Hero Banner */}
       <HeroBanner />
 
-      {/* Mini Dashboard - Sticky Sidebar */}
-      <Box
-        sx={{
-          display: { xs: 'none', lg: 'block' },
-          position: 'fixed',
-          top: 100,
-          right: 20,
-          width: 320,
-          zIndex: 1000,
-          maxHeight: 'calc(100vh - 120px)',
-          overflowY: 'auto',
-          '&::-webkit-scrollbar': {
-            width: '6px',
-          },
-          '&::-webkit-scrollbar-track': {
-            background: '#f1f1f1',
-            borderRadius: '10px',
-          },
-          '&::-webkit-scrollbar-thumb': {
-            background: '#F4C542',
-            borderRadius: '10px',
-          },
-        }}
-      >
-        {/* Top Services Card */}
-        <Card
-          sx={{
-            mb: 2,
-            borderRadius: 3,
-            boxShadow: '0 8px 24px rgba(0,0,0,0.12)',
-            border: '1px solid #e8eaed',
-            bgcolor: 'white',
-            overflow: 'hidden',
-          }}
-        >
-          <Box
-            sx={{
-              bgcolor: '#032B5A',
-              p: 2,
-              display: 'flex',
-              alignItems: 'center',
-              gap: 1.5,
-            }}
-          >
-            <Box
-              sx={{
-                width: 40,
-                height: 40,
-                borderRadius: 2,
-                bgcolor: '#F4C542',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-              }}
-            >
-              <BuildIcon sx={{ fontSize: 24, color: '#032B5A' }} />
-            </Box>
-            <Typography variant="h6" sx={{ fontWeight: 700, color: 'white', fontSize: '1.1rem' }}>
-              Top Services
-            </Typography>
-          </Box>
-          <CardContent sx={{ p: 2 }}>
-            {loadingServices ? (
-              <Box sx={{ display: 'flex', justifyContent: 'center', py: 2 }}>
-                <CircularProgress size={24} sx={{ color: '#032B5A' }} />
-              </Box>
-            ) : (
-              <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1.5 }}>
-                {featuredServices.map((service, index) => (
+      {/* Main Content with Services/Technicians on Left and Mini Dashboard on Right */}
+      <Container maxWidth="lg" sx={{ mt: { xs: 4, md: 6 } }}>
+        <Grid container spacing={3}>
+          {/* Left Side - Services and Technicians */}
+          <Grid item xs={12} lg={8}>
+            {/* Top Services Section */}
+            <Card sx={{ mb: 3, borderRadius: 3, boxShadow: '0 2px 8px rgba(0,0,0,0.08)', border: '1px solid #e8eaed' }}>
+              <CardContent sx={{ p: 3 }}>
+                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, mb: 3 }}>
                   <Box
-                    key={service.id}
-                    onClick={() => navigate(`/search?category=${service.id}`)}
                     sx={{
-                      p: 1.5,
+                      width: 48,
+                      height: 48,
                       borderRadius: 2,
-                      border: '1px solid #e8eaed',
-                      bgcolor: '#fafbfc',
-                      cursor: 'pointer',
-                      transition: 'all 0.2s ease',
-                      display: 'flex',
-                      alignItems: 'center',
-                      gap: 1.5,
-                      '&:hover': {
-                        bgcolor: '#f5f5f5',
-                        borderColor: '#F4C542',
-                        transform: 'translateX(4px)',
-                      },
-                    }}
-                  >
-                    <Box
-                      sx={{
-                        width: 40,
-                        height: 40,
-                        borderRadius: 1.5,
-                        bgcolor: '#F4C542',
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        flexShrink: 0,
-                      }}
-                    >
-                      {getServiceIcon(service.name)}
-                    </Box>
-                    <Box sx={{ flex: 1, minWidth: 0 }}>
-                      <Typography
-                        variant="subtitle2"
-                        sx={{
-                          fontWeight: 600,
-                          color: '#032B5A',
-                          fontSize: '0.9rem',
-                          mb: 0.25,
-                          overflow: 'hidden',
-                          textOverflow: 'ellipsis',
-                          whiteSpace: 'nowrap',
-                        }}
-                      >
-                        {service.name}
-                      </Typography>
-                      <Typography
-                        variant="caption"
-                        color="text.secondary"
-                        sx={{
-                          fontSize: '0.75rem',
-                          overflow: 'hidden',
-                          textOverflow: 'ellipsis',
-                          display: '-webkit-box',
-                          WebkitLineClamp: 2,
-                          WebkitBoxOrient: 'vertical',
-                        }}
-                      >
-                        {service.description || 'Service professionnel'}
-                      </Typography>
-                    </Box>
-                    <Box
-                      sx={{
-                        width: 24,
-                        height: 24,
-                        borderRadius: '50%',
-                        bgcolor: '#032B5A',
-                        color: 'white',
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        fontSize: '0.75rem',
-                        fontWeight: 700,
-                        flexShrink: 0,
-                      }}
-                    >
-                      {index + 1}
-                    </Box>
-                  </Box>
-                ))}
-              </Box>
-            )}
-          </CardContent>
-        </Card>
-
-        {/* Top Technicians Card */}
-        <Card
-          sx={{
-            borderRadius: 3,
-            boxShadow: '0 8px 24px rgba(0,0,0,0.12)',
-            border: '1px solid #e8eaed',
-            bgcolor: 'white',
-            overflow: 'hidden',
-          }}
-        >
-          <Box
-            sx={{
-              bgcolor: '#032B5A',
-              p: 2,
-              display: 'flex',
-              alignItems: 'center',
-              gap: 1.5,
-            }}
-          >
-            <Box
-              sx={{
-                width: 40,
-                height: 40,
-                borderRadius: 2,
-                bgcolor: '#F4C542',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-              }}
-            >
-              <StarIcon sx={{ fontSize: 24, color: '#032B5A' }} />
-            </Box>
-            <Typography variant="h6" sx={{ fontWeight: 700, color: 'white', fontSize: '1.1rem' }}>
-              Top Techniciens
-            </Typography>
-          </Box>
-          <CardContent sx={{ p: 2 }}>
-            {loadingTechs ? (
-              <Box sx={{ display: 'flex', justifyContent: 'center', py: 2 }}>
-                <CircularProgress size={24} sx={{ color: '#032B5A' }} />
-              </Box>
-            ) : (
-              <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1.5 }}>
-                {topTechnicians.map((technician, index) => {
-                  const imageIndex = (technician.id?.charCodeAt(0) || 1) % 8 + 1;
-                  const technicianImage = `/images/technicians/technician_${imageIndex}.svg`;
-
-                  return (
-                    <Box
-                      key={technician.id}
-                      onClick={() => navigate(`/technician/view/${technician.id}`)}
-                      sx={{
-                        p: 1.5,
-                        borderRadius: 2,
-                        border: '1px solid #e8eaed',
-                        bgcolor: '#fafbfc',
-                        cursor: 'pointer',
-                        transition: 'all 0.2s ease',
-                        display: 'flex',
-                        alignItems: 'center',
-                        gap: 1.5,
-                        '&:hover': {
-                          bgcolor: '#f5f5f5',
-                          borderColor: '#F4C542',
-                          transform: 'translateX(4px)',
-                        },
-                      }}
-                    >
-                      <Avatar
-                        src={normalizeImageUrl(technician.profilePictureUrl || technicianImage)}
-                        sx={{
-                          width: 40,
-                          height: 40,
-                          bgcolor: '#032B5A',
-                          color: '#F4C542',
-                          fontWeight: 700,
-                          flexShrink: 0,
-                        }}
-                      >
-                        {technician.user?.name?.charAt(0).toUpperCase() || 'T'}
-                      </Avatar>
-                      <Box sx={{ flex: 1, minWidth: 0 }}>
-                        <Typography
-                          variant="subtitle2"
-                          sx={{
-                            fontWeight: 600,
-                            color: '#032B5A',
-                            fontSize: '0.9rem',
-                            mb: 0.25,
-                            overflow: 'hidden',
-                            textOverflow: 'ellipsis',
-                            whiteSpace: 'nowrap',
-                          }}
-                        >
-                          {technician.user?.name || 'Technicien'}
-                        </Typography>
-                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
-                          <Rating
-                            value={technician.averageRating}
-                            readOnly
-                            size="small"
-                            precision={0.5}
-                            sx={{ fontSize: '0.75rem' }}
-                          />
-                          <Typography variant="caption" sx={{ color: '#032B5A', fontWeight: 600, fontSize: '0.75rem' }}>
-                            {technician.averageRating.toFixed(1)}
-                          </Typography>
-                        </Box>
-                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5, mt: 0.25 }}>
-                          <LocationOnIcon sx={{ fontSize: 12, color: 'text.secondary' }} />
-                          <Typography variant="caption" color="text.secondary" sx={{ fontSize: '0.7rem' }}>
-                            {technician.user?.city || 'Ville'}
-                          </Typography>
-                        </Box>
-                      </Box>
-                      <Box
-                        sx={{
-                          width: 24,
-                          height: 24,
-                          borderRadius: '50%',
-                          bgcolor: '#F4C542',
-                          color: '#032B5A',
-                          display: 'flex',
-                          alignItems: 'center',
-                          justifyContent: 'center',
-                          fontSize: '0.75rem',
-                          fontWeight: 700,
-                          flexShrink: 0,
-                        }}
-                      >
-                        {index + 1}
-                      </Box>
-                    </Box>
-                  );
-                })}
-              </Box>
-            )}
-          </CardContent>
-        </Card>
-      </Box>
-
-      {/* Featured Services Section */}
-      <Box sx={{ py: { xs: 7, md: 11 }, bgcolor: 'white' }}>
-        <Container maxWidth="lg">
-          <Box sx={{ textAlign: 'center', mb: { xs: 5, md: 7 } }}>
-            <Typography
-              variant="h3"
-              component="h2"
-              sx={{
-                fontWeight: 700,
-                color: '#032B5A',
-                mb: 2,
-                fontSize: { xs: '1.75rem', md: '2.5rem' }
-              }}
-            >
-              Nos Services les Plus Demandés
-            </Typography>
-            <Typography
-              variant="body1"
-              sx={{
-                color: 'text.secondary',
-                maxWidth: 700,
-                mx: 'auto',
-                fontSize: { xs: '0.95rem', md: '1.1rem' }
-              }}
-            >
-              Découvrez nos services les plus populaires
-            </Typography>
-          </Box>
-
-          <Grid container spacing={{ xs: 3, md: 4 }}>
-            {featuredServices.map((service) => (
-              <Grid item xs={12} md={4} key={service.id}>
-                <Card
-                  sx={{
-                    height: '100%',
-                    display: 'flex',
-                    flexDirection: 'column',
-                    border: '1px solid #e8eaed',
-                    borderRadius: 3,
-                    bgcolor: 'white',
-                    transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
-                    boxShadow: '0 2px 8px rgba(0,0,0,0.08)',
-                    overflow: 'hidden',
-                    '&:hover': {
-                      transform: 'translateY(-8px)',
-                      boxShadow: '0 12px 32px rgba(3, 43, 90, 0.15)',
-                      borderColor: '#F4C542',
-                    },
-                  }}
-                >
-                  <Box
-                    sx={{
-                      height: 160,
-                      bgcolor: '#f8f9fa',
+                      bgcolor: '#F4C542',
                       display: 'flex',
                       alignItems: 'center',
                       justifyContent: 'center',
-                      borderBottom: '2px solid #e8eaed',
                     }}
                   >
-                    <Box
-                      sx={{
-                        width: 100,
-                        height: 100,
-                        borderRadius: '50%',
-                        bgcolor: '#F4C542',
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        boxShadow: '0 4px 16px rgba(244, 197, 66, 0.3)',
-                      }}
-                    >
-                      {getServiceIcon(service.name)}
-                    </Box>
+                    <BuildIcon sx={{ fontSize: 28, color: '#032B5A' }} />
                   </Box>
-                  <CardContent sx={{ flexGrow: 1, textAlign: 'center', p: { xs: 3, md: 4 } }}>
-                    <Typography
-                      variant="h5"
-                      gutterBottom
-                      sx={{
-                        fontWeight: 700,
-                        color: '#032B5A',
-                        mb: 2,
-                        fontSize: { xs: '1.15rem', md: '1.35rem' }
-                      }}
-                    >
-                      {service.name}
-                    </Typography>
-                    {service.description && (
-                      <Typography
-                        variant="body2"
-                        color="text.secondary"
-                        sx={{
-                          mb: 3,
-                          lineHeight: 1.7,
-                          fontSize: { xs: '0.9rem', md: '1rem' },
-                          minHeight: { xs: 48, md: 60 }
-                        }}
-                      >
-                        {service.description}
-                      </Typography>
-                    )}
-                    <Button
-                      variant="contained"
-                      fullWidth
-                      onClick={() => navigate(`/search?category=${service.id}`)}
-                      sx={{
-                        bgcolor: '#032B5A',
-                        color: 'white',
-                        '&:hover': {
-                          bgcolor: '#021d3f',
-                          transform: 'scale(1.02)',
-                        },
-                        textTransform: 'none',
-                        fontWeight: 600,
-                        py: 1.5,
-                        borderRadius: 2,
-                        fontSize: { xs: '0.9rem', md: '1rem' },
-                        boxShadow: '0 4px 12px rgba(3, 43, 90, 0.2)',
-                        transition: 'all 0.2s ease',
-                      }}
-                    >
-                      Réserver
-                    </Button>
-                  </CardContent>
-                </Card>
-              </Grid>
-            ))}
-          </Grid>
-        </Container>
-      </Box>
-
-      {/* Top Technicians Section */}
-      <Box sx={{ py: { xs: 7, md: 11 }, bgcolor: '#fafbfc' }}>
-        <Container maxWidth="lg">
-          <Box sx={{ textAlign: 'center', mb: { xs: 5, md: 7 } }}>
-            <Typography
-              variant="h3"
-              component="h2"
-              sx={{
-                fontWeight: 700,
-                color: '#032B5A',
-                mb: 2,
-                fontSize: { xs: '1.75rem', md: '2.5rem' }
-              }}
-            >
-              Nos Meilleurs Techniciens
-            </Typography>
-            <Typography
-              variant="body1"
-              sx={{
-                color: 'text.secondary',
-                maxWidth: 700,
-                mx: 'auto',
-                fontSize: { xs: '0.95rem', md: '1.1rem' }
-              }}
-            >
-              Découvrez nos techniciens les mieux notés
-            </Typography>
-          </Box>
-
-          <Grid container spacing={{ xs: 3, md: 4 }}>
-            {topTechnicians.map((technician) => {
-              const imageIndex = (technician.id?.charCodeAt(0) || 1) % 8 + 1;
-              const technicianImage = `/images/technicians/technician_${imageIndex}.svg`;
-
-              return (
-                <Grid item xs={12} md={4} key={technician.id}>
-                  <Card
-                    sx={{
-                      height: '100%',
-                      display: 'flex',
-                      flexDirection: 'column',
-                      border: '1px solid #e8eaed',
-                      borderRadius: 3,
-                      bgcolor: 'white',
-                      transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
-                      boxShadow: '0 2px 8px rgba(0,0,0,0.08)',
-                      position: 'relative',
-                      overflow: 'hidden',
-                      '&:hover': {
-                        transform: 'translateY(-8px)',
-                        boxShadow: '0 12px 32px rgba(3, 43, 90, 0.15)',
-                        borderColor: '#F4C542',
-                      },
-                    }}
-                  >
-                    <CardContent sx={{ flexGrow: 1, p: { xs: 3, md: 4 } }}>
-                      <Box sx={{ display: 'flex', alignItems: 'center', gap: 2.5, mb: 3 }}>
-                        <Avatar
-                          src={normalizeImageUrl(technician.profilePictureUrl) || technicianImage}
-                          alt={technician.user?.name}
+                  <Typography variant="h6" sx={{ fontWeight: 700, color: '#032B5A', fontSize: '1.25rem' }}>
+                    Top Services
+                  </Typography>
+                </Box>
+                {loadingServices ? (
+                  <Box sx={{ display: 'flex', justifyContent: 'center', py: 4 }}>
+                    <CircularProgress sx={{ color: '#032B5A' }} />
+                  </Box>
+                ) : featuredServices.length === 0 ? (
+                  <Typography variant="body2" color="text.secondary" sx={{ textAlign: 'center', py: 4 }}>
+                    Aucun service disponible
+                  </Typography>
+                ) : (
+                  <Grid container spacing={2}>
+                    {featuredServices.map((service, index) => (
+                      <Grid item xs={12} sm={4} key={service.id}>
+                        <Card
+                          onClick={() => navigate(`/search?category=${service.id}`)}
                           sx={{
-                            width: { xs: 72, md: 90 },
-                            height: { xs: 72, md: 90 },
-                            bgcolor: '#032B5A',
-                            color: '#F4C542',
-                            fontSize: { xs: 30, md: 38 },
-                            fontWeight: 700,
-                            border: '3px solid #F4C542',
-                            boxShadow: '0 4px 16px rgba(3, 43, 90, 0.2)',
+                            height: '100%',
+                            borderRadius: 2,
+                            border: '1px solid #e8eaed',
+                            bgcolor: 'white',
+                            cursor: 'pointer',
+                            transition: 'all 0.3s ease',
+                            '&:hover': {
+                              transform: 'translateY(-4px)',
+                              boxShadow: '0 8px 24px rgba(0,0,0,0.12)',
+                              borderColor: '#F4C542',
+                            },
                           }}
                         >
-                          {technician.user?.name?.charAt(0).toUpperCase()}
-                        </Avatar>
-                        <Box sx={{ flexGrow: 1, minWidth: 0 }}>
+                          <CardContent sx={{ p: 2.5, textAlign: 'center' }}>
+                            <Box
+                              sx={{
+                                width: 64,
+                                height: 64,
+                                borderRadius: 2,
+                                bgcolor: '#F4C542',
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                mx: 'auto',
+                                mb: 2,
+                              }}
+                            >
+                              {getServiceIcon(service.name)}
+                            </Box>
+                            <Typography
+                              variant="subtitle1"
+                              sx={{
+                                fontWeight: 700,
+                                color: '#032B5A',
+                                mb: 1,
+                                fontSize: '1rem',
+                              }}
+                            >
+                              {service.name}
+                            </Typography>
+                            <Typography
+                              variant="caption"
+                              color="text.secondary"
+                              sx={{
+                                fontSize: '0.8rem',
+                                display: '-webkit-box',
+                                WebkitLineClamp: 2,
+                                WebkitBoxOrient: 'vertical',
+                                overflow: 'hidden',
+                              }}
+                            >
+                              {service.description || 'Service professionnel'}
+                            </Typography>
+                            <Box
+                              sx={{
+                                mt: 1.5,
+                                width: 28,
+                                height: 28,
+                                borderRadius: '50%',
+                                bgcolor: '#032B5A',
+                                color: 'white',
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                fontSize: '0.85rem',
+                                fontWeight: 700,
+                                mx: 'auto',
+                              }}
+                            >
+                              {index + 1}
+                            </Box>
+                          </CardContent>
+                        </Card>
+                      </Grid>
+                    ))}
+                  </Grid>
+                )}
+              </CardContent>
+            </Card>
+
+            {/* Top Technicians Section */}
+            <Card sx={{ mb: 3, borderRadius: 3, boxShadow: '0 2px 8px rgba(0,0,0,0.08)', border: '1px solid #e8eaed' }}>
+              <CardContent sx={{ p: 3 }}>
+                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, mb: 3 }}>
+                  <Box
+                    sx={{
+                      width: 48,
+                      height: 48,
+                      borderRadius: 2,
+                      bgcolor: '#F4C542',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                    }}
+                  >
+                    <StarIcon sx={{ fontSize: 28, color: '#032B5A' }} />
+                  </Box>
+                  <Typography variant="h6" sx={{ fontWeight: 700, color: '#032B5A', fontSize: '1.25rem' }}>
+                    Top Techniciens
+                  </Typography>
+                </Box>
+                {loadingTechs ? (
+                  <Box sx={{ display: 'flex', justifyContent: 'center', py: 4 }}>
+                    <CircularProgress sx={{ color: '#032B5A' }} />
+                  </Box>
+                ) : topTechnicians.length === 0 ? (
+                  <Typography variant="body2" color="text.secondary" sx={{ textAlign: 'center', py: 4 }}>
+                    Aucun technicien disponible
+                  </Typography>
+                ) : (
+                  <Grid container spacing={2}>
+                    {topTechnicians.map((technician, index) => {
+                      const imageIndex = (technician.id?.charCodeAt(0) || 1) % 8 + 1;
+                      const technicianImage = `/images/technicians/technician_${imageIndex}.svg`;
+
+                      return (
+                        <Grid item xs={12} sm={4} key={technician.id}>
+                          <Card
+                            onClick={() => navigate(`/technician/view/${technician.id}`)}
+                            sx={{
+                              height: '100%',
+                              borderRadius: 2,
+                              border: '1px solid #e8eaed',
+                              bgcolor: 'white',
+                              cursor: 'pointer',
+                              transition: 'all 0.3s ease',
+                              '&:hover': {
+                                transform: 'translateY(-4px)',
+                                boxShadow: '0 8px 24px rgba(0,0,0,0.12)',
+                                borderColor: '#F4C542',
+                              },
+                            }}
+                          >
+                            <CardContent sx={{ p: 2.5, textAlign: 'center' }}>
+                              <Avatar
+                                src={normalizeImageUrl(technician.profilePictureUrl || technicianImage)}
+                                sx={{
+                                  width: 80,
+                                  height: 80,
+                                  mx: 'auto',
+                                  mb: 2,
+                                  bgcolor: '#032B5A',
+                                  color: '#F4C542',
+                                  fontWeight: 700,
+                                  fontSize: '2rem',
+                                }}
+                              >
+                                {technician.user?.name?.charAt(0).toUpperCase() || 'T'}
+                              </Avatar>
+                              <Typography
+                                variant="subtitle1"
+                                sx={{
+                                  fontWeight: 700,
+                                  color: '#032B5A',
+                                  mb: 1,
+                                  fontSize: '1rem',
+                                }}
+                              >
+                                {technician.user?.name || 'Technicien'}
+                              </Typography>
+                              <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 0.5, mb: 1 }}>
+                                <Rating
+                                  value={technician.averageRating}
+                                  readOnly
+                                  size="small"
+                                  precision={0.5}
+                                  sx={{ fontSize: '0.9rem' }}
+                                />
+                                <Typography variant="body2" sx={{ color: '#032B5A', fontWeight: 700, fontSize: '0.9rem' }}>
+                                  {technician.averageRating.toFixed(1)}
+                                </Typography>
+                              </Box>
+                              <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 0.5, mb: 1.5 }}>
+                                <LocationOnIcon sx={{ fontSize: 14, color: 'text.secondary' }} />
+                                <Typography variant="caption" color="text.secondary" sx={{ fontSize: '0.8rem' }}>
+                                  {technician.user?.city || 'Ville'}
+                                </Typography>
+                              </Box>
+                              <Box
+                                sx={{
+                                  width: 32,
+                                  height: 32,
+                                  borderRadius: '50%',
+                                  bgcolor: '#F4C542',
+                                  color: '#032B5A',
+                                  display: 'flex',
+                                  alignItems: 'center',
+                                  justifyContent: 'center',
+                                  fontSize: '0.9rem',
+                                  fontWeight: 700,
+                                  mx: 'auto',
+                                }}
+                              >
+                                {index + 1}
+                              </Box>
+                            </CardContent>
+                          </Card>
+                        </Grid>
+                      );
+                    })}
+                  </Grid>
+                )}
+              </CardContent>
+            </Card>
+          </Grid>
+
+          {/* Right Side - Mini Dashboard */}
+          <Grid item xs={12} lg={4}>
+            <Box
+              sx={{
+                position: { lg: 'sticky' },
+                top: 100,
+                display: 'flex',
+                flexDirection: 'column',
+                gap: 2,
+              }}
+            >
+              {/* Platform Statistics */}
+              <Card sx={{ borderRadius: 3, boxShadow: '0 2px 8px rgba(0,0,0,0.08)', border: '1px solid #e8eaed' }}>
+                <CardContent sx={{ p: 2.5 }}>
+                  <Typography variant="h6" sx={{ fontWeight: 700, color: '#032B5A', mb: 2.5, fontSize: '1rem' }}>
+                    Statistiques
+                  </Typography>
+                  <Grid container spacing={2}>
+                    {statistics.map((stat, index) => (
+                      <Grid item xs={6} key={index}>
+                        <Box
+                          sx={{
+                            textAlign: 'center',
+                            p: 1.5,
+                            borderRadius: 2,
+                            bgcolor: '#fafbfc',
+                            border: '1px solid #e8eaed',
+                          }}
+                        >
+                          <Box
+                            sx={{
+                              display: 'flex',
+                              alignItems: 'center',
+                              justifyContent: 'center',
+                              mb: 1,
+                              color: '#032B5A',
+                            }}
+                          >
+                            {stat.icon}
+                          </Box>
                           <Typography
-                            variant="h6"
+                            variant="h5"
                             sx={{
                               fontWeight: 700,
                               color: '#032B5A',
                               mb: 0.5,
-                              fontSize: { xs: '1.05rem', md: '1.2rem' }
+                              fontSize: '1.5rem',
                             }}
                           >
-                            {technician.user?.name}
+                            {stat.value}
                           </Typography>
-                          <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5, mb: 1 }}>
-                            <LocationOnIcon sx={{ fontSize: 18, color: '#9e9e9e' }} />
-                            <Typography
-                              variant="body2"
-                              color="text.secondary"
-                              sx={{
-                                fontSize: { xs: '0.8rem', md: '0.875rem' },
-                                fontWeight: 500,
-                              }}
-                            >
-                              {technician.user?.city}
-                            </Typography>
-                          </Box>
-                          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                            <Rating
-                              value={technician.averageRating}
-                              readOnly
-                              precision={0.5}
-                              size="small"
-                              sx={{
-                                '& .MuiRating-iconFilled': {
-                                  color: '#F4C542',
-                                },
-                              }}
-                            />
-                            <Typography
-                              variant="body2"
-                              sx={{
-                                color: '#032B5A',
-                                fontWeight: 700,
-                                fontSize: { xs: '0.85rem', md: '0.9rem' },
-                              }}
-                            >
-                              {technician.averageRating.toFixed(1)}
-                            </Typography>
-                          </Box>
-                        </Box>
-                      </Box>
-
-                      <Box sx={{ mb: 2.5 }}>
-                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5, mb: 1.5 }}>
-                          <WorkIcon sx={{ fontSize: 18, color: '#9e9e9e' }} />
                           <Typography
-                            variant="body2"
+                            variant="caption"
                             color="text.secondary"
                             sx={{
-                              fontSize: { xs: '0.85rem', md: '0.9rem' },
+                              fontSize: '0.75rem',
+                              fontWeight: 500,
                             }}
                           >
-                            {technician.yearsOfExperience} ans d'expérience
+                            {stat.label}
                           </Typography>
                         </Box>
-                        <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.75, mt: 1.5 }}>
-                          {technician.skills.slice(0, 2).map((skill, idx) => (
-                            <Chip
-                              key={idx}
-                              label={skill}
-                              size="small"
-                              sx={{
-                                bgcolor: '#f8f9fa',
-                                color: '#032B5A',
-                                fontSize: { xs: '0.7rem', md: '0.75rem' },
-                                fontWeight: 600,
-                                border: '1px solid #e8eaed',
-                                borderRadius: 2,
-                                height: { xs: 24, md: 28 },
-                              }}
-                            />
-                          ))}
-                        </Box>
-                      </Box>
+                      </Grid>
+                    ))}
+                  </Grid>
+                </CardContent>
+              </Card>
 
-                      <Button
-                        variant="contained"
-                        fullWidth
-                        onClick={() => navigate(`/technician/view/${technician.id}`)}
-                        sx={{
-                          bgcolor: '#032B5A',
-                          color: 'white',
-                          '&:hover': {
-                            bgcolor: '#021d3f',
-                            transform: 'scale(1.02)',
-                          },
-                          textTransform: 'none',
-                          fontWeight: 600,
-                          py: 1.5,
-                          borderRadius: 2,
-                          fontSize: { xs: '0.9rem', md: '1rem' },
-                          boxShadow: '0 4px 12px rgba(3, 43, 90, 0.2)',
-                          transition: 'all 0.2s ease',
-                        }}
-                      >
-                        Voir Profil
-                      </Button>
-                    </CardContent>
-                  </Card>
-                </Grid>
-              );
-            })}
+              {/* Quick Info Card */}
+              <Card sx={{ borderRadius: 3, boxShadow: '0 2px 8px rgba(0,0,0,0.08)', border: '1px solid #e8eaed' }}>
+                <CardContent sx={{ p: 2.5 }}>
+                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 2 }}>
+                    <VerifiedUserIcon sx={{ color: '#032B5A', fontSize: 20 }} />
+                    <Typography variant="h6" sx={{ fontWeight: 700, color: '#032B5A', fontSize: '1rem' }}>
+                      Pourquoi nous choisir
+                    </Typography>
+                  </Box>
+                  <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1.5 }}>
+                    <Box sx={{ display: 'flex', alignItems: 'flex-start', gap: 1 }}>
+                      <CheckCircleIcon sx={{ color: '#4caf50', fontSize: 18, mt: 0.25 }} />
+                      <Typography variant="body2" sx={{ fontSize: '0.85rem', color: 'text.secondary' }}>
+                        Garantie Satisfait ou Refait
+                      </Typography>
+                    </Box>
+                    <Box sx={{ display: 'flex', alignItems: 'flex-start', gap: 1 }}>
+                      <CheckCircleIcon sx={{ color: '#4caf50', fontSize: 18, mt: 0.25 }} />
+                      <Typography variant="body2" sx={{ fontSize: '0.85rem', color: 'text.secondary' }}>
+                        Techniciens Vérifiés
+                      </Typography>
+                    </Box>
+                    <Box sx={{ display: 'flex', alignItems: 'flex-start', gap: 1 }}>
+                      <CheckCircleIcon sx={{ color: '#4caf50', fontSize: 18, mt: 0.25 }} />
+                      <Typography variant="body2" sx={{ fontSize: '0.85rem', color: 'text.secondary' }}>
+                        Assurance Responsabilité Civile
+                      </Typography>
+                    </Box>
+                  </Box>
+                </CardContent>
+              </Card>
+            </Box>
           </Grid>
-        </Container>
-      </Box>
+        </Grid>
+      </Container>
 
       {/* Why Choose AlloBricolage Section */}
       <Box sx={{ py: { xs: 7, md: 11 }, bgcolor: '#fafbfc' }}>
