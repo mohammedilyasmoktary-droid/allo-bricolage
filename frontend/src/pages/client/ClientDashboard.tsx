@@ -662,7 +662,7 @@ const ClientDashboard: React.FC = () => {
         </Grid>
 
         {/* Sidebar */}
-        <Grid item xs={12} lg={4}>
+        <Grid item xs={12} md={4}>
           {/* Notifications */}
           <Card sx={{ mb: 3, borderRadius: 3, boxShadow: '0 2px 8px rgba(0,0,0,0.08)', border: '1px solid #e8eaed' }}>
             <CardContent sx={{ p: 3 }}>
