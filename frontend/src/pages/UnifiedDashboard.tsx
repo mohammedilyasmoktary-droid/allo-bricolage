@@ -15,7 +15,7 @@ import {
 } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
-import DashboardSidebar from '../components/DashboardSidebar';
+import DashboardLayout from '../components/DashboardLayout';
 import { techniciansApi, Technician } from '../api/technicians';
 import { categoriesApi, Category } from '../api/categories';
 import { normalizeImageUrl } from '../utils/imageUrl';
@@ -31,7 +31,7 @@ import HomeRepairServiceIcon from '@mui/icons-material/HomeRepairService';
 
 const UnifiedDashboard: React.FC = () => {
   const navigate = useNavigate();
-  const { user, logout } = useAuth();
+  const { user } = useAuth();
   const [technicians, setTechnicians] = useState<Technician[]>([]);
   const [services, setServices] = useState<Category[]>([]);
   const [loadingTechs, setLoadingTechs] = useState(true);
@@ -97,27 +97,13 @@ const UnifiedDashboard: React.FC = () => {
     return iconMap[name] || <BuildIcon sx={{ fontSize: 48, color: '#032B5A' }} />;
   };
 
-  const handleLogout = async () => {
-    try {
-      await logout();
-      navigate('/');
-    } catch (error) {
-      console.error('Logout error:', error);
-    }
-  };
-
   if (!user || user.role !== 'CLIENT') {
     return null;
   }
 
   return (
-    <Box sx={{ display: 'flex', minHeight: '100vh', bgcolor: '#fafbfc' }}>
-      {/* Sidebar */}
-      <DashboardSidebar onLogout={handleLogout} />
-
-      {/* Main Content */}
-      <Box sx={{ flex: 1, ml: '280px', p: 4 }}>
-        <Container maxWidth="xl">
+    <DashboardLayout>
+      <Container maxWidth="xl">
           {/* Welcome Section */}
           <Box sx={{ mb: 4 }}>
             <Typography variant="h4" component="h1" sx={{ fontWeight: 700, color: '#032B5A', mb: 1 }}>
@@ -142,15 +128,15 @@ const UnifiedDashboard: React.FC = () => {
             <Box
               sx={{
                 bgcolor: '#032B5A',
-                p: 3,
+                p: { xs: 2, md: 3 },
                 background: 'linear-gradient(135deg, #032B5A 0%, #021d3f 100%)',
               }}
             >
-              <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+              <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, flexWrap: { xs: 'wrap', md: 'nowrap' } }}>
                 <Box
                   sx={{
-                    width: 56,
-                    height: 56,
+                    width: { xs: 48, md: 56 },
+                    height: { xs: 48, md: 56 },
                     borderRadius: 3,
                     bgcolor: '#F4C542',
                     display: 'flex',
@@ -159,7 +145,7 @@ const UnifiedDashboard: React.FC = () => {
                     boxShadow: '0 4px 16px rgba(244, 197, 66, 0.3)',
                   }}
                 >
-                  <StarIcon sx={{ fontSize: 32, color: '#032B5A' }} />
+                  <StarIcon sx={{ fontSize: { xs: 24, md: 32 }, color: '#032B5A' }} />
                 </Box>
                 <Box>
                   <Typography
@@ -167,19 +153,19 @@ const UnifiedDashboard: React.FC = () => {
                     sx={{
                       fontWeight: 700,
                       color: 'white',
-                      fontSize: '1.5rem',
+                      fontSize: { xs: '1.25rem', md: '1.5rem' },
                       mb: 0.5,
                     }}
                   >
                     Techniciens disponibles maintenant
                   </Typography>
-                  <Typography variant="body2" sx={{ color: 'rgba(255,255,255,0.8)' }}>
+                  <Typography variant="body2" sx={{ color: 'rgba(255,255,255,0.8)', fontSize: { xs: '0.85rem', md: '0.875rem' } }}>
                     Trouvez le professionnel idéal pour vos besoins
                   </Typography>
                 </Box>
               </Box>
             </Box>
-            <CardContent sx={{ p: 3 }}>
+            <CardContent sx={{ p: { xs: 2, md: 3 } }}>
               {loadingTechs ? (
                 <Box sx={{ display: 'flex', justifyContent: 'center', py: 6 }}>
                   <CircularProgress sx={{ color: '#032B5A' }} />
@@ -419,11 +405,11 @@ const UnifiedDashboard: React.FC = () => {
                           },
                         }}
                       >
-                        <CardContent sx={{ p: 3, textAlign: 'center' }}>
+                        <CardContent sx={{ p: { xs: 2, md: 3 }, textAlign: 'center' }}>
                           <Box
                             sx={{
-                              width: 80,
-                              height: 80,
+                              width: { xs: 64, md: 80 },
+                              height: { xs: 64, md: 80 },
                               borderRadius: 3,
                               bgcolor: '#F4C542',
                               display: 'flex',
@@ -442,7 +428,7 @@ const UnifiedDashboard: React.FC = () => {
                               fontWeight: 700,
                               color: '#032B5A',
                               mb: 1.5,
-                              fontSize: '1.15rem',
+                              fontSize: { xs: '1rem', md: '1.15rem' },
                             }}
                           >
                             {service.name}
@@ -452,9 +438,9 @@ const UnifiedDashboard: React.FC = () => {
                             color="text.secondary"
                             sx={{
                               mb: 2.5,
-                              fontSize: '0.9rem',
+                              fontSize: { xs: '0.85rem', md: '0.9rem' },
                               lineHeight: 1.6,
-                              minHeight: 48,
+                              minHeight: { xs: 40, md: 48 },
                               display: '-webkit-box',
                               WebkitLineClamp: 2,
                               WebkitBoxOrient: 'vertical',
@@ -475,9 +461,10 @@ const UnifiedDashboard: React.FC = () => {
                               color: 'white',
                               textTransform: 'none',
                               fontWeight: 600,
-                              py: 1.2,
+                              py: { xs: 1, md: 1.2 },
                               borderRadius: 2,
                               boxShadow: '0 4px 12px rgba(3, 43, 90, 0.2)',
+                              fontSize: { xs: '0.875rem', md: '1rem' },
                               '&:hover': {
                                 bgcolor: '#021d3f',
                                 transform: 'scale(1.02)',
@@ -496,8 +483,7 @@ const UnifiedDashboard: React.FC = () => {
             </CardContent>
           </Card>
         </Container>
-      </Box>
-    </Box>
+    </DashboardLayout>
   );
 };
 

@@ -70,11 +70,8 @@ const DashboardSidebar: React.FC<DashboardSidebarProps> = ({ onLogout }) => {
   return (
     <Box
       sx={{
-        width: 280,
-        height: '100vh',
-        position: 'fixed',
-        left: 0,
-        top: 0,
+        width: '100%',
+        height: '100%',
         bgcolor: 'white',
         borderRight: '1px solid #e8eaed',
         display: 'flex',
