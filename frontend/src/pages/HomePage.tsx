@@ -14,12 +14,10 @@ import {
   Badge
 } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
-import { useAuth } from '../contexts/AuthContext';
-import HeroBanner from '../components/HeroBanner';
-import HomePageMiniDashboard from '../components/HomePageMiniDashboard';
 import { techniciansApi, Technician } from '../api/technicians';
 import { categoriesApi, Category } from '../api/categories';
 import { normalizeImageUrl } from '../utils/imageUrl';
+import HeroBanner from '../components/HeroBanner';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import VerifiedUserIcon from '@mui/icons-material/VerifiedUser';
 import SecurityIcon from '@mui/icons-material/Security';
@@ -40,7 +38,6 @@ import WorkIcon from '@mui/icons-material/Work';
 
 const HomePage: React.FC = () => {
   const navigate = useNavigate();
-  const { user, loading: authLoading } = useAuth();
   const [technicians, setTechnicians] = useState<Technician[]>([]);
   const [services, setServices] = useState<Category[]>([]);
   const [loadingTechs, setLoadingTechs] = useState(true);
@@ -86,16 +83,6 @@ const HomePage: React.FC = () => {
     loadServices();
   }, []);
 
-  const { logout } = useAuth();
-  
-  const handleLogout = async () => {
-    try {
-      await logout();
-      navigate('/');
-    } catch (error) {
-      console.error('Logout error:', error);
-    }
-  };
 
   // Get icon for service
   const getServiceIcon = (name: string) => {
@@ -176,19 +163,9 @@ const HomePage: React.FC = () => {
       {/* Hero Banner */}
       <HeroBanner />
 
-      {/* Main Content - New Layout */}
-      <Container maxWidth="xl" sx={{ mt: { xs: 4, md: 6 } }}>
+      {/* Main Content - Services and Technicians */}
+      <Container maxWidth="lg" sx={{ mt: { xs: 4, md: 6 } }}>
         <Grid container spacing={3}>
-          {/* Left Side - Mini Dashboard (only for logged-in users) */}
-          {user && (
-            <Grid item xs={12} md={3}>
-              <HomePageMiniDashboard onLogout={handleLogout} />
-            </Grid>
-          )}
-
-          {/* Right Side - Services and Technicians */}
-          <Grid item xs={12} md={user ? 9 : 12}>
-            <Grid container spacing={3}>
               {/* Services List Section */}
               <Grid item xs={12}>
                 <Card
@@ -584,8 +561,6 @@ const HomePage: React.FC = () => {
                   </CardContent>
                 </Card>
               </Grid>
-            </Grid>
-          </Grid>
         </Grid>
       </Container>
 
