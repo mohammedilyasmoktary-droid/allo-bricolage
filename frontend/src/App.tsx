@@ -30,6 +30,9 @@ import AdminDashboard from './pages/admin/AdminDashboard';
 import AdminTechnicians from './pages/admin/AdminTechnicians';
 import AdminBookings from './pages/admin/AdminBookings';
 import AdminProfile from './pages/admin/AdminProfile';
+import UnifiedDashboard from './pages/UnifiedDashboard';
+import MessagesPage from './pages/MessagesPage';
+import NotificationsPage from './pages/NotificationsPage';
 
 const ProtectedRoute: React.FC<{ children: React.ReactNode; allowedRoles?: string[] }> = ({
   children,
@@ -73,6 +76,16 @@ function App() {
         }
       />
 
+      {/* Unified Dashboard - Main dashboard after login */}
+      <Route
+        path="/dashboard"
+        element={
+          <ProtectedRoute>
+            <UnifiedDashboard />
+          </ProtectedRoute>
+        }
+      />
+
       {/* Client Routes */}
       <Route
         path="/dashboard/client"
@@ -101,6 +114,23 @@ function App() {
             <Layout>
               <ClientBookings />
             </Layout>
+          </ProtectedRoute>
+        }
+      />
+      {/* Messages and Notifications */}
+      <Route
+        path="/messages"
+        element={
+          <ProtectedRoute>
+            <MessagesPage />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/notifications"
+        element={
+          <ProtectedRoute>
+            <NotificationsPage />
           </ProtectedRoute>
         }
       />

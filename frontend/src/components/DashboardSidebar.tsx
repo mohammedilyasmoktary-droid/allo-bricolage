@@ -1,0 +1,206 @@
+import React from 'react';
+import {
+  Box,
+  List,
+  ListItem,
+  ListItemButton,
+  ListItemIcon,
+  ListItemText,
+  Divider,
+  Avatar,
+  Typography,
+  Button,
+} from '@mui/material';
+import { useNavigate, useLocation } from 'react-router-dom';
+import { useAuth } from '../contexts/AuthContext';
+import HomeIcon from '@mui/icons-material/Home';
+import CalendarTodayIcon from '@mui/icons-material/CalendarToday';
+import WorkIcon from '@mui/icons-material/Work';
+import MessageIcon from '@mui/icons-material/Message';
+import NotificationsIcon from '@mui/icons-material/Notifications';
+import PersonIcon from '@mui/icons-material/Person';
+import LogoutIcon from '@mui/icons-material/Logout';
+
+interface DashboardSidebarProps {
+  onLogout: () => void;
+}
+
+const DashboardSidebar: React.FC<DashboardSidebarProps> = ({ onLogout }) => {
+  const navigate = useNavigate();
+  const location = useLocation();
+  const { user } = useAuth();
+
+  if (!user) return null;
+
+  const isActive = (path: string) => location.pathname === path;
+
+  const menuItems = [
+    {
+      label: 'Accueil',
+      icon: <HomeIcon />,
+      path: '/dashboard',
+      roles: ['CLIENT', 'TECHNICIAN', 'ADMIN'],
+    },
+    {
+      label: user.role === 'CLIENT' ? 'Mes Réservations' : 'Mes Missions',
+      icon: user.role === 'CLIENT' ? <CalendarTodayIcon /> : <WorkIcon />,
+      path: user.role === 'CLIENT' ? '/client/bookings' : '/technician/jobs',
+      roles: ['CLIENT', 'TECHNICIAN'],
+    },
+    {
+      label: 'Messages',
+      icon: <MessageIcon />,
+      path: '/messages',
+      roles: ['CLIENT', 'TECHNICIAN'],
+    },
+    {
+      label: 'Notifications',
+      icon: <NotificationsIcon />,
+      path: '/notifications',
+      roles: ['CLIENT', 'TECHNICIAN', 'ADMIN'],
+    },
+    {
+      label: 'Profil',
+      icon: <PersonIcon />,
+      path: user.role === 'CLIENT' ? '/client/profile' : user.role === 'TECHNICIAN' ? '/technician/profile' : '/admin/profile',
+      roles: ['CLIENT', 'TECHNICIAN', 'ADMIN'],
+    },
+  ].filter(item => item.roles.includes(user.role));
+
+  return (
+    <Box
+      sx={{
+        width: 280,
+        height: '100vh',
+        position: 'fixed',
+        left: 0,
+        top: 0,
+        bgcolor: 'white',
+        borderRight: '1px solid #e8eaed',
+        display: 'flex',
+        flexDirection: 'column',
+        boxShadow: '0 2px 8px rgba(0,0,0,0.08)',
+      }}
+    >
+      {/* Profile Section */}
+      <Box
+        sx={{
+          p: 3,
+          bgcolor: '#032B5A',
+          background: 'linear-gradient(135deg, #032B5A 0%, #021d3f 100%)',
+          color: 'white',
+        }}
+      >
+        <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 2 }}>
+          <Avatar
+            sx={{
+              width: 56,
+              height: 56,
+              bgcolor: '#F4C542',
+              color: '#032B5A',
+              fontSize: '1.5rem',
+              fontWeight: 700,
+              border: '3px solid white',
+            }}
+          >
+            {user.name?.charAt(0).toUpperCase() || 'U'}
+          </Avatar>
+          <Box sx={{ flex: 1, minWidth: 0 }}>
+            <Typography
+              variant="h6"
+              sx={{
+                fontWeight: 700,
+                fontSize: '1.1rem',
+                mb: 0.5,
+                overflow: 'hidden',
+                textOverflow: 'ellipsis',
+                whiteSpace: 'nowrap',
+              }}
+            >
+              {user.name}
+            </Typography>
+            <Typography
+              variant="caption"
+              sx={{
+                color: 'rgba(255,255,255,0.8)',
+                textTransform: 'capitalize',
+                fontSize: '0.85rem',
+              }}
+            >
+              {user.role === 'CLIENT' ? 'Client' : user.role === 'TECHNICIAN' ? 'Technicien' : 'Administrateur'}
+            </Typography>
+          </Box>
+        </Box>
+      </Box>
+
+      {/* Navigation Menu */}
+      <Box sx={{ flex: 1, overflowY: 'auto', py: 2 }}>
+        <List sx={{ px: 2 }}>
+          {menuItems.map((item) => (
+            <ListItem key={item.path} disablePadding sx={{ mb: 0.5 }}>
+              <ListItemButton
+                onClick={() => navigate(item.path)}
+                sx={{
+                  borderRadius: 2,
+                  py: 1.5,
+                  px: 2,
+                  bgcolor: isActive(item.path) ? '#F4C542' : 'transparent',
+                  color: isActive(item.path) ? '#032B5A' : '#032B5A',
+                  '&:hover': {
+                    bgcolor: isActive(item.path) ? '#F4C542' : '#f5f5f5',
+                  },
+                  transition: 'all 0.2s ease',
+                }}
+              >
+                <ListItemIcon
+                  sx={{
+                    minWidth: 40,
+                    color: isActive(item.path) ? '#032B5A' : '#032B5A',
+                  }}
+                >
+                  {item.icon}
+                </ListItemIcon>
+                <ListItemText
+                  primary={item.label}
+                  primaryTypographyProps={{
+                    fontWeight: isActive(item.path) ? 700 : 600,
+                    fontSize: '0.95rem',
+                  }}
+                />
+              </ListItemButton>
+            </ListItem>
+          ))}
+        </List>
+      </Box>
+
+      <Divider />
+
+      {/* Logout Button */}
+      <Box sx={{ p: 2 }}>
+        <Button
+          fullWidth
+          variant="outlined"
+          startIcon={<LogoutIcon />}
+          onClick={onLogout}
+          sx={{
+            borderColor: '#dc3545',
+            color: '#dc3545',
+            textTransform: 'none',
+            fontWeight: 600,
+            py: 1.2,
+            borderRadius: 2,
+            '&:hover': {
+              borderColor: '#c82333',
+              bgcolor: '#fff5f5',
+            },
+          }}
+        >
+          Déconnexion
+        </Button>
+      </Box>
+    </Box>
+  );
+};
+
+export default DashboardSidebar;
+

@@ -34,18 +34,14 @@ const LoginPage: React.FC = () => {
     setLoading(false);
   }, []);
 
-  // Redirect based on user role after successful login
+  // Redirect to unified dashboard after successful login
   // Only redirect if we're on the login page (not already redirected)
   useEffect(() => {
     if (user && window.location.pathname === '/login') {
-      if (user.role === 'CLIENT') {
-        navigate('/dashboard/client', { replace: true });
-      } else if (user.role === 'TECHNICIAN') {
-        navigate('/dashboard/technicien', { replace: true });
-      } else if (user.role === 'ADMIN') {
+      if (user.role === 'ADMIN') {
         navigate('/admin/dashboard', { replace: true });
       } else {
-        navigate('/', { replace: true });
+        navigate('/dashboard', { replace: true });
       }
     }
   }, [user, navigate]);
