@@ -35,8 +35,9 @@ const LoginPage: React.FC = () => {
   }, []);
 
   // Redirect based on user role after successful login
+  // Only redirect if we're on the login page (not already redirected)
   useEffect(() => {
-    if (user) {
+    if (user && window.location.pathname === '/login') {
       if (user.role === 'CLIENT') {
         navigate('/dashboard/client', { replace: true });
       } else if (user.role === 'TECHNICIAN') {

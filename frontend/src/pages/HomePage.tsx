@@ -37,11 +37,24 @@ import WorkIcon from '@mui/icons-material/Work';
 
 const HomePage: React.FC = () => {
   const navigate = useNavigate();
-  const { user } = useAuth();
+  const { user, loading: authLoading } = useAuth();
   const [topTechnicians, setTopTechnicians] = useState<Technician[]>([]);
   const [featuredServices, setFeaturedServices] = useState<Category[]>([]);
   const [loadingTechs, setLoadingTechs] = useState(true);
   const [loadingServices, setLoadingServices] = useState(true);
+
+  // Redirect authenticated users to their dashboard
+  useEffect(() => {
+    if (!authLoading && user) {
+      if (user.role === 'CLIENT') {
+        navigate('/dashboard/client', { replace: true });
+      } else if (user.role === 'TECHNICIAN') {
+        navigate('/dashboard/technicien', { replace: true });
+      } else if (user.role === 'ADMIN') {
+        navigate('/admin/dashboard', { replace: true });
+      }
+    }
+  }, [user, authLoading, navigate]);
 
   // Fetch top technicians
   useEffect(() => {

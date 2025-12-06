@@ -54,14 +54,14 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
     switch (user.role) {
       case 'CLIENT':
         return [
-          { label: 'Accueil', path: '/' },
+          { label: 'Tableau de bord', path: '/dashboard/client' },
           { label: 'Rechercher', path: '/search' },
           { label: 'Mes réservations', path: '/client/bookings' },
           { label: 'Profil', path: '/client/profile' },
         ];
       case 'TECHNICIAN':
         return [
-          { label: 'Tableau de bord', path: '/technician/dashboard' },
+          { label: 'Tableau de bord', path: '/dashboard/technicien' },
           { label: 'Statistiques', path: '/technician/analytics' },
           { label: 'Demandes', path: '/technician/requests' },
           { label: 'Mes travaux', path: '/technician/jobs' },
