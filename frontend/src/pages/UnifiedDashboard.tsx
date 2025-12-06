@@ -37,10 +37,24 @@ const UnifiedDashboard: React.FC = () => {
   const [loadingTechs, setLoadingTechs] = useState(true);
   const [loadingServices, setLoadingServices] = useState(true);
 
+  // Redirect non-clients to their appropriate dashboards
   useEffect(() => {
-    loadTechnicians();
-    loadServices();
-  }, []);
+    if (user) {
+      if (user.role === 'TECHNICIAN') {
+        navigate('/dashboard/technicien', { replace: true });
+      } else if (user.role === 'ADMIN') {
+        navigate('/admin/dashboard', { replace: true });
+      }
+    }
+  }, [user, navigate]);
+
+  useEffect(() => {
+    // Only load data if user is a client
+    if (user?.role === 'CLIENT') {
+      loadTechnicians();
+      loadServices();
+    }
+  }, [user]);
 
   const loadTechnicians = async () => {
     try {
@@ -92,7 +106,7 @@ const UnifiedDashboard: React.FC = () => {
     }
   };
 
-  if (!user) {
+  if (!user || user.role !== 'CLIENT') {
     return null;
   }
 

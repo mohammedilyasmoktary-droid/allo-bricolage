@@ -38,7 +38,7 @@ const DashboardSidebar: React.FC<DashboardSidebarProps> = ({ onLogout }) => {
     {
       label: 'Accueil',
       icon: <HomeIcon />,
-      path: '/dashboard',
+      path: user.role === 'CLIENT' ? '/dashboard' : user.role === 'TECHNICIAN' ? '/dashboard/technicien' : '/admin/dashboard',
       roles: ['CLIENT', 'TECHNICIAN', 'ADMIN'],
     },
     {

@@ -78,11 +78,11 @@ function App() {
         }
       />
 
-      {/* Unified Dashboard - Main dashboard after login */}
+      {/* Unified Dashboard - Main dashboard after login (CLIENTS ONLY) */}
       <Route
         path="/dashboard"
         element={
-          <ProtectedRoute>
+          <ProtectedRoute allowedRoles={['CLIENT']}>
             <UnifiedDashboard />
           </ProtectedRoute>
         }
