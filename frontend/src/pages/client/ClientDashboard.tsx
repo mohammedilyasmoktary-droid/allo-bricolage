@@ -99,7 +99,7 @@ const ClientDashboard: React.FC = () => {
       case 'AWAITING_PAYMENT':
         return <HourglassEmptyIcon sx={{ fontSize: 18 }} />;
       default:
-        return null;
+        return undefined;
     }
   };
 
@@ -202,7 +202,7 @@ const ClientDashboard: React.FC = () => {
                               label={getStatusLabel(booking.status)}
                               size="small"
                               color={getStatusColor(booking.status)}
-                              icon={getStatusIcon(booking.status)}
+                              icon={getStatusIcon(booking.status) || undefined}
                               sx={{ fontWeight: 600, fontSize: '0.75rem' }}
                             />
                           </Box>

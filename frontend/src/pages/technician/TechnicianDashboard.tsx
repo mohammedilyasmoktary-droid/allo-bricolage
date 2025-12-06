@@ -140,7 +140,7 @@ const TechnicianDashboard: React.FC = () => {
   const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
   const completedThisMonth = bookings.filter((b) => {
     if (b.status !== 'COMPLETED') return false;
-    const completedDate = new Date(b.updatedAt || b.createdAt);
+    const completedDate = new Date(b.createdAt);
     return completedDate >= startOfMonth;
   });
 
