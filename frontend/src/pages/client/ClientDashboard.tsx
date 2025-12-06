@@ -773,6 +773,7 @@ const ClientDashboard: React.FC = () => {
           </Box>
         </Grid>
       </Grid>
+      </Container>
     </Box>
   );
 };
