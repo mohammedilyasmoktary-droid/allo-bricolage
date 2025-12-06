@@ -46,16 +46,16 @@ const HomePage: React.FC = () => {
   const [loadingTechs, setLoadingTechs] = useState(true);
   const [loadingServices, setLoadingServices] = useState(true);
 
-  // Fetch technicians (5-10)
+  // Fetch top 3 technicians
   useEffect(() => {
     const loadTechnicians = async () => {
       try {
         const data = await techniciansApi.getAvailable();
-        // Sort by rating and take 5-10
+        // Sort by rating and take top 3
         const sorted = data
           .filter(t => t.verificationStatus === 'APPROVED')
           .sort((a, b) => b.averageRating - a.averageRating)
-          .slice(0, 10);
+          .slice(0, 3);
         setTechnicians(sorted);
       } catch (error) {
         console.error('Failed to load technicians:', error);
@@ -66,12 +66,17 @@ const HomePage: React.FC = () => {
     loadTechnicians();
   }, []);
 
-  // Fetch all services
+  // Fetch top 3 services
   useEffect(() => {
     const loadServices = async () => {
       try {
         const data = await categoriesApi.getAll();
-        setServices(data);
+        // Get top 3 most popular services
+        const popularServices = ['Plomberie', 'Électricité', 'Climatisation'];
+        const filtered = data
+          .filter(cat => popularServices.includes(cat.name))
+          .slice(0, 3);
+        setServices(filtered);
       } catch (error) {
         console.error('Failed to load services:', error);
       } finally {
@@ -181,9 +186,169 @@ const HomePage: React.FC = () => {
             </Grid>
           )}
 
-          {/* Right Side - Technicians and Services */}
+          {/* Right Side - Services and Technicians */}
           <Grid item xs={12} md={user ? 9 : 12}>
             <Grid container spacing={3}>
+              {/* Services List Section */}
+              <Grid item xs={12}>
+                <Card
+                  sx={{
+                    borderRadius: 4,
+                    boxShadow: '0 8px 32px rgba(0,0,0,0.12)',
+                    border: '1px solid #e8eaed',
+                    bgcolor: 'white',
+                    overflow: 'hidden',
+                  }}
+                >
+                  <Box
+                    sx={{
+                      bgcolor: '#032B5A',
+                      p: 3,
+                      background: 'linear-gradient(135deg, #032B5A 0%, #021d3f 100%)',
+                    }}
+                  >
+                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+                      <Box
+                        sx={{
+                          width: 56,
+                          height: 56,
+                          borderRadius: 3,
+                          bgcolor: '#F4C542',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          boxShadow: '0 4px 16px rgba(244, 197, 66, 0.3)',
+                        }}
+                      >
+                        <BuildIcon sx={{ fontSize: 32, color: '#032B5A' }} />
+                      </Box>
+                      <Box>
+                        <Typography
+                          variant="h5"
+                          sx={{
+                            fontWeight: 700,
+                            color: 'white',
+                            fontSize: '1.5rem',
+                            mb: 0.5,
+                          }}
+                        >
+                          Nos Services
+                        </Typography>
+                        <Typography variant="body2" sx={{ color: 'rgba(255,255,255,0.8)' }}>
+                          Découvrez tous nos services de maintenance et réparation
+                        </Typography>
+                      </Box>
+                    </Box>
+                  </Box>
+                  <CardContent sx={{ p: 3 }}>
+                    {loadingServices ? (
+                      <Box sx={{ display: 'flex', justifyContent: 'center', py: 6 }}>
+                        <CircularProgress sx={{ color: '#032B5A' }} />
+                      </Box>
+                    ) : services.length === 0 ? (
+                      <Typography variant="body2" color="text.secondary" sx={{ textAlign: 'center', py: 6 }}>
+                        Aucun service disponible
+                      </Typography>
+                    ) : (
+                      <Grid container spacing={3}>
+                        {services.map((service) => (
+                          <Grid item xs={12} sm={6} md={4} key={service.id}>
+                            <Card
+                              onClick={() => navigate(`/search?category=${service.id}`)}
+                              sx={{
+                                height: '100%',
+                                borderRadius: 3,
+                                border: '1px solid #e8eaed',
+                                bgcolor: 'white',
+                                cursor: 'pointer',
+                                transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+                                boxShadow: '0 2px 8px rgba(0,0,0,0.08)',
+                                overflow: 'hidden',
+                                '&:hover': {
+                                  transform: 'translateY(-8px)',
+                                  boxShadow: '0 12px 32px rgba(3, 43, 90, 0.15)',
+                                  borderColor: '#F4C542',
+                                },
+                              }}
+                            >
+                              <CardContent sx={{ p: 3, textAlign: 'center' }}>
+                                <Box
+                                  sx={{
+                                    width: 80,
+                                    height: 80,
+                                    borderRadius: 3,
+                                    bgcolor: '#F4C542',
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    justifyContent: 'center',
+                                    mx: 'auto',
+                                    mb: 2,
+                                    boxShadow: '0 4px 16px rgba(244, 197, 66, 0.3)',
+                                  }}
+                                >
+                                  {getServiceIcon(service.name)}
+                                </Box>
+                                <Typography
+                                  variant="h6"
+                                  sx={{
+                                    fontWeight: 700,
+                                    color: '#032B5A',
+                                    mb: 1.5,
+                                    fontSize: '1.15rem',
+                                  }}
+                                >
+                                  {service.name}
+                                </Typography>
+                                <Typography
+                                  variant="body2"
+                                  color="text.secondary"
+                                  sx={{
+                                    mb: 2.5,
+                                    fontSize: '0.9rem',
+                                    lineHeight: 1.6,
+                                    minHeight: 48,
+                                    display: '-webkit-box',
+                                    WebkitLineClamp: 2,
+                                    WebkitBoxOrient: 'vertical',
+                                    overflow: 'hidden',
+                                  }}
+                                >
+                                  {service.description || 'Service professionnel de qualité'}
+                                </Typography>
+                                <Button
+                                  fullWidth
+                                  variant="contained"
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    navigate(`/search?category=${service.id}`);
+                                  }}
+                                  sx={{
+                                    bgcolor: '#032B5A',
+                                    color: 'white',
+                                    textTransform: 'none',
+                                    fontWeight: 600,
+                                    py: 1.2,
+                                    borderRadius: 2,
+                                    boxShadow: '0 4px 12px rgba(3, 43, 90, 0.2)',
+                                    '&:hover': {
+                                      bgcolor: '#021d3f',
+                                      transform: 'scale(1.02)',
+                                    },
+                                    transition: 'all 0.2s ease',
+                                  }}
+                                >
+                                  Trouver un technicien
+                                </Button>
+                              </CardContent>
+                            </Card>
+                          </Grid>
+                        ))}
+                      </Grid>
+                    )}
+                  </CardContent>
+                </Card>
+              </Grid>
+
               {/* Technicians List Section */}
               <Grid item xs={12}>
                 <Card
@@ -414,166 +579,6 @@ const HomePage: React.FC = () => {
                             </Grid>
                           );
                         })}
-                      </Grid>
-                    )}
-                  </CardContent>
-                </Card>
-              </Grid>
-
-              {/* Services List Section */}
-              <Grid item xs={12}>
-                <Card
-                  sx={{
-                    borderRadius: 4,
-                    boxShadow: '0 8px 32px rgba(0,0,0,0.12)',
-                    border: '1px solid #e8eaed',
-                    bgcolor: 'white',
-                    overflow: 'hidden',
-                  }}
-                >
-                  <Box
-                    sx={{
-                      bgcolor: '#032B5A',
-                      p: 3,
-                      background: 'linear-gradient(135deg, #032B5A 0%, #021d3f 100%)',
-                    }}
-                  >
-                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-                      <Box
-                        sx={{
-                          width: 56,
-                          height: 56,
-                          borderRadius: 3,
-                          bgcolor: '#F4C542',
-                          display: 'flex',
-                          alignItems: 'center',
-                          justifyContent: 'center',
-                          boxShadow: '0 4px 16px rgba(244, 197, 66, 0.3)',
-                        }}
-                      >
-                        <BuildIcon sx={{ fontSize: 32, color: '#032B5A' }} />
-                      </Box>
-                      <Box>
-                        <Typography
-                          variant="h5"
-                          sx={{
-                            fontWeight: 700,
-                            color: 'white',
-                            fontSize: '1.5rem',
-                            mb: 0.5,
-                          }}
-                        >
-                          Nos Services
-                        </Typography>
-                        <Typography variant="body2" sx={{ color: 'rgba(255,255,255,0.8)' }}>
-                          Découvrez tous nos services de maintenance et réparation
-                        </Typography>
-                      </Box>
-                    </Box>
-                  </Box>
-                  <CardContent sx={{ p: 3 }}>
-                    {loadingServices ? (
-                      <Box sx={{ display: 'flex', justifyContent: 'center', py: 6 }}>
-                        <CircularProgress sx={{ color: '#032B5A' }} />
-                      </Box>
-                    ) : services.length === 0 ? (
-                      <Typography variant="body2" color="text.secondary" sx={{ textAlign: 'center', py: 6 }}>
-                        Aucun service disponible
-                      </Typography>
-                    ) : (
-                      <Grid container spacing={3}>
-                        {services.map((service) => (
-                          <Grid item xs={12} sm={6} md={4} key={service.id}>
-                            <Card
-                              onClick={() => navigate(`/search?category=${service.id}`)}
-                              sx={{
-                                height: '100%',
-                                borderRadius: 3,
-                                border: '1px solid #e8eaed',
-                                bgcolor: 'white',
-                                cursor: 'pointer',
-                                transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
-                                boxShadow: '0 2px 8px rgba(0,0,0,0.08)',
-                                overflow: 'hidden',
-                                '&:hover': {
-                                  transform: 'translateY(-8px)',
-                                  boxShadow: '0 12px 32px rgba(3, 43, 90, 0.15)',
-                                  borderColor: '#F4C542',
-                                },
-                              }}
-                            >
-                              <CardContent sx={{ p: 3, textAlign: 'center' }}>
-                                <Box
-                                  sx={{
-                                    width: 80,
-                                    height: 80,
-                                    borderRadius: 3,
-                                    bgcolor: '#F4C542',
-                                    display: 'flex',
-                                    alignItems: 'center',
-                                    justifyContent: 'center',
-                                    mx: 'auto',
-                                    mb: 2,
-                                    boxShadow: '0 4px 16px rgba(244, 197, 66, 0.3)',
-                                  }}
-                                >
-                                  {getServiceIcon(service.name)}
-                                </Box>
-                                <Typography
-                                  variant="h6"
-                                  sx={{
-                                    fontWeight: 700,
-                                    color: '#032B5A',
-                                    mb: 1.5,
-                                    fontSize: '1.15rem',
-                                  }}
-                                >
-                                  {service.name}
-                                </Typography>
-                                <Typography
-                                  variant="body2"
-                                  color="text.secondary"
-                                  sx={{
-                                    mb: 2.5,
-                                    fontSize: '0.9rem',
-                                    lineHeight: 1.6,
-                                    minHeight: 48,
-                                    display: '-webkit-box',
-                                    WebkitLineClamp: 2,
-                                    WebkitBoxOrient: 'vertical',
-                                    overflow: 'hidden',
-                                  }}
-                                >
-                                  {service.description || 'Service professionnel de qualité'}
-                                </Typography>
-                                <Button
-                                  fullWidth
-                                  variant="contained"
-                                  onClick={(e) => {
-                                    e.stopPropagation();
-                                    navigate(`/search?category=${service.id}`);
-                                  }}
-                                  sx={{
-                                    bgcolor: '#032B5A',
-                                    color: 'white',
-                                    textTransform: 'none',
-                                    fontWeight: 600,
-                                    py: 1.2,
-                                    borderRadius: 2,
-                                    boxShadow: '0 4px 12px rgba(3, 43, 90, 0.2)',
-                                    '&:hover': {
-                                      bgcolor: '#021d3f',
-                                      transform: 'scale(1.02)',
-                                    },
-                                    transition: 'all 0.2s ease',
-                                  }}
-                                >
-                                  Trouver un technicien
-                                </Button>
-                              </CardContent>
-                            </Card>
-                          </Grid>
-                        ))}
                       </Grid>
                     )}
                   </CardContent>
