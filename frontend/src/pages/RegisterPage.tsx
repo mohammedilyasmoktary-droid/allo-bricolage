@@ -123,13 +123,16 @@ const RegisterPage: React.FC = () => {
         await register(formData);
       }
       
-      // After successful registration, redirect based on URL parameters
-      if (technicianIdParam && categoryIdParam && formData.role === 'CLIENT') {
-        // Redirect to booking page with technician and category
+      // After successful registration, redirect based on role
+      if (formData.role === 'TECHNICIAN') {
+        // Technicians go to their dashboard
+        navigate('/dashboard/technicien');
+      } else if (technicianIdParam && categoryIdParam) {
+        // Client with booking flow - redirect to booking page
         navigate(`/booking?technicianId=${technicianIdParam}&categoryId=${categoryIdParam}`);
       } else {
-        // Default redirect to home
-        navigate('/');
+        // Default client redirect to client dashboard
+        navigate('/dashboard/client');
       }
     } catch (err: any) {
       console.error('Registration error:', err);
@@ -246,75 +249,12 @@ const RegisterPage: React.FC = () => {
           )}
 
           <form onSubmit={handleSubmit}>
-            {/* Role Selection */}
-            {!roleParam && (
-              <>
-                <FormLabel
-                  component="legend"
-                  sx={{
-                    mb: 1.5,
-                    fontWeight: 600,
-                    color: '#032B5A',
-                    fontSize: '0.95rem',
-                  }}
-                >
-                  Je suis
-                </FormLabel>
-                <RadioGroup
-                  row
-                  value={formData.role}
-                  onChange={(e) => {
-                    const newRole = e.target.value as 'CLIENT' | 'TECHNICIAN';
-                    setFormData({ ...formData, role: newRole });
-                    // Clear national ID card if switching to client
-                    if (newRole === 'CLIENT') {
-                      setNationalIdCard(null);
-                      setNationalIdPreview(null);
-                    }
-                  }}
-                  sx={{
-                    mb: 3,
-                    '& .MuiFormControlLabel-root': {
-                      flex: 1,
-                      mx: 0,
-                      '& .MuiRadio-root': {
-                        color: '#032B5A',
-                        '&.Mui-checked': {
-                          color: '#F4C542',
-                        },
-                      },
-                    },
-                  }}
-                >
-              <FormControlLabel
-                value="CLIENT"
-                control={<Radio />}
-                label={
-                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                    <AccountCircleIcon sx={{ fontSize: 20, color: formData.role === 'CLIENT' ? '#F4C542' : '#666' }} />
-                    <Typography sx={{ fontWeight: formData.role === 'CLIENT' ? 600 : 400 }}>
-                      Client
-                    </Typography>
-                  </Box>
-                }
-              />
-              <FormControlLabel
-                value="TECHNICIAN"
-                control={<Radio />}
-                label={
-                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                    <BuildIcon sx={{ fontSize: 20, color: formData.role === 'TECHNICIAN' ? '#F4C542' : '#666' }} />
-                    <Typography sx={{ fontWeight: formData.role === 'TECHNICIAN' ? 600 : 400 }}>
-                      Technicien
-                    </Typography>
-                  </Box>
-                }
-              />
-                </RadioGroup>
-              </>
+            {/* Role Selection - Only show if coming from technician flow */}
+            {roleParam === 'TECHNICIAN' && (
+              <Alert severity="info" sx={{ mb: 3, borderRadius: 2 }}>
+                Vous créez un compte technicien. Veuillez remplir tous les champs requis.
+              </Alert>
             )}
-
-            <Divider sx={{ mb: 3, borderColor: '#e0e0e0' }} />
 
             {/* Form Fields */}
             <TextField

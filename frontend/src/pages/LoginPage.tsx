@@ -22,7 +22,7 @@ import LoginIcon from '@mui/icons-material/Login';
 
 const LoginPage: React.FC = () => {
   const navigate = useNavigate();
-  const { login } = useAuth();
+  const { login, user } = useAuth();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
@@ -33,6 +33,21 @@ const LoginPage: React.FC = () => {
   useEffect(() => {
     setLoading(false);
   }, []);
+
+  // Redirect based on user role after successful login
+  useEffect(() => {
+    if (user) {
+      if (user.role === 'CLIENT') {
+        navigate('/dashboard/client', { replace: true });
+      } else if (user.role === 'TECHNICIAN') {
+        navigate('/dashboard/technicien', { replace: true });
+      } else if (user.role === 'ADMIN') {
+        navigate('/admin/dashboard', { replace: true });
+      } else {
+        navigate('/', { replace: true });
+      }
+    }
+  }, [user, navigate]);
 
   const isFormValid = email.trim() !== '' && password.trim() !== '';
 
@@ -46,9 +61,8 @@ const LoginPage: React.FC = () => {
     try {
       console.log('Attempting login with:', email.trim());
       await login(email.trim(), password);
-      console.log('Login successful, navigating...');
-      // Navigation will happen automatically after successful login
-      navigate('/');
+      console.log('Login successful, navigation will happen automatically via useEffect');
+      // Navigation will be handled by useEffect that watches user changes
     } catch (err: any) {
       console.error('Login error:', err);
       console.error('Error details:', {

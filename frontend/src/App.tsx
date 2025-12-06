@@ -9,6 +9,7 @@ import ForgotPasswordPage from './pages/auth/ForgotPasswordPage';
 import ResetPasswordPage from './pages/auth/ResetPasswordPage';
 import ClientProfile from './pages/client/ClientProfile';
 import ClientBookings from './pages/client/ClientBookings';
+import ClientDashboard from './pages/client/ClientDashboard';
 import SearchTechnicians from './pages/client/SearchTechnicians';
 import CreateBooking from './pages/client/CreateBooking';
 import PaymentPage from './pages/client/PaymentPage';
@@ -73,6 +74,16 @@ function App() {
       />
 
       {/* Client Routes */}
+      <Route
+        path="/dashboard/client"
+        element={
+          <ProtectedRoute allowedRoles={['CLIENT']}>
+            <Layout>
+              <ClientDashboard />
+            </Layout>
+          </ProtectedRoute>
+        }
+      />
       <Route
         path="/client/profile"
         element={
@@ -180,6 +191,16 @@ function App() {
       />
 
       {/* Technician Routes */}
+      <Route
+        path="/dashboard/technicien"
+        element={
+          <ProtectedRoute allowedRoles={['TECHNICIAN']}>
+            <Layout>
+              <TechnicianDashboard />
+            </Layout>
+          </ProtectedRoute>
+        }
+      />
       <Route
         path="/technician/dashboard"
         element={

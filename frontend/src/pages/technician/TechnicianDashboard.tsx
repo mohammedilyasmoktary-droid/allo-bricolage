@@ -1,18 +1,45 @@
 import React, { useState, useEffect } from 'react';
-import { Box, Typography, Card, CardContent, Grid, Chip, Switch, FormControlLabel, Button, Alert } from '@mui/material';
+import {
+  Box,
+  Typography,
+  Card,
+  CardContent,
+  Grid,
+  Chip,
+  Button,
+  Switch,
+  FormControlLabel,
+  CircularProgress,
+  Avatar,
+  Divider,
+  Paper,
+  Alert,
+} from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
 import { techniciansApi } from '../../api/technicians';
 import { bookingsApi, Booking } from '../../api/bookings';
 import { subscriptionsApi } from '../../api/subscriptions';
+import { format } from 'date-fns';
+import { fr } from 'date-fns/locale';
+import CheckCircleIcon from '@mui/icons-material/CheckCircle';
+import DirectionsCarIcon from '@mui/icons-material/DirectionsCar';
+import PlayArrowIcon from '@mui/icons-material/PlayArrow';
+import StopIcon from '@mui/icons-material/Stop';
+import CalendarTodayIcon from '@mui/icons-material/CalendarToday';
+import LocationOnIcon from '@mui/icons-material/LocationOn';
+import PersonIcon from '@mui/icons-material/Person';
+import AttachMoneyIcon from '@mui/icons-material/AttachMoney';
+import EditIcon from '@mui/icons-material/Edit';
+import BuildIcon from '@mui/icons-material/Build';
 
 const TechnicianDashboard: React.FC = () => {
   const navigate = useNavigate();
   const { user, refreshUser } = useAuth();
   const [isOnline, setIsOnline] = useState(false);
-  const [todayBookings, setTodayBookings] = useState<Booking[]>([]);
-  const [pendingRequests, setPendingRequests] = useState<Booking[]>([]);
+  const [bookings, setBookings] = useState<Booking[]>([]);
   const [subscriptionStatus, setSubscriptionStatus] = useState<any>(null);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     loadDashboardData();
@@ -24,28 +51,25 @@ const TechnicianDashboard: React.FC = () => {
         setIsOnline(user.technicianProfile.isOnline);
       }
 
-      const [bookings, subscription] = await Promise.all([
+      const [bookingsData, subscription] = await Promise.all([
         bookingsApi.getMyBookings(),
-        subscriptionsApi.getStatus().catch(() => null), // Don't fail if subscription check fails
+        subscriptionsApi.getStatus().catch(() => null),
       ]);
 
-      const todayDate = new Date();
-      todayDate.setHours(0, 0, 0, 0);
-
-      const today = bookings.filter((b) => {
-        if (!b.scheduledDateTime) return false;
-        const bookingDate = new Date(b.scheduledDateTime);
-        bookingDate.setHours(0, 0, 0, 0);
-        return bookingDate.getTime() === todayDate.getTime();
+      // Sort bookings by scheduled date
+      bookingsData.sort((a, b) => {
+        if (!a.scheduledDateTime && !b.scheduledDateTime) return 0;
+        if (!a.scheduledDateTime) return 1;
+        if (!b.scheduledDateTime) return -1;
+        return new Date(a.scheduledDateTime).getTime() - new Date(b.scheduledDateTime).getTime();
       });
 
-      const pending = bookings.filter((b) => b.status === 'PENDING');
-
-      setTodayBookings(today);
-      setPendingRequests(pending);
+      setBookings(bookingsData);
       setSubscriptionStatus(subscription);
     } catch (error) {
       console.error('Failed to load dashboard data:', error);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -59,15 +83,112 @@ const TechnicianDashboard: React.FC = () => {
     }
   };
 
+  const handleStatusUpdate = async (bookingId: string, status: string) => {
+    try {
+      await bookingsApi.updateStatus(bookingId, { status });
+      await loadDashboardData();
+    } catch (error) {
+      console.error('Failed to update booking status:', error);
+    }
+  };
+
+  const getStatusLabel = (status: string) => {
+    const labels: Record<string, string> = {
+      PENDING: 'En attente',
+      ACCEPTED: 'Acceptée',
+      DECLINED: 'Refusée',
+      ON_THE_WAY: 'En route',
+      IN_PROGRESS: 'En cours',
+      COMPLETED: 'Terminée',
+      AWAITING_PAYMENT: 'En attente de paiement',
+      CANCELLED: 'Annulée',
+    };
+    return labels[status] || status;
+  };
+
+  const getStatusColor = (status: string) => {
+    const colors: Record<string, 'default' | 'primary' | 'secondary' | 'error' | 'info' | 'success' | 'warning'> = {
+      PENDING: 'warning',
+      ACCEPTED: 'info',
+      DECLINED: 'error',
+      ON_THE_WAY: 'info',
+      IN_PROGRESS: 'primary',
+      COMPLETED: 'success',
+      AWAITING_PAYMENT: 'warning',
+      CANCELLED: 'error',
+    };
+    return colors[status] || 'default';
+  };
+
+  // Get current/ongoing job
+  const currentJob = bookings.find(
+    (b) => b.status === 'ON_THE_WAY' || b.status === 'IN_PROGRESS' || b.status === 'ACCEPTED'
+  );
+
+  // Get upcoming jobs (next 5)
+  const upcomingJobs = bookings
+    .filter((b) => {
+      if (!b.scheduledDateTime) return false;
+      const bookingDate = new Date(b.scheduledDateTime);
+      const now = new Date();
+      return bookingDate > now && (b.status === 'ACCEPTED' || b.status === 'PENDING');
+    })
+    .slice(0, 5);
+
+  // Get completed jobs this month
+  const now = new Date();
+  const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+  const completedThisMonth = bookings.filter((b) => {
+    if (b.status !== 'COMPLETED') return false;
+    const completedDate = new Date(b.updatedAt || b.createdAt);
+    return completedDate >= startOfMonth;
+  });
+
+  // Calculate earnings (placeholder)
+  const totalEarnings = bookings
+    .filter((b) => b.paymentStatus === 'PAID' && b.finalPrice)
+    .reduce((sum, b) => sum + (b.finalPrice || 0), 0);
+
+  if (loading) {
+    return (
+      <Box display="flex" justifyContent="center" alignItems="center" minHeight="400px">
+        <CircularProgress sx={{ color: '#032B5A' }} />
+      </Box>
+    );
+  }
+
   return (
-    <Box>
-      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 4, flexWrap: 'wrap', gap: 2 }}>
-        <Typography variant="h4" component="h1" sx={{ fontWeight: 600, color: '#032B5A' }}>
-          Tableau de bord
-        </Typography>
+    <Box sx={{ bgcolor: '#fafbfc', minHeight: '100vh', py: 3 }}>
+      {/* Welcome Section */}
+      <Box sx={{ mb: 4, display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 2 }}>
+        <Box>
+          <Typography variant="h4" component="h1" sx={{ fontWeight: 700, color: '#032B5A', mb: 1 }}>
+            Bienvenue, {user?.name} 👋
+          </Typography>
+          <Typography variant="body1" color="text.secondary">
+            Gérez vos missions et suivez vos performances
+          </Typography>
+        </Box>
         <FormControlLabel
-          control={<Switch checked={isOnline} onChange={handleToggleOnline} />}
-          label={isOnline ? 'En ligne' : 'Hors ligne'}
+          control={
+            <Switch
+              checked={isOnline}
+              onChange={handleToggleOnline}
+              sx={{
+                '& .MuiSwitch-switchBase.Mui-checked': {
+                  color: '#4caf50',
+                },
+                '& .MuiSwitch-switchBase.Mui-checked + .MuiSwitch-track': {
+                  backgroundColor: '#4caf50',
+                },
+              }}
+            />
+          }
+          label={
+            <Typography sx={{ fontWeight: 600, color: isOnline ? '#4caf50' : '#666' }}>
+              {isOnline ? 'En ligne' : 'Hors ligne'}
+            </Typography>
+          }
         />
       </Box>
 
@@ -75,13 +196,13 @@ const TechnicianDashboard: React.FC = () => {
       {subscriptionStatus && !subscriptionStatus.canAcceptJobs && (
         <Alert
           severity="warning"
-          sx={{ mb: 3 }}
+          sx={{ mb: 3, borderRadius: 2 }}
           action={
             <Button
               color="inherit"
               size="small"
               onClick={() => navigate('/technician/subscription')}
-              sx={{ textTransform: 'none' }}
+              sx={{ textTransform: 'none', fontWeight: 600 }}
             >
               Renouveler
             </Button>
@@ -92,12 +213,12 @@ const TechnicianDashboard: React.FC = () => {
       )}
 
       {subscriptionStatus && subscriptionStatus.subscription && subscriptionStatus.daysRemaining <= 7 && subscriptionStatus.daysRemaining > 0 && (
-        <Alert severity="info" sx={{ mb: 3 }}>
+        <Alert severity="info" sx={{ mb: 3, borderRadius: 2 }}>
           Votre abonnement expire dans {subscriptionStatus.daysRemaining} jour(s).{' '}
           <Button
             size="small"
             onClick={() => navigate('/technician/subscription')}
-            sx={{ textTransform: 'none', ml: 1 }}
+            sx={{ textTransform: 'none', ml: 1, fontWeight: 600 }}
           >
             Renouveler maintenant
           </Button>
@@ -105,48 +226,274 @@ const TechnicianDashboard: React.FC = () => {
       )}
 
       <Grid container spacing={3}>
-        <Grid item xs={12} md={4}>
-          <Card sx={{ boxShadow: 2 }}>
-            <CardContent>
-              <Typography variant="h6" gutterBottom sx={{ color: '#032B5A', fontWeight: 500 }}>
-                Demandes en attente
+        {/* Current Job */}
+        {currentJob && (
+          <Grid item xs={12}>
+            <Card sx={{ borderRadius: 3, boxShadow: '0 2px 8px rgba(0,0,0,0.08)', border: '1px solid #e8eaed', bgcolor: '#fff3e0' }}>
+              <CardContent sx={{ p: 3 }}>
+                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 2 }}>
+                  <BuildIcon sx={{ color: '#F4C542', fontSize: 28 }} />
+                  <Typography variant="h6" sx={{ fontWeight: 700, color: '#032B5A', fontSize: '1.25rem' }}>
+                    Mission en cours
+                  </Typography>
+                </Box>
+                <Paper sx={{ p: 2.5, bgcolor: 'white', borderRadius: 2, mb: 2 }}>
+                  <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 2 }}>
+                    <Box sx={{ flex: 1 }}>
+                      <Typography variant="h6" sx={{ fontWeight: 600, color: '#032B5A', mb: 1 }}>
+                        {currentJob.category?.name || 'Service'}
+                      </Typography>
+                      <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1 }}>
+                        <PersonIcon sx={{ fontSize: 16, color: 'text.secondary' }} />
+                        <Typography variant="body2" color="text.secondary">
+                          {currentJob.client?.name || 'Client'}
+                        </Typography>
+                      </Box>
+                      {currentJob.scheduledDateTime && (
+                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1 }}>
+                          <CalendarTodayIcon sx={{ fontSize: 16, color: 'text.secondary' }} />
+                          <Typography variant="body2" color="text.secondary">
+                            {format(new Date(currentJob.scheduledDateTime), "d MMMM yyyy 'à' HH:mm", { locale: fr })}
+                          </Typography>
+                        </Box>
+                      )}
+                      <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                        <LocationOnIcon sx={{ fontSize: 16, color: 'text.secondary' }} />
+                        <Typography variant="body2" color="text.secondary">
+                          {currentJob.address}, {currentJob.city}
+                        </Typography>
+                      </Box>
+                    </Box>
+                    <Chip
+                      label={getStatusLabel(currentJob.status)}
+                      color={getStatusColor(currentJob.status)}
+                      sx={{ fontWeight: 600 }}
+                    />
+                  </Box>
+                  <Divider sx={{ my: 2 }} />
+                  <Box sx={{ display: 'flex', gap: 1.5, flexWrap: 'wrap' }}>
+                    {currentJob.status === 'ACCEPTED' && (
+                      <Button
+                        variant="contained"
+                        startIcon={<DirectionsCarIcon />}
+                        onClick={() => handleStatusUpdate(currentJob.id, 'ON_THE_WAY')}
+                        sx={{
+                          bgcolor: '#032B5A',
+                          '&:hover': { bgcolor: '#021d3f' },
+                          textTransform: 'none',
+                          fontWeight: 600,
+                        }}
+                      >
+                        Arrivé
+                      </Button>
+                    )}
+                    {currentJob.status === 'ON_THE_WAY' && (
+                      <Button
+                        variant="contained"
+                        startIcon={<PlayArrowIcon />}
+                        onClick={() => handleStatusUpdate(currentJob.id, 'IN_PROGRESS')}
+                        sx={{
+                          bgcolor: '#4caf50',
+                          '&:hover': { bgcolor: '#388e3c' },
+                          textTransform: 'none',
+                          fontWeight: 600,
+                        }}
+                      >
+                        Commencer
+                      </Button>
+                    )}
+                    {currentJob.status === 'IN_PROGRESS' && (
+                      <Button
+                        variant="contained"
+                        startIcon={<StopIcon />}
+                        onClick={() => handleStatusUpdate(currentJob.id, 'COMPLETED')}
+                        sx={{
+                          bgcolor: '#F4C542',
+                          color: '#032B5A',
+                          '&:hover': { bgcolor: '#f5b800' },
+                          textTransform: 'none',
+                          fontWeight: 600,
+                        }}
+                      >
+                        Terminer
+                      </Button>
+                    )}
+                  </Box>
+                </Paper>
+              </CardContent>
+            </Card>
+          </Grid>
+        )}
+
+        {/* Upcoming Jobs */}
+        <Grid item xs={12} md={6}>
+          <Card sx={{ borderRadius: 3, boxShadow: '0 2px 8px rgba(0,0,0,0.08)', border: '1px solid #e8eaed' }}>
+            <CardContent sx={{ p: 3 }}>
+              <Typography variant="h6" sx={{ fontWeight: 700, color: '#032B5A', mb: 3, fontSize: '1.25rem' }}>
+                Prochaines missions
               </Typography>
-              <Typography variant="h3" sx={{ color: '#F4C542', fontWeight: 600 }}>
-                {pendingRequests.length}
-              </Typography>
+              {upcomingJobs.length === 0 ? (
+                <Typography variant="body2" color="text.secondary" sx={{ textAlign: 'center', py: 2 }}>
+                  Aucune mission à venir
+                </Typography>
+              ) : (
+                <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+                  {upcomingJobs.map((booking) => (
+                    <Paper
+                      key={booking.id}
+                      sx={{
+                        p: 2,
+                        borderRadius: 2,
+                        border: '1px solid #e8eaed',
+                        bgcolor: 'white',
+                      }}
+                    >
+                      <Typography variant="subtitle1" sx={{ fontWeight: 600, color: '#032B5A', mb: 1 }}>
+                        {booking.category?.name || 'Service'}
+                      </Typography>
+                      {booking.scheduledDateTime && (
+                        <Typography variant="body2" color="text.secondary" sx={{ mb: 0.5 }}>
+                          {format(new Date(booking.scheduledDateTime), "d MMM yyyy 'à' HH:mm", { locale: fr })}
+                        </Typography>
+                      )}
+                      <Typography variant="body2" color="text.secondary">
+                        {booking.city}
+                      </Typography>
+                    </Paper>
+                  ))}
+                </Box>
+              )}
             </CardContent>
           </Card>
         </Grid>
 
-        <Grid item xs={12} md={4}>
-          <Card sx={{ boxShadow: 2 }}>
-            <CardContent>
-              <Typography variant="h6" gutterBottom sx={{ color: '#032B5A', fontWeight: 500 }}>
-                Travaux aujourd'hui
-              </Typography>
-              <Typography variant="h3" sx={{ color: '#F4C542', fontWeight: 600 }}>
-                {todayBookings.length}
-              </Typography>
-            </CardContent>
-          </Card>
+        {/* Stats */}
+        <Grid item xs={12} md={6}>
+          <Grid container spacing={2}>
+            <Grid item xs={12}>
+              <Card sx={{ borderRadius: 3, boxShadow: '0 2px 8px rgba(0,0,0,0.08)', border: '1px solid #e8eaed' }}>
+                <CardContent sx={{ p: 3 }}>
+                  <Typography variant="h6" sx={{ fontWeight: 700, color: '#032B5A', mb: 2, fontSize: '1.1rem' }}>
+                    Missions terminées ce mois
+                  </Typography>
+                  <Typography variant="h3" sx={{ fontWeight: 700, color: '#4caf50' }}>
+                    {completedThisMonth.length}
+                  </Typography>
+                </CardContent>
+              </Card>
+            </Grid>
+            <Grid item xs={12}>
+              <Card sx={{ borderRadius: 3, boxShadow: '0 2px 8px rgba(0,0,0,0.08)', border: '1px solid #e8eaed' }}>
+                <CardContent sx={{ p: 3 }}>
+                  <Typography variant="h6" sx={{ fontWeight: 700, color: '#032B5A', mb: 2, fontSize: '1.1rem' }}>
+                    Gains totaux
+                  </Typography>
+                  <Typography variant="h3" sx={{ fontWeight: 700, color: '#F4C542' }}>
+                    {totalEarnings.toFixed(2)} MAD
+                  </Typography>
+                </CardContent>
+              </Card>
+            </Grid>
+          </Grid>
         </Grid>
 
-        <Grid item xs={12} md={4}>
-          <Card sx={{ boxShadow: 2 }}>
-            <CardContent>
-              <Typography variant="h6" gutterBottom sx={{ color: '#032B5A', fontWeight: 500 }}>
-                Statut de vérification
+        {/* Quick Actions */}
+        <Grid item xs={12}>
+          <Card sx={{ borderRadius: 3, boxShadow: '0 2px 8px rgba(0,0,0,0.08)', border: '1px solid #e8eaed' }}>
+            <CardContent sx={{ p: 3 }}>
+              <Typography variant="h6" sx={{ fontWeight: 700, color: '#032B5A', mb: 3, fontSize: '1.25rem' }}>
+                Actions rapides
               </Typography>
-              <Chip
-                label={user?.technicianProfile?.verificationStatus || 'PENDING'}
-                color={
-                  user?.technicianProfile?.verificationStatus === 'APPROVED'
-                    ? 'success'
-                    : user?.technicianProfile?.verificationStatus === 'REJECTED'
-                    ? 'error'
-                    : 'warning'
-                }
-              />
+              <Grid container spacing={2}>
+                <Grid item xs={12} sm={6} md={3}>
+                  <Button
+                    fullWidth
+                    variant="outlined"
+                    startIcon={<EditIcon />}
+                    onClick={() => navigate('/technician/profile')}
+                    sx={{
+                      borderColor: '#032B5A',
+                      color: '#032B5A',
+                      textTransform: 'none',
+                      fontWeight: 600,
+                      py: 1.5,
+                      borderRadius: 2,
+                      '&:hover': {
+                        borderColor: '#021d3f',
+                        bgcolor: '#f5f5f5',
+                      },
+                    }}
+                  >
+                    Modifier profil
+                  </Button>
+                </Grid>
+                <Grid item xs={12} sm={6} md={3}>
+                  <Button
+                    fullWidth
+                    variant="outlined"
+                    startIcon={<BuildIcon />}
+                    onClick={() => navigate('/technician/requests')}
+                    sx={{
+                      borderColor: '#032B5A',
+                      color: '#032B5A',
+                      textTransform: 'none',
+                      fontWeight: 600,
+                      py: 1.5,
+                      borderRadius: 2,
+                      '&:hover': {
+                        borderColor: '#021d3f',
+                        bgcolor: '#f5f5f5',
+                      },
+                    }}
+                  >
+                    Voir les demandes
+                  </Button>
+                </Grid>
+                <Grid item xs={12} sm={6} md={3}>
+                  <Button
+                    fullWidth
+                    variant="outlined"
+                    startIcon={<CheckCircleIcon />}
+                    onClick={() => navigate('/technician/jobs')}
+                    sx={{
+                      borderColor: '#032B5A',
+                      color: '#032B5A',
+                      textTransform: 'none',
+                      fontWeight: 600,
+                      py: 1.5,
+                      borderRadius: 2,
+                      '&:hover': {
+                        borderColor: '#021d3f',
+                        bgcolor: '#f5f5f5',
+                      },
+                    }}
+                  >
+                    Mes travaux
+                  </Button>
+                </Grid>
+                <Grid item xs={12} sm={6} md={3}>
+                  <Button
+                    fullWidth
+                    variant="outlined"
+                    startIcon={<AttachMoneyIcon />}
+                    onClick={() => navigate('/technician/subscription')}
+                    sx={{
+                      borderColor: '#032B5A',
+                      color: '#032B5A',
+                      textTransform: 'none',
+                      fontWeight: 600,
+                      py: 1.5,
+                      borderRadius: 2,
+                      '&:hover': {
+                        borderColor: '#021d3f',
+                        bgcolor: '#f5f5f5',
+                      },
+                    }}
+                  >
+                    Abonnement
+                  </Button>
+                </Grid>
+              </Grid>
             </CardContent>
           </Card>
         </Grid>
@@ -156,4 +503,3 @@ const TechnicianDashboard: React.FC = () => {
 };
 
 export default TechnicianDashboard;
-
