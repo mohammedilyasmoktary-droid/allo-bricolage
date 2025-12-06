@@ -76,12 +76,15 @@ const ClientDashboard: React.FC = () => {
 
   const loadTopTechnicians = async () => {
     try {
+      console.log('Loading top technicians...');
       const data = await techniciansApi.getAvailable();
+      console.log('Technicians loaded:', data.length);
       // Sort by rating and take top 3
       const sorted = data
         .filter(t => t.verificationStatus === 'APPROVED')
         .sort((a, b) => b.averageRating - a.averageRating)
         .slice(0, 3);
+      console.log('Top 3 technicians:', sorted);
       setTopTechnicians(sorted);
     } catch (error) {
       console.error('Failed to load top technicians:', error);
@@ -92,12 +95,15 @@ const ClientDashboard: React.FC = () => {
 
   const loadFeaturedServices = async () => {
     try {
+      console.log('Loading featured services...');
       const data = await categoriesApi.getAll();
+      console.log('Categories loaded:', data.length);
       // Get top 3 most popular services
       const popularServices = ['Plomberie', 'Électricité', 'Climatisation'];
       const filtered = data
         .filter(cat => popularServices.includes(cat.name))
         .slice(0, 3);
+      console.log('Featured services:', filtered);
       setFeaturedServices(filtered);
     } catch (error) {
       console.error('Failed to load featured services:', error);
@@ -183,7 +189,7 @@ const ClientDashboard: React.FC = () => {
       {/* Mini Dashboard - Sticky Sidebar */}
       <Box
         sx={{
-          display: { xs: 'none', lg: 'block' },
+          display: { xs: 'none', md: 'block' },
           position: 'fixed',
           top: 100,
           right: 20,
@@ -246,6 +252,10 @@ const ClientDashboard: React.FC = () => {
               <Box sx={{ display: 'flex', justifyContent: 'center', py: 2 }}>
                 <CircularProgress size={24} sx={{ color: '#032B5A' }} />
               </Box>
+            ) : featuredServices.length === 0 ? (
+              <Typography variant="body2" color="text.secondary" sx={{ textAlign: 'center', py: 2, fontSize: '0.85rem' }}>
+                Aucun service disponible
+              </Typography>
             ) : (
               <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1.5 }}>
                 {featuredServices.map((service, index) => (
@@ -378,6 +388,10 @@ const ClientDashboard: React.FC = () => {
               <Box sx={{ display: 'flex', justifyContent: 'center', py: 2 }}>
                 <CircularProgress size={24} sx={{ color: '#032B5A' }} />
               </Box>
+            ) : topTechnicians.length === 0 ? (
+              <Typography variant="body2" color="text.secondary" sx={{ textAlign: 'center', py: 2, fontSize: '0.85rem' }}>
+                Aucun technicien disponible
+              </Typography>
             ) : (
               <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1.5 }}>
                 {topTechnicians.map((technician, index) => {
@@ -480,7 +494,7 @@ const ClientDashboard: React.FC = () => {
 
       <Grid container spacing={3}>
         {/* Main Content */}
-        <Grid item xs={12} lg={8}>
+        <Grid item xs={12} md={8}>
           {/* My Orders Section */}
           <Card sx={{ mb: 3, borderRadius: 3, boxShadow: '0 2px 8px rgba(0,0,0,0.08)', border: '1px solid #e8eaed' }}>
             <CardContent sx={{ p: 3 }}>
