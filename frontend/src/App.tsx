@@ -2,6 +2,7 @@ import { Routes, Route, Navigate } from 'react-router-dom';
 import { useAuth } from './contexts/AuthContext';
 import { Box, CircularProgress, Typography, Button } from '@mui/material';
 import Layout from './components/Layout';
+import DashboardLayout from './components/DashboardLayout';
 import HomePage from './pages/HomePage';
 import LoginPage from './pages/LoginPage';
 import RegisterPage from './pages/RegisterPage';
@@ -91,9 +92,9 @@ function App() {
         path="/dashboard/client"
         element={
           <ProtectedRoute allowedRoles={['CLIENT']}>
-            <Layout>
+            <DashboardLayout>
               <ClientDashboard />
-            </Layout>
+            </DashboardLayout>
           </ProtectedRoute>
         }
       />
@@ -101,9 +102,9 @@ function App() {
         path="/client/profile"
         element={
           <ProtectedRoute allowedRoles={['CLIENT']}>
-            <Layout>
+            <DashboardLayout>
               <ClientProfile />
-            </Layout>
+            </DashboardLayout>
           </ProtectedRoute>
         }
       />
@@ -111,9 +112,9 @@ function App() {
         path="/client/bookings"
         element={
           <ProtectedRoute allowedRoles={['CLIENT']}>
-            <Layout>
+            <DashboardLayout>
               <ClientBookings />
-            </Layout>
+            </DashboardLayout>
           </ProtectedRoute>
         }
       />
@@ -147,9 +148,9 @@ function App() {
         path="/client/search"
         element={
           <ProtectedRoute allowedRoles={['CLIENT']}>
-            <Layout>
+            <DashboardLayout>
               <SearchTechnicians />
-            </Layout>
+            </DashboardLayout>
           </ProtectedRoute>
         }
       />
@@ -157,9 +158,9 @@ function App() {
         path="/booking"
         element={
           <ProtectedRoute allowedRoles={['CLIENT']}>
-            <Layout>
+            <DashboardLayout>
               <CreateBooking />
-            </Layout>
+            </DashboardLayout>
           </ProtectedRoute>
         }
       />
@@ -167,9 +168,9 @@ function App() {
         path="/client/bookings/create"
         element={
           <ProtectedRoute allowedRoles={['CLIENT']}>
-            <Layout>
+            <DashboardLayout>
               <CreateBooking />
-            </Layout>
+            </DashboardLayout>
           </ProtectedRoute>
         }
       />
@@ -177,9 +178,9 @@ function App() {
         path="/client/bookings/recap"
         element={
           <ProtectedRoute allowedRoles={['CLIENT']}>
-            <Layout>
+            <DashboardLayout>
               <BookingRecapPage />
-            </Layout>
+            </DashboardLayout>
           </ProtectedRoute>
         }
       />
@@ -187,9 +188,9 @@ function App() {
         path="/payment/:bookingId"
         element={
           <ProtectedRoute allowedRoles={['CLIENT']}>
-            <Layout>
+            <DashboardLayout>
               <PaymentPage />
-            </Layout>
+            </DashboardLayout>
           </ProtectedRoute>
         }
       />
@@ -197,9 +198,9 @@ function App() {
         path="/client/diagnosis"
         element={
           <ProtectedRoute allowedRoles={['CLIENT']}>
-            <Layout>
+            <DashboardLayout>
               <DiagnosisPage />
-            </Layout>
+            </DashboardLayout>
           </ProtectedRoute>
         }
       />
@@ -225,9 +226,9 @@ function App() {
         path="/dashboard/technicien"
         element={
           <ProtectedRoute allowedRoles={['TECHNICIAN']}>
-            <Layout>
+            <DashboardLayout>
               <TechnicianDashboard />
-            </Layout>
+            </DashboardLayout>
           </ProtectedRoute>
         }
       />
@@ -235,9 +236,9 @@ function App() {
         path="/technician/dashboard"
         element={
           <ProtectedRoute allowedRoles={['TECHNICIAN']}>
-            <Layout>
+            <DashboardLayout>
               <TechnicianDashboard />
-            </Layout>
+            </DashboardLayout>
           </ProtectedRoute>
         }
       />
@@ -245,9 +246,9 @@ function App() {
         path="/technician/requests"
         element={
           <ProtectedRoute allowedRoles={['TECHNICIAN']}>
-            <Layout>
+            <DashboardLayout>
               <TechnicianRequests />
-            </Layout>
+            </DashboardLayout>
           </ProtectedRoute>
         }
       />
@@ -255,9 +256,9 @@ function App() {
         path="/technician/jobs"
         element={
           <ProtectedRoute allowedRoles={['TECHNICIAN']}>
-            <Layout>
+            <DashboardLayout>
               <TechnicianJobs />
-            </Layout>
+            </DashboardLayout>
           </ProtectedRoute>
         }
       />
@@ -281,9 +282,9 @@ function App() {
         path="/technician/subscription"
         element={
           <ProtectedRoute allowedRoles={['TECHNICIAN']}>
-            <Layout>
+            <DashboardLayout>
               <SubscriptionPage />
-            </Layout>
+            </DashboardLayout>
           </ProtectedRoute>
         }
       />
@@ -291,9 +292,9 @@ function App() {
         path="/technician/subscription/payment"
         element={
           <ProtectedRoute allowedRoles={['TECHNICIAN']}>
-            <Layout>
+            <DashboardLayout>
               <SubscriptionPaymentPage />
-            </Layout>
+            </DashboardLayout>
           </ProtectedRoute>
         }
       />
@@ -301,9 +302,9 @@ function App() {
         path="/technician/analytics"
         element={
           <ProtectedRoute allowedRoles={['TECHNICIAN']}>
-            <Layout>
+            <DashboardLayout>
               <TechnicianAnalytics />
-            </Layout>
+            </DashboardLayout>
           </ProtectedRoute>
         }
       />
@@ -311,9 +312,9 @@ function App() {
         path="/technician/profile"
         element={
           <ProtectedRoute allowedRoles={['TECHNICIAN']}>
-            <Layout>
+            <DashboardLayout>
               <TechnicianProfile />
-            </Layout>
+            </DashboardLayout>
           </ProtectedRoute>
         }
       />
@@ -323,9 +324,9 @@ function App() {
         path="/admin/dashboard"
         element={
           <ProtectedRoute allowedRoles={['ADMIN']}>
-            <Layout>
+            <DashboardLayout>
               <AdminDashboard />
-            </Layout>
+            </DashboardLayout>
           </ProtectedRoute>
         }
       />
@@ -333,9 +334,9 @@ function App() {
         path="/admin/technicians"
         element={
           <ProtectedRoute allowedRoles={['ADMIN']}>
-            <Layout>
+            <DashboardLayout>
               <AdminTechnicians />
-            </Layout>
+            </DashboardLayout>
           </ProtectedRoute>
         }
       />
@@ -343,9 +344,9 @@ function App() {
         path="/admin/bookings"
         element={
           <ProtectedRoute allowedRoles={['ADMIN']}>
-            <Layout>
+            <DashboardLayout>
               <AdminBookings />
-            </Layout>
+            </DashboardLayout>
           </ProtectedRoute>
         }
       />
@@ -353,9 +354,9 @@ function App() {
         path="/admin/profile"
         element={
           <ProtectedRoute allowedRoles={['ADMIN']}>
-            <Layout>
+            <DashboardLayout>
               <AdminProfile />
-            </Layout>
+            </DashboardLayout>
           </ProtectedRoute>
         }
       />

@@ -24,6 +24,7 @@ import {
   Divider,
   Paper,
   Alert,
+  Container,
 } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 import { bookingsApi, Booking } from '../../api/bookings';
@@ -220,13 +221,22 @@ const ClientBookings: React.FC = () => {
   }
 
   return (
-    <Box sx={{ maxWidth: 1400, mx: 'auto', px: { xs: 2, md: 0 }, py: 4 }}>
+    <Container maxWidth="xl">
       {/* Header */}
-      <Box sx={{ mb: 4 }}>
-        <Typography variant="h4" component="h1" sx={{ fontWeight: 700, mb: 2, color: '#032B5A' }}>
+      <Box
+        sx={{
+          mb: 5,
+          p: 4,
+          borderRadius: 4,
+          background: 'linear-gradient(135deg, #032B5A 0%, #021d3f 100%)',
+          boxShadow: '0 8px 32px rgba(3, 43, 90, 0.15)',
+          color: 'white',
+        }}
+      >
+        <Typography variant="h3" component="h1" sx={{ fontWeight: 700, mb: 1.5, fontSize: { xs: '1.75rem', md: '2.5rem' } }}>
           Mes réservations
         </Typography>
-        <Typography variant="body1" color="text.secondary">
+        <Typography variant="body1" sx={{ color: 'rgba(255,255,255,0.9)', fontSize: '1.1rem' }}>
           Gérez et suivez toutes vos réservations de services
         </Typography>
       </Box>
@@ -235,9 +245,11 @@ const ClientBookings: React.FC = () => {
       <Card
         sx={{
           mb: 4,
-          boxShadow: 3,
-          borderRadius: 3,
-          border: '1px solid #e0e0e0',
+          borderRadius: 4,
+          boxShadow: '0 8px 32px rgba(0,0,0,0.12)',
+          border: '1px solid #e8eaed',
+          bgcolor: 'white',
+          overflow: 'hidden',
         }}
       >
         <CardContent sx={{ p: 3 }}>
@@ -306,9 +318,11 @@ const ClientBookings: React.FC = () => {
       {filteredAndSortedBookings.length === 0 ? (
         <Card
           sx={{
-            boxShadow: 3,
-            borderRadius: 3,
-            border: '1px solid #e0e0e0',
+            borderRadius: 4,
+            boxShadow: '0 8px 32px rgba(0,0,0,0.12)',
+            border: '1px solid #e8eaed',
+            bgcolor: 'white',
+            overflow: 'hidden',
           }}
         >
           <CardContent>
@@ -356,14 +370,16 @@ const ClientBookings: React.FC = () => {
               <Grid item xs={12} key={booking.id}>
                 <Card
                   sx={{
-                    boxShadow: 3,
-                    borderRadius: 3,
-                    border: '1px solid #e0e0e0',
+                    borderRadius: 4,
+                    boxShadow: '0 8px 32px rgba(0,0,0,0.12)',
+                    border: '1px solid #e8eaed',
+                    bgcolor: 'white',
                     overflow: 'hidden',
-                    transition: 'all 0.3s',
+                    transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
                     '&:hover': {
-                      transform: 'translateY(-4px)',
-                      boxShadow: '0 8px 24px rgba(0,0,0,0.12)',
+                      transform: 'translateY(-8px)',
+                      boxShadow: '0 12px 32px rgba(3, 43, 90, 0.15)',
+                      borderColor: '#F4C542',
                     },
                   }}
                 >
@@ -838,7 +854,7 @@ const ClientBookings: React.FC = () => {
           </Button>
         </DialogActions>
       </Dialog>
-    </Box>
+    </Container>
   );
 };
 

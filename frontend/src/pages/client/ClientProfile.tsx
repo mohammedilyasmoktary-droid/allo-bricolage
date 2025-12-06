@@ -15,6 +15,7 @@ import {
   InputLabel,
   Select,
   MenuItem,
+  Container,
 } from '@mui/material';
 import { useAuth } from '../../contexts/AuthContext';
 import { usersApi } from '../../api/users';
@@ -114,24 +115,47 @@ const ClientProfile: React.FC = () => {
   };
 
   return (
-    <Box sx={{ maxWidth: 1000, mx: 'auto', py: 4 }}>
-      <Typography variant="h4" component="h1" gutterBottom sx={{ fontWeight: 700, mb: 4, color: '#032B5A' }}>
-        Informations du compte
-      </Typography>
+    <Container maxWidth="lg">
+      {/* Header */}
+      <Box
+        sx={{
+          mb: 5,
+          p: 4,
+          borderRadius: 4,
+          background: 'linear-gradient(135deg, #032B5A 0%, #021d3f 100%)',
+          boxShadow: '0 8px 32px rgba(3, 43, 90, 0.15)',
+          color: 'white',
+        }}
+      >
+        <Typography variant="h3" component="h1" sx={{ fontWeight: 700, mb: 1.5, fontSize: { xs: '1.75rem', md: '2.5rem' } }}>
+          Informations du compte
+        </Typography>
+        <Typography variant="body1" sx={{ color: 'rgba(255,255,255,0.9)', fontSize: '1.1rem' }}>
+          Gérez vos informations personnelles et préférences
+        </Typography>
+      </Box>
 
       {error && (
-        <Alert severity="error" sx={{ mb: 3, borderRadius: 2 }} onClose={() => setError('')}>
+        <Alert severity="error" sx={{ mb: 3, borderRadius: 3 }} onClose={() => setError('')}>
           {error}
         </Alert>
       )}
 
       {success && (
-        <Alert severity="success" sx={{ mb: 3, borderRadius: 2 }} onClose={() => setSuccess(false)}>
+        <Alert severity="success" sx={{ mb: 3, borderRadius: 3 }} onClose={() => setSuccess(false)}>
           Profil mis à jour avec succès!
         </Alert>
       )}
 
-      <Card sx={{ boxShadow: 3, borderRadius: 3, border: '1px solid #e0e0e0' }}>
+      <Card
+        sx={{
+          borderRadius: 4,
+          boxShadow: '0 8px 32px rgba(0,0,0,0.12)',
+          border: '1px solid #e8eaed',
+          bgcolor: 'white',
+          overflow: 'hidden',
+        }}
+      >
         <CardContent sx={{ p: 4 }}>
           {/* Avatar Section */}
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 3, mb: 4 }}>
@@ -349,7 +373,7 @@ const ClientProfile: React.FC = () => {
           )}
         </CardContent>
       </Card>
-    </Box>
+    </Container>
   );
 };
 
