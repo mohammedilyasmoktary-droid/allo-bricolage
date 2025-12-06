@@ -24,6 +24,7 @@ import {
   InputAdornment,
   TextField,
   Divider,
+  Container,
 } from '@mui/material';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { techniciansApi, Technician } from '../../api/technicians';
@@ -235,13 +236,37 @@ const SearchTechnicians: React.FC = () => {
   const hasActiveFilters = minRating > 0 || minExperience > 0 || availabilityFilter !== 'all' || priceRange[0] > 0 || priceRange[1] < 500;
 
   return (
-    <Box sx={{ maxWidth: 1400, mx: 'auto', px: { xs: 2, md: 0 } }}>
-      <Typography variant="h4" component="h1" gutterBottom sx={{ fontWeight: 700, mb: 3, color: '#032B5A' }}>
-        Rechercher un technicien
-      </Typography>
+    <Container maxWidth="xl">
+      {/* Header */}
+      <Box
+        sx={{
+          mb: 5,
+          p: 4,
+          borderRadius: 4,
+          background: 'linear-gradient(135deg, #032B5A 0%, #021d3f 100%)',
+          boxShadow: '0 8px 32px rgba(3, 43, 90, 0.15)',
+          color: 'white',
+        }}
+      >
+        <Typography variant="h3" component="h1" sx={{ fontWeight: 700, mb: 1.5, fontSize: { xs: '1.75rem', md: '2.5rem' } }}>
+          Rechercher un technicien
+        </Typography>
+        <Typography variant="body1" sx={{ color: 'rgba(255,255,255,0.9)', fontSize: '1.1rem' }}>
+          Trouvez le professionnel idéal pour vos besoins
+        </Typography>
+      </Box>
 
       {/* Search Bar */}
-      <Card sx={{ mb: 4, p: 3, boxShadow: 3, borderRadius: 3 }}>
+      <Card
+        sx={{
+          mb: 4,
+          p: 3,
+          borderRadius: 4,
+          boxShadow: '0 8px 32px rgba(0,0,0,0.12)',
+          border: '1px solid #e8eaed',
+          bgcolor: 'white',
+        }}
+      >
         <Grid container spacing={2} alignItems="center">
           <Grid item xs={12} md={3}>
             <FormControl fullWidth>
@@ -679,7 +704,15 @@ const SearchTechnicians: React.FC = () => {
       )}
 
       {technicians.length === 0 && !loading && (
-        <Card sx={{ mt: 3, boxShadow: 3, borderRadius: 3 }}>
+        <Card
+          sx={{
+            mt: 3,
+            borderRadius: 4,
+            boxShadow: '0 8px 32px rgba(0,0,0,0.12)',
+            border: '1px solid #e8eaed',
+            bgcolor: 'white',
+          }}
+        >
           <CardContent>
             <Box sx={{ textAlign: 'center', py: 6 }}>
               <Typography variant="h6" color="text.secondary" gutterBottom sx={{ fontWeight: 600 }}>
@@ -714,7 +747,7 @@ const SearchTechnicians: React.FC = () => {
         isUrgent={isUrgent}
         categoryId={category}
       />
-    </Box>
+    </Container>
   );
 };
 

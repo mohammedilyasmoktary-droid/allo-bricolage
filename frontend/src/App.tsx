@@ -3,6 +3,7 @@ import { useAuth } from './contexts/AuthContext';
 import { Box, CircularProgress, Typography, Button } from '@mui/material';
 import Layout from './components/Layout';
 import DashboardLayout from './components/DashboardLayout';
+import ConditionalLayout from './components/ConditionalLayout';
 import HomePage from './pages/HomePage';
 import LoginPage from './pages/LoginPage';
 import RegisterPage from './pages/RegisterPage';
@@ -135,13 +136,13 @@ function App() {
           </ProtectedRoute>
         }
       />
-      {/* Public search page - accessible without login */}
+      {/* Public search page - accessible without login, but uses DashboardLayout when logged in */}
       <Route
         path="/search"
         element={
-          <Layout>
+          <ConditionalLayout>
             <SearchTechnicians />
-          </Layout>
+          </ConditionalLayout>
         }
       />
       <Route
@@ -207,17 +208,17 @@ function App() {
       <Route
         path="/service/:categoryId"
         element={
-          <Layout>
+          <ConditionalLayout>
             <ServiceDetailPage />
-          </Layout>
+          </ConditionalLayout>
         }
       />
       <Route
         path="/technician/view/:id"
         element={
-          <Layout>
+          <ConditionalLayout>
             <TechnicianViewPage />
-          </Layout>
+          </ConditionalLayout>
         }
       />
 

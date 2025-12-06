@@ -19,6 +19,7 @@ import {
   DialogContentText,
   DialogActions,
   Alert,
+  Container,
 } from '@mui/material';
 import { techniciansApi, Technician } from '../../api/technicians';
 import { adminApi } from '../../api/admin';
@@ -117,13 +118,22 @@ const TechnicianViewPage: React.FC = () => {
   }
 
   return (
-    <Box sx={{ bgcolor: '#fafbfc', minHeight: '100vh', py: 3 }}>
+    <Container maxWidth="xl">
       {/* Header Section */}
-      <Card sx={{ mb: 4, overflow: 'hidden', borderRadius: 3, boxShadow: '0 2px 8px rgba(0,0,0,0.08)' }}>
+      <Card
+        sx={{
+          mb: 4,
+          overflow: 'hidden',
+          borderRadius: 4,
+          boxShadow: '0 8px 32px rgba(0,0,0,0.12)',
+          border: '1px solid #e8eaed',
+          bgcolor: 'white',
+        }}
+      >
         <Box
           sx={{
             height: 200,
-            bgcolor: '#032B5A',
+            background: 'linear-gradient(135deg, #032B5A 0%, #021d3f 100%)',
             position: 'relative',
             display: 'flex',
             alignItems: 'center',
@@ -266,7 +276,15 @@ const TechnicianViewPage: React.FC = () => {
         {/* Left Column */}
         <Grid item xs={12} md={8}>
           {/* Skills Section */}
-          <Card sx={{ mb: 3, borderRadius: 3, boxShadow: '0 2px 8px rgba(0,0,0,0.08)', border: '1px solid #e8eaed' }}>
+          <Card
+            sx={{
+              mb: 3,
+              borderRadius: 4,
+              boxShadow: '0 8px 32px rgba(0,0,0,0.12)',
+              border: '1px solid #e8eaed',
+              bgcolor: 'white',
+            }}
+          >
             <CardContent sx={{ p: 3 }}>
               <Typography variant="h6" gutterBottom sx={{ fontWeight: 700, color: '#032B5A', mb: 2.5, fontSize: '1.25rem' }}>
                 Compétences
@@ -292,7 +310,15 @@ const TechnicianViewPage: React.FC = () => {
 
           {/* Bio Section */}
           {technician.bio && (
-            <Card sx={{ mb: 3, borderRadius: 3, boxShadow: '0 2px 8px rgba(0,0,0,0.08)', border: '1px solid #e8eaed' }}>
+            <Card
+            sx={{
+              mb: 3,
+              borderRadius: 4,
+              boxShadow: '0 8px 32px rgba(0,0,0,0.12)',
+              border: '1px solid #e8eaed',
+              bgcolor: 'white',
+            }}
+          >
               <CardContent sx={{ p: 3 }}>
                 <Typography variant="h6" gutterBottom sx={{ fontWeight: 700, color: '#032B5A', mb: 2.5, fontSize: '1.25rem' }}>
                   À propos
@@ -349,7 +375,16 @@ const TechnicianViewPage: React.FC = () => {
 
         {/* Right Column */}
         <Grid item xs={12} md={4}>
-          <Card sx={{ position: 'sticky', top: 20, borderRadius: 3, boxShadow: '0 2px 8px rgba(0,0,0,0.08)', border: '1px solid #e8eaed' }}>
+          <Card
+            sx={{
+              position: 'sticky',
+              top: 20,
+              borderRadius: 4,
+              boxShadow: '0 8px 32px rgba(0,0,0,0.12)',
+              border: '1px solid #e8eaed',
+              bgcolor: 'white',
+            }}
+          >
             <CardContent sx={{ p: 3 }}>
               <Typography variant="h6" gutterBottom sx={{ fontWeight: 700, color: '#032B5A', mb: 3, fontSize: '1.25rem' }}>
                 Contact
@@ -467,7 +502,7 @@ const TechnicianViewPage: React.FC = () => {
           </Button>
         </DialogActions>
       </Dialog>
-    </Box>
+    </Container>
   );
 };
 
