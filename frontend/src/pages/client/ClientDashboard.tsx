@@ -13,6 +13,7 @@ import {
   Paper,
   Alert,
   Rating,
+  Container,
 } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
@@ -175,24 +176,49 @@ const ClientDashboard: React.FC = () => {
   }
 
   return (
-    <Box sx={{ bgcolor: '#fafbfc', minHeight: '100vh', py: 3, position: 'relative' }}>
-      {/* Welcome Section */}
-      <Box sx={{ mb: 4 }}>
-        <Typography variant="h4" component="h1" sx={{ fontWeight: 700, color: '#032B5A', mb: 1 }}>
-          Bienvenue, {user?.name} 👋
-        </Typography>
-        <Typography variant="body1" color="text.secondary">
-          Gérez vos réservations et suivez vos services en un seul endroit
-        </Typography>
-      </Box>
+    <Box sx={{ bgcolor: '#fafbfc', minHeight: '100vh', py: 4, position: 'relative' }}>
+      <Container maxWidth="xl">
+        {/* Welcome Section */}
+        <Box
+          sx={{
+            mb: 5,
+            p: 4,
+            borderRadius: 4,
+            background: 'linear-gradient(135deg, #032B5A 0%, #021d3f 100%)',
+            boxShadow: '0 8px 32px rgba(3, 43, 90, 0.15)',
+            color: 'white',
+          }}
+        >
+          <Typography variant="h3" component="h1" sx={{ fontWeight: 700, mb: 1.5, fontSize: { xs: '1.75rem', md: '2.5rem' } }}>
+            Bienvenue, {user?.name} 👋
+          </Typography>
+          <Typography variant="body1" sx={{ color: 'rgba(255,255,255,0.9)', fontSize: '1.1rem' }}>
+            Gérez vos réservations et suivez vos services en un seul endroit
+          </Typography>
+        </Box>
 
       <Grid container spacing={3}>
         {/* Left Side - Services and Technicians */}
         <Grid item xs={12} lg={8}>
           {/* Top Services Section */}
-          <Card sx={{ mb: 3, borderRadius: 3, boxShadow: '0 2px 8px rgba(0,0,0,0.08)', border: '1px solid #e8eaed' }}>
-            <CardContent sx={{ p: 3 }}>
-              <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, mb: 3 }}>
+          <Card
+            sx={{
+              mb: 3,
+              borderRadius: 4,
+              boxShadow: '0 8px 32px rgba(0,0,0,0.12)',
+              border: '1px solid #e8eaed',
+              bgcolor: 'white',
+              overflow: 'hidden',
+            }}
+          >
+            <Box
+              sx={{
+                bgcolor: '#032B5A',
+                p: 2.5,
+                background: 'linear-gradient(135deg, #032B5A 0%, #021d3f 100%)',
+              }}
+            >
+              <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
                 <Box
                   sx={{
                     width: 48,
@@ -202,14 +228,17 @@ const ClientDashboard: React.FC = () => {
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
+                    boxShadow: '0 4px 16px rgba(244, 197, 66, 0.3)',
                   }}
                 >
                   <BuildIcon sx={{ fontSize: 28, color: '#032B5A' }} />
                 </Box>
-                <Typography variant="h6" sx={{ fontWeight: 700, color: '#032B5A', fontSize: '1.25rem' }}>
+                <Typography variant="h6" sx={{ fontWeight: 700, color: 'white', fontSize: '1.25rem' }}>
                   Top Services
                 </Typography>
               </Box>
+            </Box>
+            <CardContent sx={{ p: 3 }}>
               {loadingServices ? (
                 <Box sx={{ display: 'flex', justifyContent: 'center', py: 4 }}>
                   <CircularProgress sx={{ color: '#032B5A' }} />
@@ -306,9 +335,24 @@ const ClientDashboard: React.FC = () => {
           </Card>
 
           {/* Top Technicians Section */}
-          <Card sx={{ mb: 3, borderRadius: 3, boxShadow: '0 2px 8px rgba(0,0,0,0.08)', border: '1px solid #e8eaed' }}>
-            <CardContent sx={{ p: 3 }}>
-              <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, mb: 3 }}>
+          <Card
+            sx={{
+              mb: 3,
+              borderRadius: 4,
+              boxShadow: '0 8px 32px rgba(0,0,0,0.12)',
+              border: '1px solid #e8eaed',
+              bgcolor: 'white',
+              overflow: 'hidden',
+            }}
+          >
+            <Box
+              sx={{
+                bgcolor: '#032B5A',
+                p: 2.5,
+                background: 'linear-gradient(135deg, #032B5A 0%, #021d3f 100%)',
+              }}
+            >
+              <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
                 <Box
                   sx={{
                     width: 48,
@@ -318,14 +362,17 @@ const ClientDashboard: React.FC = () => {
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
+                    boxShadow: '0 4px 16px rgba(244, 197, 66, 0.3)',
                   }}
                 >
                   <StarIcon sx={{ fontSize: 28, color: '#032B5A' }} />
                 </Box>
-                <Typography variant="h6" sx={{ fontWeight: 700, color: '#032B5A', fontSize: '1.25rem' }}>
+                <Typography variant="h6" sx={{ fontWeight: 700, color: 'white', fontSize: '1.25rem' }}>
                   Top Techniciens
                 </Typography>
               </Box>
+            </Box>
+            <CardContent sx={{ p: 3 }}>
               {loadingTechs ? (
                 <Box sx={{ display: 'flex', justifyContent: 'center', py: 4 }}>
                   <CircularProgress sx={{ color: '#032B5A' }} />
@@ -430,10 +477,25 @@ const ClientDashboard: React.FC = () => {
             </CardContent>
           </Card>
           {/* My Orders Section */}
-          <Card sx={{ mb: 3, borderRadius: 3, boxShadow: '0 2px 8px rgba(0,0,0,0.08)', border: '1px solid #e8eaed' }}>
-            <CardContent sx={{ p: 3 }}>
-              <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
-                <Typography variant="h6" sx={{ fontWeight: 700, color: '#032B5A', fontSize: '1.25rem' }}>
+          <Card
+            sx={{
+              mb: 3,
+              borderRadius: 4,
+              boxShadow: '0 8px 32px rgba(0,0,0,0.12)',
+              border: '1px solid #e8eaed',
+              bgcolor: 'white',
+              overflow: 'hidden',
+            }}
+          >
+            <Box
+              sx={{
+                bgcolor: '#032B5A',
+                p: 2.5,
+                background: 'linear-gradient(135deg, #032B5A 0%, #021d3f 100%)',
+              }}
+            >
+              <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <Typography variant="h6" sx={{ fontWeight: 700, color: 'white', fontSize: '1.25rem' }}>
                   Mes Réservations
                 </Typography>
                 <Button
@@ -442,18 +504,20 @@ const ClientDashboard: React.FC = () => {
                   onClick={() => navigate('/client/bookings')}
                   sx={{
                     textTransform: 'none',
-                    borderColor: '#032B5A',
-                    color: '#032B5A',
+                    borderColor: 'white',
+                    color: 'white',
                     fontWeight: 600,
                     '&:hover': {
-                      borderColor: '#021d3f',
-                      bgcolor: '#f5f5f5',
+                      borderColor: '#F4C542',
+                      bgcolor: 'rgba(244, 197, 66, 0.1)',
                     },
                   }}
                 >
                   Voir toutes les réservations
                 </Button>
               </Box>
+            </Box>
+            <CardContent sx={{ p: 3 }}>
 
               {recentBookings.length === 0 ? (
                 <Box sx={{ textAlign: 'center', py: 4 }}>
@@ -546,11 +610,27 @@ const ClientDashboard: React.FC = () => {
           </Card>
 
           {/* Quick Actions */}
-          <Card sx={{ borderRadius: 3, boxShadow: '0 2px 8px rgba(0,0,0,0.08)', border: '1px solid #e8eaed' }}>
-            <CardContent sx={{ p: 3 }}>
-              <Typography variant="h6" sx={{ fontWeight: 700, color: '#032B5A', mb: 3, fontSize: '1.25rem' }}>
+          <Card
+            sx={{
+              borderRadius: 4,
+              boxShadow: '0 8px 32px rgba(0,0,0,0.12)',
+              border: '1px solid #e8eaed',
+              bgcolor: 'white',
+              overflow: 'hidden',
+            }}
+          >
+            <Box
+              sx={{
+                bgcolor: '#032B5A',
+                p: 2.5,
+                background: 'linear-gradient(135deg, #032B5A 0%, #021d3f 100%)',
+              }}
+            >
+              <Typography variant="h6" sx={{ fontWeight: 700, color: 'white', fontSize: '1.25rem' }}>
                 Actions rapides
               </Typography>
+            </Box>
+            <CardContent sx={{ p: 3 }}>
               <Grid container spacing={2}>
                 <Grid item xs={12} sm={6}>
                   <Button
@@ -607,14 +687,30 @@ const ClientDashboard: React.FC = () => {
             }}
           >
             {/* Notifications */}
-            <Card sx={{ borderRadius: 3, boxShadow: '0 2px 8px rgba(0,0,0,0.08)', border: '1px solid #e8eaed' }}>
-              <CardContent sx={{ p: 2.5 }}>
-                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 2 }}>
-                  <NotificationsIcon sx={{ color: '#032B5A', fontSize: 20 }} />
-                  <Typography variant="h6" sx={{ fontWeight: 700, color: '#032B5A', fontSize: '1rem' }}>
+            <Card
+              sx={{
+                borderRadius: 4,
+                boxShadow: '0 8px 32px rgba(0,0,0,0.12)',
+                border: '1px solid #e8eaed',
+                bgcolor: 'white',
+                overflow: 'hidden',
+              }}
+            >
+              <Box
+                sx={{
+                  bgcolor: '#032B5A',
+                  p: 2,
+                  background: 'linear-gradient(135deg, #032B5A 0%, #021d3f 100%)',
+                }}
+              >
+                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                  <NotificationsIcon sx={{ color: 'white', fontSize: 20 }} />
+                  <Typography variant="h6" sx={{ fontWeight: 700, color: 'white', fontSize: '1rem' }}>
                     Notifications
                   </Typography>
                 </Box>
+              </Box>
+              <CardContent sx={{ p: 2.5 }}>
                 {notifications.length === 0 ? (
                   <Typography variant="body2" color="text.secondary" sx={{ textAlign: 'center', py: 1.5, fontSize: '0.85rem' }}>
                     Aucune notification
@@ -632,11 +728,27 @@ const ClientDashboard: React.FC = () => {
             </Card>
 
             {/* Stats Card */}
-            <Card sx={{ borderRadius: 3, boxShadow: '0 2px 8px rgba(0,0,0,0.08)', border: '1px solid #e8eaed' }}>
-              <CardContent sx={{ p: 2.5 }}>
-                <Typography variant="h6" sx={{ fontWeight: 700, color: '#032B5A', mb: 2.5, fontSize: '1rem' }}>
+            <Card
+              sx={{
+                borderRadius: 4,
+                boxShadow: '0 8px 32px rgba(0,0,0,0.12)',
+                border: '1px solid #e8eaed',
+                bgcolor: 'white',
+                overflow: 'hidden',
+              }}
+            >
+              <Box
+                sx={{
+                  bgcolor: '#032B5A',
+                  p: 2,
+                  background: 'linear-gradient(135deg, #032B5A 0%, #021d3f 100%)',
+                }}
+              >
+                <Typography variant="h6" sx={{ fontWeight: 700, color: 'white', fontSize: '1rem' }}>
                   Statistiques
                 </Typography>
+              </Box>
+              <CardContent sx={{ p: 2.5 }}>
                 <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
                   <Box>
                     <Typography variant="body2" color="text.secondary" sx={{ mb: 0.5, fontSize: '0.85rem' }}>
