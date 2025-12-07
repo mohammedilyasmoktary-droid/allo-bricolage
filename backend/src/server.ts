@@ -125,8 +125,18 @@ app.use((err: any, req: express.Request, res: express.Response, next: express.Ne
   });
 });
 
-app.listen(PORT, () => {
-  console.log(`🚀 Allo Bricolage API server running on port ${PORT}`);
-  console.log(`📁 Upload directory: ${path.join(__dirname, '..', uploadDir)}`);
+// Apply database migration on startup (non-blocking)
+applyReceiptColumnsMigration().then(() => {
+  app.listen(PORT, () => {
+    console.log(`🚀 Allo Bricolage API server running on port ${PORT}`);
+    console.log(`📁 Upload directory: ${path.join(__dirname, '..', uploadDir)}`);
+  });
+}).catch((error) => {
+  // Even if migration fails, start the server
+  console.warn('⚠️ Migration check had issues, but starting server anyway:', error.message);
+  app.listen(PORT, () => {
+    console.log(`🚀 Allo Bricolage API server running on port ${PORT}`);
+    console.log(`📁 Upload directory: ${path.join(__dirname, '..', uploadDir)}`);
+  });
 });
 
