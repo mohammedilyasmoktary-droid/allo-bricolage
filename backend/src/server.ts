@@ -13,6 +13,7 @@ import { reviewRouter } from './routes/review.routes';
 import { adminRouter } from './routes/admin.routes';
 import { notificationRouter } from './routes/notification.routes';
 import { subscriptionRouter } from './routes/subscription.routes';
+import { applyReceiptColumnsMigration } from './utils/migration';
 
 dotenv.config();
 
