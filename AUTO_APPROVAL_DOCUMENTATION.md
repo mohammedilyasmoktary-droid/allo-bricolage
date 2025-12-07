@@ -17,9 +17,10 @@ When a technician registers and uploads documents:
    - **OTHER** (Autres documents) - Optional
 
 2. **Automatic Approval**: 
-   - When **any document is uploaded** (including CIN, Diplomas, Certificates, or Other), the technician's `verificationStatus` is automatically set to `APPROVED`
+   - When **any document is uploaded** (CIN, Diplomas, Certificates, or Other), the technician's `verificationStatus` is automatically set to `APPROVED`
    - This means the technician account is immediately verified and can start accepting bookings
-   - A notification is sent to the technician confirming the auto-approval
+   - A notification is sent to the technician confirming the auto-approval with details of uploaded documents
+   - **Important**: CIN is still required for validation, but auto-approval works for ALL document types
 
 3. **Verification Status**:
    - If documents are uploaded: `verificationStatus = 'APPROVED'`
@@ -30,26 +31,37 @@ When a technician registers and uploads documents:
 ### Backend (`backend/src/routes/auth.routes.ts`)
 
 ```typescript
-// Auto-approve verification when any document is uploaded
+// Auto-approve verification when ANY document is uploaded (CIN, Diploma, Certificate, or Other)
 const hasCIN = !!nationalIdCardFile || documents.some(doc => doc.type === 'CIN');
+const hasAnyDocument = hasCIN || documents.length > 0;
 
 const technicianProfile = await prisma.technicianProfile.create({
   data: {
     userId: user.id,
     skills: [],
     yearsOfExperience: 0,
-    // Auto-approve if CIN is uploaded (works for all document types)
-    verificationStatus: hasCIN ? 'APPROVED' : 'PENDING',
+    // Auto-approve if any document is uploaded
+    verificationStatus: hasAnyDocument ? 'APPROVED' : 'PENDING',
   },
 });
 
-// Create notification for auto-approval
-if (hasCIN) {
+// Create notification for auto-approval when any document is uploaded
+if (hasAnyDocument) {
+  const documentTypes = documents.map(doc => {
+    switch (doc.type) {
+      case 'CIN': return 'CIN';
+      case 'DIPLOMA': return 'diplôme';
+      case 'CERTIFICATE': return 'certificat';
+      case 'OTHER': return 'document';
+      default: return 'document';
+    }
+  }).join(', ');
+  
   await prisma.notification.create({
     data: {
       userId: user.id,
       type: 'VERIFICATION_APPROVED',
-      message: 'Votre compte technicien a été approuvé automatiquement après l\'upload de votre CIN.',
+      message: `Votre compte technicien a été approuvé automatiquement après l'upload de votre${documents.length > 1 ? 's' : ''} ${documentTypes}.`,
     },
   });
 }

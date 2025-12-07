@@ -146,13 +146,23 @@ router.post(
           });
         }
 
-        // Create notification for auto-approval
-        if (hasCIN) {
+        // Create notification for auto-approval when any document is uploaded
+        if (hasAnyDocument) {
+          const documentTypes = documents.map(doc => {
+            switch (doc.type) {
+              case 'CIN': return 'CIN';
+              case 'DIPLOMA': return 'diplôme';
+              case 'CERTIFICATE': return 'certificat';
+              case 'OTHER': return 'document';
+              default: return 'document';
+            }
+          }).join(', ');
+          
           await prisma.notification.create({
             data: {
               userId: user.id,
               type: 'VERIFICATION_APPROVED',
-              message: 'Votre compte technicien a été approuvé automatiquement après l\'upload de votre CIN.',
+              message: `Votre compte technicien a été approuvé automatiquement après l'upload de votre${documents.length > 1 ? 's' : ''} ${documentTypes}.`,
             },
           });
         }
