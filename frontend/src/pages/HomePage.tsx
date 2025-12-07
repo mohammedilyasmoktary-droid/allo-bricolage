@@ -540,9 +540,10 @@ const HomePage: React.FC = () => {
                                       color: 'white',
                                       textTransform: 'none',
                                       fontWeight: 600,
-                                      py: 1.2,
+                                      py: { xs: 1, md: 1.2 },
                                       borderRadius: 2,
                                       boxShadow: '0 4px 12px rgba(3, 43, 90, 0.2)',
+                                      fontSize: { xs: '0.875rem', md: '1rem' },
                                       '&:hover': {
                                         bgcolor: '#021d3f',
                                         transform: 'scale(1.02)',
