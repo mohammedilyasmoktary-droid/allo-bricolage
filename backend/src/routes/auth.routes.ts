@@ -88,15 +88,17 @@ router.post(
 
       // If technician, create technician profile and documents
       if (role === 'TECHNICIAN') {
-        // Auto-approve verification if CIN is uploaded (works for all document types)
+        // Auto-approve verification when ANY document is uploaded (CIN, Diploma, Certificate, or Other)
+        // This allows all document types to trigger auto-approval, not just CIN
+        const hasAnyDocument = hasCIN || documents.length > 0;
 
         const technicianProfile = await prisma.technicianProfile.create({
           data: {
             userId: user.id,
             skills: [],
             yearsOfExperience: 0,
-            // Auto-approve if CIN is uploaded
-            verificationStatus: hasCIN ? 'APPROVED' : 'PENDING',
+            // Auto-approve if any document is uploaded
+            verificationStatus: hasAnyDocument ? 'APPROVED' : 'PENDING',
           },
         });
 
