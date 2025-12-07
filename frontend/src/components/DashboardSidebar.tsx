@@ -23,9 +23,10 @@ import LogoutIcon from '@mui/icons-material/Logout';
 
 interface DashboardSidebarProps {
   onLogout: () => void;
+  onNavigate?: () => void; // Callback to close drawer on mobile after navigation
 }
 
-const DashboardSidebar: React.FC<DashboardSidebarProps> = ({ onLogout }) => {
+const DashboardSidebar: React.FC<DashboardSidebarProps> = ({ onLogout, onNavigate }) => {
   const navigate = useNavigate();
   const location = useLocation();
   const { user } = useAuth();
@@ -33,6 +34,14 @@ const DashboardSidebar: React.FC<DashboardSidebarProps> = ({ onLogout }) => {
   if (!user) return null;
 
   const isActive = (path: string) => location.pathname === path;
+
+  const handleNavigation = (path: string) => {
+    navigate(path);
+    // Close drawer on mobile after navigation
+    if (onNavigate) {
+      onNavigate();
+    }
+  };
 
   const menuItems = [
     {
@@ -131,16 +140,16 @@ const DashboardSidebar: React.FC<DashboardSidebarProps> = ({ onLogout }) => {
       </Box>
 
       {/* Navigation Menu */}
-      <Box sx={{ flex: 1, overflowY: 'auto', py: 2 }}>
-        <List sx={{ px: 2 }}>
+      <Box sx={{ flex: 1, overflowY: 'auto', py: { xs: 1.5, md: 2 } }}>
+        <List sx={{ px: { xs: 1, md: 2 } }}>
           {menuItems.map((item) => (
             <ListItem key={item.path} disablePadding sx={{ mb: 0.5 }}>
               <ListItemButton
-                onClick={() => navigate(item.path)}
+                onClick={() => handleNavigation(item.path)}
                 sx={{
                   borderRadius: 2,
-                  py: 1.5,
-                  px: 2,
+                  py: { xs: 1.25, md: 1.5 },
+                  px: { xs: 1.5, md: 2 },
                   bgcolor: isActive(item.path) ? '#F4C542' : 'transparent',
                   color: isActive(item.path) ? '#032B5A' : '#032B5A',
                   '&:hover': {
@@ -151,7 +160,7 @@ const DashboardSidebar: React.FC<DashboardSidebarProps> = ({ onLogout }) => {
               >
                 <ListItemIcon
                   sx={{
-                    minWidth: 40,
+                    minWidth: { xs: 36, md: 40 },
                     color: isActive(item.path) ? '#032B5A' : '#032B5A',
                   }}
                 >
@@ -161,7 +170,7 @@ const DashboardSidebar: React.FC<DashboardSidebarProps> = ({ onLogout }) => {
                   primary={item.label}
                   primaryTypographyProps={{
                     fontWeight: isActive(item.path) ? 700 : 600,
-                    fontSize: '0.95rem',
+                    fontSize: { xs: '0.875rem', md: '0.95rem' },
                   }}
                 />
               </ListItemButton>
@@ -173,7 +182,7 @@ const DashboardSidebar: React.FC<DashboardSidebarProps> = ({ onLogout }) => {
       <Divider />
 
       {/* Logout Button */}
-      <Box sx={{ p: 2 }}>
+      <Box sx={{ p: { xs: 1.5, md: 2 } }}>
         <Button
           fullWidth
           variant="outlined"
@@ -184,8 +193,9 @@ const DashboardSidebar: React.FC<DashboardSidebarProps> = ({ onLogout }) => {
             color: '#dc3545',
             textTransform: 'none',
             fontWeight: 600,
-            py: 1.2,
+            py: { xs: 1, md: 1.2 },
             borderRadius: 2,
+            fontSize: { xs: '0.875rem', md: '1rem' },
             '&:hover': {
               borderColor: '#c82333',
               bgcolor: '#fff5f5',

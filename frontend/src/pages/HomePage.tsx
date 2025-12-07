@@ -180,15 +180,15 @@ const HomePage: React.FC = () => {
                   <Box
                     sx={{
                       bgcolor: '#032B5A',
-                      p: 3,
+                      p: { xs: 2, md: 3 },
                       background: 'linear-gradient(135deg, #032B5A 0%, #021d3f 100%)',
                     }}
                   >
-                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, flexWrap: { xs: 'wrap', md: 'nowrap' } }}>
                       <Box
                         sx={{
-                          width: 56,
-                          height: 56,
+                          width: { xs: 48, md: 56 },
+                          height: { xs: 48, md: 56 },
                           borderRadius: 3,
                           bgcolor: '#F4C542',
                           display: 'flex',
@@ -197,7 +197,7 @@ const HomePage: React.FC = () => {
                           boxShadow: '0 4px 16px rgba(244, 197, 66, 0.3)',
                         }}
                       >
-                        <BuildIcon sx={{ fontSize: 32, color: '#032B5A' }} />
+                        <BuildIcon sx={{ fontSize: { xs: 24, md: 32 }, color: '#032B5A' }} />
                       </Box>
                       <Box>
                         <Typography
@@ -205,19 +205,19 @@ const HomePage: React.FC = () => {
                           sx={{
                             fontWeight: 700,
                             color: 'white',
-                            fontSize: '1.5rem',
+                            fontSize: { xs: '1.25rem', md: '1.5rem' },
                             mb: 0.5,
                           }}
                         >
                           Nos Services
                         </Typography>
-                        <Typography variant="body2" sx={{ color: 'rgba(255,255,255,0.8)' }}>
+                        <Typography variant="body2" sx={{ color: 'rgba(255,255,255,0.8)', fontSize: { xs: '0.85rem', md: '0.875rem' } }}>
                           Découvrez tous nos services de maintenance et réparation
                         </Typography>
                       </Box>
                     </Box>
                   </Box>
-                  <CardContent sx={{ p: 3 }}>
+                  <CardContent sx={{ p: { xs: 2, md: 3 } }}>
                     {loadingServices ? (
                       <Box sx={{ display: 'flex', justifyContent: 'center', py: 6 }}>
                         <CircularProgress sx={{ color: '#032B5A' }} />
@@ -248,11 +248,11 @@ const HomePage: React.FC = () => {
                                 },
                               }}
                             >
-                              <CardContent sx={{ p: 3, textAlign: 'center' }}>
+                              <CardContent sx={{ p: { xs: 2, md: 3 }, textAlign: 'center' }}>
                                 <Box
                                   sx={{
-                                    width: 80,
-                                    height: 80,
+                                    width: { xs: 64, md: 80 },
+                                    height: { xs: 64, md: 80 },
                                     borderRadius: 3,
                                     bgcolor: '#F4C542',
                                     display: 'flex',
@@ -271,7 +271,7 @@ const HomePage: React.FC = () => {
                                     fontWeight: 700,
                                     color: '#032B5A',
                                     mb: 1.5,
-                                    fontSize: '1.15rem',
+                                    fontSize: { xs: '1rem', md: '1.15rem' },
                                   }}
                                 >
                                   {service.name}
@@ -281,9 +281,9 @@ const HomePage: React.FC = () => {
                                   color="text.secondary"
                                   sx={{
                                     mb: 2.5,
-                                    fontSize: '0.9rem',
+                                    fontSize: { xs: '0.85rem', md: '0.9rem' },
                                     lineHeight: 1.6,
-                                    minHeight: 48,
+                                    minHeight: { xs: 40, md: 48 },
                                     display: '-webkit-box',
                                     WebkitLineClamp: 2,
                                     WebkitBoxOrient: 'vertical',
@@ -304,9 +304,10 @@ const HomePage: React.FC = () => {
                                     color: 'white',
                                     textTransform: 'none',
                                     fontWeight: 600,
-                                    py: 1.2,
+                                    py: { xs: 1, md: 1.2 },
                                     borderRadius: 2,
                                     boxShadow: '0 4px 12px rgba(3, 43, 90, 0.2)',
+                                    fontSize: { xs: '0.875rem', md: '1rem' },
                                     '&:hover': {
                                       bgcolor: '#021d3f',
                                       transform: 'scale(1.02)',
@@ -340,15 +341,15 @@ const HomePage: React.FC = () => {
                   <Box
                     sx={{
                       bgcolor: '#032B5A',
-                      p: 3,
+                      p: { xs: 2, md: 3 },
                       background: 'linear-gradient(135deg, #032B5A 0%, #021d3f 100%)',
                     }}
                   >
-                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, flexWrap: { xs: 'wrap', md: 'nowrap' } }}>
                       <Box
                         sx={{
-                          width: 56,
-                          height: 56,
+                          width: { xs: 48, md: 56 },
+                          height: { xs: 48, md: 56 },
                           borderRadius: 3,
                           bgcolor: '#F4C542',
                           display: 'flex',
@@ -357,7 +358,7 @@ const HomePage: React.FC = () => {
                           boxShadow: '0 4px 16px rgba(244, 197, 66, 0.3)',
                         }}
                       >
-                        <StarIcon sx={{ fontSize: 32, color: '#032B5A' }} />
+                        <StarIcon sx={{ fontSize: { xs: 24, md: 32 }, color: '#032B5A' }} />
                       </Box>
                       <Box>
                         <Typography
@@ -365,19 +366,19 @@ const HomePage: React.FC = () => {
                           sx={{
                             fontWeight: 700,
                             color: 'white',
-                            fontSize: '1.5rem',
+                            fontSize: { xs: '1.25rem', md: '1.5rem' },
                             mb: 0.5,
                           }}
                         >
                           Nos Techniciens
                         </Typography>
-                        <Typography variant="body2" sx={{ color: 'rgba(255,255,255,0.8)' }}>
+                        <Typography variant="body2" sx={{ color: 'rgba(255,255,255,0.8)', fontSize: { xs: '0.85rem', md: '0.875rem' } }}>
                           Trouvez le professionnel idéal pour vos besoins
                         </Typography>
                       </Box>
                     </Box>
                   </Box>
-                  <CardContent sx={{ p: 3 }}>
+                  <CardContent sx={{ p: { xs: 2, md: 3 } }}>
                     {loadingTechs ? (
                       <Box sx={{ display: 'flex', justifyContent: 'center', py: 6 }}>
                         <CircularProgress sx={{ color: '#032B5A' }} />
@@ -413,16 +414,16 @@ const HomePage: React.FC = () => {
                                   },
                                 }}
                               >
-                                <CardContent sx={{ p: 3 }}>
-                                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 2 }}>
+                                <CardContent sx={{ p: { xs: 2, md: 3 } }}>
+                                  <Box sx={{ display: 'flex', alignItems: 'center', gap: { xs: 1.5, md: 2 }, mb: 2 }}>
                                     <Badge
                                       overlap="circular"
                                       anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
                                       badgeContent={
                                         <Box
                                           sx={{
-                                            width: 16,
-                                            height: 16,
+                                            width: { xs: 12, md: 16 },
+                                            height: { xs: 12, md: 16 },
                                             borderRadius: '50%',
                                             bgcolor: technician.isOnline ? '#4caf50' : '#9e9e9e',
                                             border: '2px solid white',
@@ -433,12 +434,12 @@ const HomePage: React.FC = () => {
                                       <Avatar
                                         src={normalizeImageUrl(technician.profilePictureUrl || technicianImage)}
                                         sx={{
-                                          width: 72,
-                                          height: 72,
+                                          width: { xs: 56, md: 72 },
+                                          height: { xs: 56, md: 72 },
                                           bgcolor: '#032B5A',
                                           color: '#F4C542',
                                           fontWeight: 700,
-                                          fontSize: '1.75rem',
+                                          fontSize: { xs: '1.25rem', md: '1.75rem' },
                                           border: '3px solid #F4C542',
                                         }}
                                       >
@@ -452,7 +453,7 @@ const HomePage: React.FC = () => {
                                           fontWeight: 700,
                                           color: '#032B5A',
                                           mb: 0.5,
-                                          fontSize: '1.1rem',
+                                          fontSize: { xs: '0.95rem', md: '1.1rem' },
                                           overflow: 'hidden',
                                           textOverflow: 'ellipsis',
                                           whiteSpace: 'nowrap',

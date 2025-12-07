@@ -33,7 +33,7 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children }) => {
     return null;
   }
 
-  const drawer = <DashboardSidebar onLogout={handleLogout} />;
+  const drawer = <DashboardSidebar onLogout={handleLogout} onNavigate={() => setMobileOpen(false)} />;
 
   return (
     <Box sx={{ display: 'flex', minHeight: '100vh', bgcolor: '#fafbfc' }}>
@@ -107,9 +107,10 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children }) => {
         component="main"
         sx={{
           flexGrow: 1,
-          p: { xs: 2, md: 4 },
-          width: { md: `calc(100% - 280px)` },
-          mt: { xs: '64px', md: 0 },
+          p: { xs: 1.5, sm: 2, md: 4 },
+          width: { xs: '100%', md: `calc(100% - 280px)` },
+          mt: { xs: '56px', sm: '64px', md: 0 },
+          minWidth: 0, // Prevent overflow
         }}
       >
         {children}
