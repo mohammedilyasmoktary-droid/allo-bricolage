@@ -938,6 +938,25 @@ const TechnicianJobs: React.FC = () => {
                               </Button>
                             </>
                           )}
+                          
+                          {/* Completed section - Show review option */}
+                          {tabValue === 2 && booking.paymentStatus === 'PAID' && (
+                            <Box sx={{ mt: 2, p: 2, bgcolor: '#e8f5e9', borderRadius: 2, border: '1px solid #4caf50' }}>
+                              <Typography variant="body2" sx={{ fontWeight: 600, color: '#2e7d32', mb: 1 }}>
+                                ✓ Mission complétée et payée
+                              </Typography>
+                              <Typography variant="caption" sx={{ color: '#032B5A', display: 'block', mb: 1 }}>
+                                Montant reçu: <strong>{booking.finalPrice || booking.estimatedPrice} MAD</strong>
+                              </Typography>
+                              {booking.paymentMethod && (
+                                <Typography variant="caption" sx={{ color: '#666', display: 'block' }}>
+                                  Méthode: {booking.paymentMethod === 'CASH' ? 'Espèces' : 
+                                           booking.paymentMethod === 'CARD' ? 'Carte' :
+                                           booking.paymentMethod === 'WAFACASH' ? 'Wafacash' : 'Virement bancaire'}
+                                </Typography>
+                              )}
+                            </Box>
+                          )}
 
                           {booking.status === 'AWAITING_PAYMENT' && booking.paymentStatus !== 'PENDING' && (
                             <Alert severity="info" sx={{ borderRadius: 2 }}>
