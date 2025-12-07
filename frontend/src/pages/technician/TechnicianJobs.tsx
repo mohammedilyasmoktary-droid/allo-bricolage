@@ -29,8 +29,13 @@ import {
   List,
   ListItem,
   ListItemText,
+  Rating,
+  TextareaAutosize,
 } from '@mui/material';
 import { bookingsApi, Booking } from '../../api/bookings';
+import { reviewsApi, CreateReviewData } from '../../api/reviews';
+import { useAuth } from '../../contexts/AuthContext';
+import { generateBookingPDF, BookingPDFData } from '../../utils/pdfGenerator';
 import { format } from 'date-fns';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import DirectionsCarIcon from '@mui/icons-material/DirectionsCar';
@@ -48,6 +53,8 @@ import CloseIcon from '@mui/icons-material/Close';
 import PhoneIcon from '@mui/icons-material/Phone';
 import EmailIcon from '@mui/icons-material/Email';
 import AccessTimeIcon from '@mui/icons-material/AccessTime';
+import PictureAsPdfIcon from '@mui/icons-material/PictureAsPdf';
+import StarIcon from '@mui/icons-material/Star';
 
 const TechnicianJobs: React.FC = () => {
   const [bookings, setBookings] = useState<Booking[]>([]);
@@ -60,6 +67,12 @@ const TechnicianJobs: React.FC = () => {
   const [selectedBooking, setSelectedBooking] = useState<Booking | null>(null);
   const [finalPrice, setFinalPrice] = useState<string>('');
   const [error, setError] = useState('');
+  const [reviewRating, setReviewRating] = useState<number>(5);
+  const [reviewComment, setReviewComment] = useState('');
+  const [submittingReview, setSubmittingReview] = useState(false);
+  const [reviewSuccess, setReviewSuccess] = useState(false);
+  const [existingReview, setExistingReview] = useState<any>(null);
+  const { user } = useAuth();
 
   useEffect(() => {
     loadJobs();
@@ -120,9 +133,92 @@ const TechnicianJobs: React.FC = () => {
     updateStatus(selectedBooking.id, 'COMPLETED', price);
   };
 
-  const handleViewDetails = (booking: Booking) => {
+  const handleViewDetails = async (booking: Booking) => {
     setSelectedBooking(booking);
     setDetailDialogOpen(true);
+    
+    // Load existing review if payment is paid
+    if (booking.paymentStatus === 'PAID' && booking.reviews && booking.reviews.length > 0) {
+      const technicianReview = booking.reviews.find((r: any) => r.reviewerId === user?.id);
+      if (technicianReview) {
+        setExistingReview(technicianReview);
+        setReviewRating(technicianReview.rating);
+        setReviewComment(technicianReview.comment || '');
+      } else {
+        setExistingReview(null);
+        setReviewRating(5);
+        setReviewComment('');
+      }
+    } else {
+      setExistingReview(null);
+      setReviewRating(5);
+      setReviewComment('');
+    }
+  };
+
+  const handleDownloadPDF = async () => {
+    if (!selectedBooking) return;
+    
+    const pdfData: BookingPDFData = {
+      bookingId: selectedBooking.id,
+      clientName: selectedBooking.client?.name || 'N/A',
+      clientEmail: selectedBooking.client?.email || 'N/A',
+      clientPhone: selectedBooking.client?.phone || 'N/A',
+      technicianName: selectedBooking.technician?.name || 'N/A',
+      technicianPhone: selectedBooking.technician?.phone || 'N/A',
+      serviceCategory: selectedBooking.category?.name || 'N/A',
+      description: selectedBooking.description,
+      address: selectedBooking.address,
+      city: selectedBooking.city,
+      scheduledDate: selectedBooking.scheduledDateTime,
+      status: selectedBooking.status,
+      estimatedPrice: selectedBooking.estimatedPrice,
+      finalPrice: selectedBooking.finalPrice,
+      paymentMethod: selectedBooking.paymentMethod,
+      paymentStatus: selectedBooking.paymentStatus,
+      receiptUrl: selectedBooking.receiptUrl,
+      transactionId: selectedBooking.transactionId,
+      createdAt: selectedBooking.createdAt,
+      review: existingReview ? {
+        rating: existingReview.rating,
+        comment: existingReview.comment,
+        createdAt: existingReview.createdAt,
+      } : undefined,
+    };
+    
+    await generateBookingPDF(pdfData);
+  };
+
+  const handleSubmitReview = async () => {
+    if (!selectedBooking || !selectedBooking.clientId) return;
+    
+    setSubmittingReview(true);
+    try {
+      const reviewData: CreateReviewData = {
+        bookingId: selectedBooking.id,
+        revieweeId: selectedBooking.clientId,
+        rating: reviewRating,
+        comment: reviewComment || undefined,
+      };
+      
+      await reviewsApi.create(reviewData);
+      setReviewSuccess(true);
+      
+      // Reload booking to get updated review
+      const updated = await bookingsApi.getById(selectedBooking.id);
+      setSelectedBooking(updated);
+      const technicianReview = updated.reviews?.find((r: any) => r.reviewerId === user?.id);
+      if (technicianReview) {
+        setExistingReview(technicianReview);
+      }
+      
+      // Reload all jobs
+      loadJobs();
+    } catch (err: any) {
+      setError(err.response?.data?.error || 'Échec de la soumission de l\'avis');
+    } finally {
+      setSubmittingReview(false);
+    }
   };
 
   const getStatusColor = (status: Booking['status']) => {
@@ -859,9 +955,29 @@ const TechnicianJobs: React.FC = () => {
           }}
         >
           Détails de la mission
-          <IconButton onClick={() => setDetailDialogOpen(false)} sx={{ color: 'white' }}>
-            <CloseIcon />
-          </IconButton>
+          <Box sx={{ display: 'flex', gap: 1, alignItems: 'center' }}>
+            {selectedBooking && (selectedBooking.paymentStatus === 'PAID' || selectedBooking.paymentStatus === 'PENDING') && (
+              <Button
+                variant="outlined"
+                startIcon={<PictureAsPdfIcon />}
+                onClick={handleDownloadPDF}
+                sx={{
+                  borderColor: 'white',
+                  color: 'white',
+                  textTransform: 'none',
+                  '&:hover': {
+                    borderColor: '#F4C542',
+                    bgcolor: 'rgba(244, 197, 66, 0.1)',
+                  },
+                }}
+              >
+                PDF
+              </Button>
+            )}
+            <IconButton onClick={() => setDetailDialogOpen(false)} sx={{ color: 'white' }}>
+              <CloseIcon />
+            </IconButton>
+          </Box>
         </DialogTitle>
         <DialogContent sx={{ p: 4 }}>
           {selectedBooking && (
@@ -957,10 +1073,97 @@ const TechnicianJobs: React.FC = () => {
               </Grid>
             </Grid>
           )}
+
+          {/* Review Section */}
+          {selectedBooking && selectedBooking.paymentStatus === 'PAID' && selectedBooking.status === 'COMPLETED' && (
+            <Box sx={{ mt: 4, pt: 3, borderTop: '2px solid #e0e0e0' }}>
+              <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 3 }}>
+                <StarIcon sx={{ color: '#F4C542', fontSize: 28 }} />
+                <Typography variant="h6" sx={{ fontWeight: 700, color: '#032B5A' }}>
+                  Évaluer le client
+                </Typography>
+              </Box>
+              {reviewSuccess && (
+                <Alert severity="success" sx={{ mb: 3, borderRadius: 2 }}>
+                  Votre avis a été soumis avec succès!
+                </Alert>
+              )}
+              {existingReview ? (
+                <Box>
+                  <Box sx={{ mb: 2 }}>
+                    <Rating value={existingReview.rating} readOnly size="large" sx={{ color: '#F4C542' }} />
+                  </Box>
+                  {existingReview.comment && (
+                    <Typography variant="body1" sx={{ color: '#032B5A', mb: 2 }}>
+                      {existingReview.comment}
+                    </Typography>
+                  )}
+                  <Typography variant="caption" color="text.secondary">
+                    Publié le {new Date(existingReview.createdAt).toLocaleDateString('fr-FR')}
+                  </Typography>
+                </Box>
+              ) : (
+                <Box>
+                  <Box sx={{ mb: 3 }}>
+                    <Typography variant="body2" sx={{ mb: 1, fontWeight: 600, color: '#032B5A' }}>
+                      Note
+                    </Typography>
+                    <Rating
+                      value={reviewRating}
+                      onChange={(_, newValue) => setReviewRating(newValue || 5)}
+                      size="large"
+                      sx={{ color: '#F4C542' }}
+                    />
+                  </Box>
+                  <Box sx={{ mb: 3 }}>
+                    <Typography variant="body2" sx={{ mb: 1, fontWeight: 600, color: '#032B5A' }}>
+                      Commentaire (optionnel)
+                    </Typography>
+                    <TextareaAutosize
+                      minRows={4}
+                      value={reviewComment}
+                      onChange={(e) => setReviewComment(e.target.value)}
+                      placeholder="Partagez votre expérience avec ce client..."
+                      style={{
+                        width: '100%',
+                        padding: '12px',
+                        borderRadius: '8px',
+                        border: '1px solid #e0e0e0',
+                        fontFamily: 'inherit',
+                        fontSize: '14px',
+                        resize: 'vertical',
+                      }}
+                    />
+                  </Box>
+                  <Button
+                    variant="contained"
+                    onClick={handleSubmitReview}
+                    disabled={submittingReview}
+                    startIcon={!submittingReview && <StarIcon />}
+                    sx={{
+                      bgcolor: '#F4C542',
+                      color: '#032B5A',
+                      '&:hover': { bgcolor: '#e0b038' },
+                      textTransform: 'none',
+                      borderRadius: 2,
+                      py: 1.5,
+                      px: 4,
+                      fontWeight: 700,
+                    }}
+                  >
+                    {submittingReview ? 'Envoi...' : 'Soumettre l\'avis'}
+                  </Button>
+                </Box>
+              )}
+            </Box>
+          )}
         </DialogContent>
         <DialogActions sx={{ p: 3, bgcolor: '#f5f5f5' }}>
           <Button
-            onClick={() => setDetailDialogOpen(false)}
+            onClick={() => {
+              setDetailDialogOpen(false);
+              setReviewSuccess(false);
+            }}
             sx={{
               textTransform: 'none',
               color: '#032B5A',

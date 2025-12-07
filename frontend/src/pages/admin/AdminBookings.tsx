@@ -32,7 +32,8 @@ import {
   Tooltip,
 } from '@mui/material';
 import { adminApi, AdminStats } from '../../api/admin';
-import { Booking } from '../../api/bookings';
+import { bookingsApi, Booking } from '../../api/bookings';
+import { generateBookingPDF, BookingPDFData } from '../../utils/pdfGenerator';
 import { format } from 'date-fns';
 import SearchIcon from '@mui/icons-material/Search';
 import ClearIcon from '@mui/icons-material/Clear';
@@ -50,6 +51,8 @@ import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import PendingIcon from '@mui/icons-material/Pending';
 import TrendingUpIcon from '@mui/icons-material/TrendingUp';
 import AccountBalanceWalletIcon from '@mui/icons-material/AccountBalanceWallet';
+import PictureAsPdfIcon from '@mui/icons-material/PictureAsPdf';
+import CloseIcon from '@mui/icons-material/Close';
 
 const AdminBookings: React.FC = () => {
   const [bookings, setBookings] = useState<Booking[]>([]);
@@ -133,6 +136,51 @@ const AdminBookings: React.FC = () => {
     } finally {
       setUpdatingPayment(false);
     }
+  };
+
+  const handleViewDetails = async (booking: Booking) => {
+    setSelectedBooking(booking);
+    // Load full booking details with reviews
+    try {
+      const fullBooking = await bookingsApi.getById(booking.id);
+      setSelectedBooking(fullBooking);
+    } catch (error) {
+      console.error('Failed to load full booking details:', error);
+    }
+    setDetailsOpen(true);
+  };
+
+  const handleDownloadPDF = async () => {
+    if (!selectedBooking) return;
+    
+    const pdfData: BookingPDFData = {
+      bookingId: selectedBooking.id,
+      clientName: selectedBooking.client?.name || 'N/A',
+      clientEmail: selectedBooking.client?.email || 'N/A',
+      clientPhone: selectedBooking.client?.phone || 'N/A',
+      technicianName: selectedBooking.technician?.name || 'N/A',
+      technicianPhone: selectedBooking.technician?.phone || 'N/A',
+      serviceCategory: selectedBooking.category?.name || 'N/A',
+      description: selectedBooking.description,
+      address: selectedBooking.address,
+      city: selectedBooking.city,
+      scheduledDate: selectedBooking.scheduledDateTime,
+      status: selectedBooking.status,
+      estimatedPrice: selectedBooking.estimatedPrice,
+      finalPrice: selectedBooking.finalPrice,
+      paymentMethod: selectedBooking.paymentMethod,
+      paymentStatus: selectedBooking.paymentStatus,
+      receiptUrl: selectedBooking.receiptUrl,
+      transactionId: selectedBooking.transactionId,
+      createdAt: selectedBooking.createdAt,
+      review: selectedBooking.reviews && selectedBooking.reviews.length > 0 ? {
+        rating: selectedBooking.reviews[0].rating,
+        comment: selectedBooking.reviews[0].comment,
+        createdAt: selectedBooking.reviews[0].createdAt,
+      } : undefined,
+    };
+    
+    await generateBookingPDF(pdfData);
   };
 
   const getStatusColor = (status: string) => {
@@ -549,10 +597,7 @@ const AdminBookings: React.FC = () => {
                         <Tooltip title="Voir les détails">
                           <IconButton
                             size="small"
-                            onClick={() => {
-                              setSelectedBooking(booking);
-                              setDetailsOpen(true);
-                            }}
+                            onClick={() => handleViewDetails(booking)}
                             sx={{
                               color: '#032B5A',
                               '&:hover': { bgcolor: '#f5f5f5' },
@@ -609,15 +654,35 @@ const AdminBookings: React.FC = () => {
             <BuildIcon />
             <Typography variant="h6">Détails de la réservation</Typography>
           </Box>
-          <IconButton
-            onClick={() => {
-              setDetailsOpen(false);
-              setSelectedBooking(null);
-            }}
-            sx={{ color: 'white' }}
-          >
-            <ClearIcon />
-          </IconButton>
+          <Box sx={{ display: 'flex', gap: 1, alignItems: 'center' }}>
+            {selectedBooking && (
+              <Button
+                variant="outlined"
+                startIcon={<PictureAsPdfIcon />}
+                onClick={handleDownloadPDF}
+                sx={{
+                  borderColor: 'white',
+                  color: 'white',
+                  textTransform: 'none',
+                  '&:hover': {
+                    borderColor: '#F4C542',
+                    bgcolor: 'rgba(244, 197, 66, 0.1)',
+                  },
+                }}
+              >
+                PDF
+              </Button>
+            )}
+            <IconButton
+              onClick={() => {
+                setDetailsOpen(false);
+                setSelectedBooking(null);
+              }}
+              sx={{ color: 'white' }}
+            >
+              <CloseIcon />
+            </IconButton>
+          </Box>
         </DialogTitle>
         <DialogContent sx={{ p: 4 }}>
           {selectedBooking && (
