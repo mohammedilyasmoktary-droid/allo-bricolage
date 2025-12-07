@@ -65,7 +65,7 @@ const TechnicianAvailabilityCalendar: React.FC<TechnicianAvailabilityCalendarPro
         // Only include bookings with scheduledDateTime that are not cancelled/declined/completed
         const technicianBookings = allBookings.filter(
           (booking) =>
-            booking.technicianProfileId === technicianId &&
+            (booking.technicianProfile?.id === technicianId || booking.technicianId === technicianId) &&
             booking.scheduledDateTime &&
             booking.status !== 'CANCELLED' &&
             booking.status !== 'DECLINED' &&
