@@ -803,6 +803,140 @@ const HomePage: React.FC = () => {
         </Container>
       </Box>
 
+      {/* Customer Reviews Section */}
+      <Box sx={{ py: { xs: 7, md: 11 }, bgcolor: 'white' }}>
+        <Container maxWidth="lg">
+          <Card
+            sx={{
+              borderRadius: 4,
+              boxShadow: '0 8px 32px rgba(0,0,0,0.12)',
+              border: '1px solid #e8eaed',
+              bgcolor: 'white',
+              overflow: 'hidden',
+              mb: 4,
+            }}
+          >
+            <Box
+              sx={{
+                bgcolor: '#032B5A',
+                p: { xs: 2, md: 3 },
+                background: 'linear-gradient(135deg, #032B5A 0%, #021d3f 100%)',
+              }}
+            >
+              <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, flexWrap: { xs: 'wrap', md: 'nowrap' } }}>
+                <Box
+                  sx={{
+                    width: { xs: 48, md: 56 },
+                    height: { xs: 48, md: 56 },
+                    borderRadius: 3,
+                    bgcolor: '#F4C542',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    boxShadow: '0 4px 16px rgba(244, 197, 66, 0.3)',
+                  }}
+                >
+                  <StarIcon sx={{ fontSize: { xs: 24, md: 32 }, color: '#032B5A' }} />
+                </Box>
+                <Box>
+                  <Typography
+                    variant="h5"
+                    sx={{
+                      fontWeight: 700,
+                      color: 'white',
+                      fontSize: { xs: '1.25rem', md: '1.5rem' },
+                      mb: 0.5,
+                    }}
+                  >
+                    Ce que disent nos clients
+                  </Typography>
+                  <Typography variant="body2" sx={{ color: 'rgba(255,255,255,0.8)', fontSize: { xs: '0.85rem', md: '0.875rem' } }}>
+                    Découvrez les témoignages de nos clients satisfaits
+                  </Typography>
+                </Box>
+              </Box>
+            </Box>
+            <CardContent sx={{ p: { xs: 3, md: 4 } }}>
+              <Grid container spacing={{ xs: 2, md: 3 }}>
+                {testimonials.map((testimonial, index) => (
+                  <Grid item xs={12} sm={6} md={3} key={index}>
+                    <Card
+                      sx={{
+                        height: '100%',
+                        p: { xs: 2.5, md: 3.5 },
+                        border: '1px solid #e8eaed',
+                        borderRadius: 3,
+                        bgcolor: 'white',
+                        transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+                        boxShadow: '0 2px 8px rgba(0,0,0,0.08)',
+                        display: 'flex',
+                        flexDirection: 'column',
+                        '&:hover': {
+                          transform: 'translateY(-6px)',
+                          boxShadow: '0 12px 32px rgba(3, 43, 90, 0.15)',
+                          borderColor: '#F4C542',
+                        },
+                      }}
+                    >
+                      <Box sx={{ mb: 2 }}>
+                        <Rating value={testimonial.rating} readOnly size="small" sx={{ color: '#F4C542', mb: 1.5 }} />
+                        <Typography
+                          variant="body1"
+                          sx={{
+                            color: '#032B5A',
+                            fontWeight: 500,
+                            fontSize: { xs: '0.9rem', md: '1rem' },
+                            lineHeight: 1.6,
+                            mb: 2,
+                          }}
+                        >
+                          "{testimonial.text}"
+                        </Typography>
+                      </Box>
+                      <Box sx={{ mt: 'auto', display: 'flex', alignItems: 'center', gap: 1.5 }}>
+                        <Avatar
+                          sx={{
+                            bgcolor: '#032B5A',
+                            color: '#F4C542',
+                            width: { xs: 36, md: 40 },
+                            height: { xs: 36, md: 40 },
+                            fontSize: { xs: '0.9rem', md: '1rem' },
+                            fontWeight: 700,
+                          }}
+                        >
+                          {testimonial.name.charAt(0)}
+                        </Avatar>
+                        <Box>
+                          <Typography
+                            variant="body2"
+                            sx={{
+                              fontWeight: 700,
+                              color: '#032B5A',
+                              fontSize: { xs: '0.85rem', md: '0.95rem' }
+                            }}
+                          >
+                            {testimonial.name}
+                          </Typography>
+                          <Typography
+                            variant="caption"
+                            sx={{
+                              color: 'text.secondary',
+                              fontSize: { xs: '0.75rem', md: '0.8rem' }
+                            }}
+                          >
+                            {testimonial.city}
+                          </Typography>
+                        </Box>
+                      </Box>
+                    </Card>
+                  </Grid>
+                ))}
+              </Grid>
+            </CardContent>
+          </Card>
+        </Container>
+      </Box>
+
       {/* Platform Statistics Section */}
       <Box sx={{ py: { xs: 7, md: 11 }, bgcolor: '#fafbfc' }}>
         <Container maxWidth="lg">
@@ -927,7 +1061,7 @@ const HomePage: React.FC = () => {
       </Box>
 
       {/* How It Works Section */}
-      <Box sx={{ py: { xs: 7, md: 11 }, bgcolor: 'white' }}>
+      <Box sx={{ py: { xs: 7, md: 11 }, bgcolor: '#fafbfc' }}>
         <Container maxWidth="lg">
           <Card
             sx={{
@@ -981,209 +1115,75 @@ const HomePage: React.FC = () => {
             </Box>
             <CardContent sx={{ p: { xs: 3, md: 4 } }}>
               <Grid container spacing={{ xs: 3, md: 4 }}>
-            {steps.map((step, index) => (
-              <Grid item xs={12} sm={6} md={3} key={index}>
-                <Card
-                  sx={{
-                    height: '100%',
-                    textAlign: 'center',
-                    p: { xs: 3, md: 4 },
-                    border: '1px solid #e8eaed',
-                    borderRadius: 3,
-                    bgcolor: 'white',
-                    transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
-                    boxShadow: '0 2px 8px rgba(0,0,0,0.08)',
-                    position: 'relative',
-                    '&:hover': {
-                      transform: 'translateY(-8px)',
-                      boxShadow: '0 12px 32px rgba(3, 43, 90, 0.15)',
-                      borderColor: '#F4C542',
-                    },
-                  }}
-                >
-                  <Box
-                    sx={{
-                      width: { xs: 70, md: 90 },
-                      height: { xs: 70, md: 90 },
-                      borderRadius: '50%',
-                      bgcolor: '#032B5A',
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      mx: 'auto',
-                      mb: 3,
-                      mt: 2,
-                      boxShadow: '0 4px 16px rgba(3, 43, 90, 0.2)',
-                    }}
-                  >
-                    {React.cloneElement(step.icon, {
-                      sx: { fontSize: { xs: 40, md: 50 }, color: '#F4C542' }
-                    })}
-                  </Box>
-                  <Typography
-                    variant="h6"
-                    gutterBottom
-                    sx={{
-                      fontWeight: 700,
-                      color: '#032B5A',
-                      mb: 1.5,
-                      fontSize: { xs: '1.05rem', md: '1.2rem' }
-                    }}
-                  >
-                    {step.title}
-                  </Typography>
-                  <Typography
-                    variant="body2"
-                    color="text.secondary"
-                    sx={{
-                      lineHeight: 1.7,
-                      fontSize: { xs: '0.85rem', md: '0.95rem' }
-                    }}
-                  >
-                    {step.description}
-                  </Typography>
-                </Card>
-              </Grid>
-              ))}
-            </Grid>
-          </CardContent>
-        </Card>
-      </Container>
-    </Box>
-
-    {/* Customer Reviews Section */}
-    <Box sx={{ py: { xs: 7, md: 11 }, bgcolor: '#fafbfc' }}>
-      <Container maxWidth="lg">
-        <Card
-          sx={{
-            borderRadius: 4,
-            boxShadow: '0 8px 32px rgba(0,0,0,0.12)',
-            border: '1px solid #e8eaed',
-            bgcolor: 'white',
-            overflow: 'hidden',
-            mb: 4,
-          }}
-        >
-          <Box
-            sx={{
-              bgcolor: '#032B5A',
-              p: { xs: 2, md: 3 },
-              background: 'linear-gradient(135deg, #032B5A 0%, #021d3f 100%)',
-            }}
-          >
-            <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, flexWrap: { xs: 'wrap', md: 'nowrap' } }}>
-              <Box
-                sx={{
-                  width: { xs: 48, md: 56 },
-                  height: { xs: 48, md: 56 },
-                  borderRadius: 3,
-                  bgcolor: '#F4C542',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  boxShadow: '0 4px 16px rgba(244, 197, 66, 0.3)',
-                }}
-              >
-                <StarIcon sx={{ fontSize: { xs: 24, md: 32 }, color: '#032B5A' }} />
-              </Box>
-              <Box>
-                <Typography
-                  variant="h5"
-                  sx={{
-                    fontWeight: 700,
-                    color: 'white',
-                    fontSize: { xs: '1.25rem', md: '1.5rem' },
-                    mb: 0.5,
-                  }}
-                >
-                  Ce que disent nos clients
-                </Typography>
-                <Typography variant="body2" sx={{ color: 'rgba(255,255,255,0.8)', fontSize: { xs: '0.85rem', md: '0.875rem' } }}>
-                  Découvrez les témoignages de nos clients satisfaits
-                </Typography>
-              </Box>
-            </Box>
-          </Box>
-          <CardContent sx={{ p: { xs: 3, md: 4 } }}>
-            <Grid container spacing={{ xs: 2, md: 3 }}>
-              {testimonials.map((testimonial, index) => (
-              <Grid item xs={12} sm={6} md={3} key={index}>
-                <Card
-                  sx={{
-                    height: '100%',
-                    p: { xs: 2.5, md: 3.5 },
-                    border: '1px solid #e8eaed',
-                    borderRadius: 3,
-                    bgcolor: 'white',
-                    transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
-                    boxShadow: '0 2px 8px rgba(0,0,0,0.08)',
-                    display: 'flex',
-                    flexDirection: 'column',
-                    '&:hover': {
-                      transform: 'translateY(-6px)',
-                      boxShadow: '0 12px 32px rgba(3, 43, 90, 0.15)',
-                      borderColor: '#F4C542',
-                    },
-                  }}
-                >
-                  <Box sx={{ mb: 2 }}>
-                    <Rating value={testimonial.rating} readOnly size="small" sx={{ color: '#F4C542', mb: 1.5 }} />
-                    <Typography
-                      variant="body1"
+                {steps.map((step, index) => (
+                  <Grid item xs={12} sm={6} md={3} key={index}>
+                    <Card
                       sx={{
-                        color: '#032B5A',
-                        fontWeight: 500,
-                        fontSize: { xs: '0.9rem', md: '1rem' },
-                        lineHeight: 1.6,
-                        mb: 2,
+                        height: '100%',
+                        textAlign: 'center',
+                        p: { xs: 3, md: 4 },
+                        border: '1px solid #e8eaed',
+                        borderRadius: 3,
+                        bgcolor: 'white',
+                        transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+                        boxShadow: '0 2px 8px rgba(0,0,0,0.08)',
+                        position: 'relative',
+                        '&:hover': {
+                          transform: 'translateY(-8px)',
+                          boxShadow: '0 12px 32px rgba(3, 43, 90, 0.15)',
+                          borderColor: '#F4C542',
+                        },
                       }}
                     >
-                      "{testimonial.text}"
-                    </Typography>
-                  </Box>
-                  <Box sx={{ mt: 'auto', display: 'flex', alignItems: 'center', gap: 1.5 }}>
-                    <Avatar
-                      sx={{
-                        bgcolor: '#032B5A',
-                        color: '#F4C542',
-                        width: { xs: 36, md: 40 },
-                        height: { xs: 36, md: 40 },
-                        fontSize: { xs: '0.9rem', md: '1rem' },
-                        fontWeight: 700,
-                      }}
-                    >
-                      {testimonial.name.charAt(0)}
-                    </Avatar>
-                    <Box>
+                      <Box
+                        sx={{
+                          width: { xs: 70, md: 90 },
+                          height: { xs: 70, md: 90 },
+                          borderRadius: '50%',
+                          bgcolor: '#032B5A',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          mx: 'auto',
+                          mb: 3,
+                          mt: 2,
+                          boxShadow: '0 4px 16px rgba(3, 43, 90, 0.2)',
+                        }}
+                      >
+                        {React.cloneElement(step.icon, {
+                          sx: { fontSize: { xs: 40, md: 50 }, color: '#F4C542' }
+                        })}
+                      </Box>
                       <Typography
-                        variant="body2"
+                        variant="h6"
+                        gutterBottom
                         sx={{
                           fontWeight: 700,
                           color: '#032B5A',
+                          mb: 1.5,
+                          fontSize: { xs: '1.05rem', md: '1.2rem' }
+                        }}
+                      >
+                        {step.title}
+                      </Typography>
+                      <Typography
+                        variant="body2"
+                        color="text.secondary"
+                        sx={{
+                          lineHeight: 1.7,
                           fontSize: { xs: '0.85rem', md: '0.95rem' }
                         }}
                       >
-                        {testimonial.name}
+                        {step.description}
                       </Typography>
-                      <Typography
-                        variant="caption"
-                        sx={{
-                          color: 'text.secondary',
-                          fontSize: { xs: '0.75rem', md: '0.8rem' }
-                        }}
-                      >
-                        {testimonial.city}
-                      </Typography>
-                    </Box>
-                  </Box>
-                </Card>
+                    </Card>
+                  </Grid>
+                ))}
               </Grid>
-              ))}
-            </Grid>
-          </CardContent>
-        </Card>
-      </Container>
-    </Box>
+            </CardContent>
+          </Card>
+        </Container>
+      </Box>
     </Box>
   );
 };
