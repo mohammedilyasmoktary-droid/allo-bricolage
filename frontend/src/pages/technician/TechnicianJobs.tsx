@@ -284,14 +284,18 @@ const TechnicianJobs: React.FC = () => {
 
     // Status filter based on tab
     const statusMap = [
-      ['ACCEPTED', 'ON_THE_WAY', 'IN_PROGRESS'], // Active
-      ['AWAITING_PAYMENT'], // Payment
-      ['COMPLETED'], // Completed
+      [], // Tab 0: All bookings (empty array means show all)
+      ['ACCEPTED', 'ON_THE_WAY', 'IN_PROGRESS'], // Tab 1: Active
+      ['AWAITING_PAYMENT'], // Tab 2: Payment
+      ['COMPLETED'], // Tab 3: Completed
     ];
     const allowedStatuses = statusMap[tabValue] || [];
-    if (tabValue === 0 && statusFilter !== 'all') {
-      // If using dropdown filter on active tab
-      filtered = filtered.filter((b) => b.status === statusFilter);
+    if (tabValue === 0) {
+      // Show all bookings when "all" tab is selected
+      // Only apply statusFilter if it's not 'all'
+      if (statusFilter !== 'all') {
+        filtered = filtered.filter((b) => b.status === statusFilter);
+      }
     } else if (allowedStatuses.length > 0) {
       filtered = filtered.filter((b) => allowedStatuses.includes(b.status));
     }
@@ -409,9 +413,14 @@ const TechnicianJobs: React.FC = () => {
                   sx={{ borderRadius: 2 }}
                 >
                   <MenuItem value="all">Tous</MenuItem>
+                  <MenuItem value="PENDING">En attente</MenuItem>
                   <MenuItem value="ACCEPTED">Acceptés</MenuItem>
                   <MenuItem value="ON_THE_WAY">En route</MenuItem>
                   <MenuItem value="IN_PROGRESS">En cours</MenuItem>
+                  <MenuItem value="AWAITING_PAYMENT">En attente de paiement</MenuItem>
+                  <MenuItem value="COMPLETED">Terminé</MenuItem>
+                  <MenuItem value="DECLINED">Refusé</MenuItem>
+                  <MenuItem value="CANCELLED">Annulé</MenuItem>
                 </Select>
               </FormControl>
             </Box>
@@ -428,8 +437,10 @@ const TechnicianJobs: React.FC = () => {
                 {searchQuery
                   ? 'Aucun travail trouvé'
                   : tabValue === 0
-                  ? 'Aucun travail en cours'
+                  ? 'Aucun travail'
                   : tabValue === 1
+                  ? 'Aucun travail en cours'
+                  : tabValue === 2
                   ? 'Aucun paiement en attente'
                   : 'Aucun travail terminé'}
               </Typography>
