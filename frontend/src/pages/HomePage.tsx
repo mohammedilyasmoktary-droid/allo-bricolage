@@ -162,7 +162,7 @@ const HomePage: React.FC = () => {
     <Box sx={{ pb: { xs: 4, md: 8 }, position: 'relative' }}>
       {/* Hero Banner */}
       <Box sx={{ py: { xs: 6, md: 8 }, bgcolor: '#fafbfc' }}>
-        <Container maxWidth="lg">
+        <Container maxWidth="xl">
           <HeroBanner />
         </Container>
       </Box>
