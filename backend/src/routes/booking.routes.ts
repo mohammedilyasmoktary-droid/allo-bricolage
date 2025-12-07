@@ -338,7 +338,7 @@ router.patch('/:id/accept', authenticate, authorize('TECHNICIAN'), checkSubscrip
       data: {
         userId: booking.clientId,
         type: 'BOOKING_ACCEPTED',
-        message: `Your booking has been accepted by ${updated.technician?.name}`,
+        message: `Votre réservation a été acceptée par ${updated.technician?.name}. Le technicien vous contactera bientôt.`,
       },
     });
 
@@ -463,19 +463,28 @@ router.patch(
         },
       });
 
-      // Notify client
-      const notificationType = status === 'ON_THE_WAY' ? 'BOOKING_ON_THE_WAY' :
-                              status === 'IN_PROGRESS' ? 'BOOKING_IN_PROGRESS' :
-                              'BOOKING_COMPLETED';
+      // Notify client with specific messages
+      let notificationType: string;
+      let notificationMessage: string;
 
-      const notificationMessage = updateData.status === 'AWAITING_PAYMENT' 
-        ? 'Service completed! Please proceed to payment.'
-        : `Booking status updated to ${updateData.status || status}`;
+      if (updateData.status === 'AWAITING_PAYMENT') {
+        notificationType = 'BOOKING_COMPLETED';
+        notificationMessage = `Le service a été complété par ${updated.technician?.name}. Veuillez procéder au paiement.`;
+      } else if (status === 'ON_THE_WAY') {
+        notificationType = 'BOOKING_ON_THE_WAY';
+        notificationMessage = `${updated.technician?.name} est en route vers votre adresse.`;
+      } else if (status === 'IN_PROGRESS') {
+        notificationType = 'BOOKING_IN_PROGRESS';
+        notificationMessage = `${updated.technician?.name} a commencé l'intervention.`;
+      } else {
+        notificationType = 'BOOKING_COMPLETED';
+        notificationMessage = `Le statut de votre réservation a été mis à jour.`;
+      }
 
       await prisma.notification.create({
         data: {
           userId: booking.clientId,
-          type: updateData.status === 'AWAITING_PAYMENT' ? 'BOOKING_COMPLETED' : notificationType,
+          type: notificationType as any,
           message: notificationMessage,
         },
       });

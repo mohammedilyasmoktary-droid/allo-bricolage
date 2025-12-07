@@ -4,6 +4,7 @@ import { Box, CircularProgress, Typography, Button } from '@mui/material';
 import Layout from './components/Layout';
 import DashboardLayout from './components/DashboardLayout';
 import ConditionalLayout from './components/ConditionalLayout';
+import NotificationPopup from './components/NotificationPopup';
 import HomePage from './pages/HomePage';
 import LoginPage from './pages/LoginPage';
 import RegisterPage from './pages/RegisterPage';
@@ -63,7 +64,9 @@ const ProtectedRoute: React.FC<{ children: React.ReactNode; allowedRoles?: strin
 
 function App() {
   return (
-    <Routes>
+    <>
+      <NotificationPopup />
+      <Routes>
       <Route path="/login" element={<LoginPage />} />
       <Route path="/register" element={<RegisterPage />} />
       <Route path="/forgot-password" element={<ForgotPasswordPage />} />
@@ -390,6 +393,7 @@ function App() {
         }
       />
     </Routes>
+    </>
   );
 }
 

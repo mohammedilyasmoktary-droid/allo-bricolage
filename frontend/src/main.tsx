@@ -5,6 +5,7 @@ import { ThemeProvider, CssBaseline } from '@mui/material';
 import App from './App';
 import { theme } from './theme';
 import { AuthProvider } from './contexts/AuthContext';
+import { NotificationProvider } from './contexts/NotificationContext';
 import ErrorBoundary from './components/ErrorBoundary';
 
 // Wrap ErrorBoundary inside ThemeProvider so Material-UI components are available
@@ -15,7 +16,9 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
         <CssBaseline />
         <ErrorBoundary>
           <AuthProvider>
-            <App />
+            <NotificationProvider>
+              <App />
+            </NotificationProvider>
           </AuthProvider>
         </ErrorBoundary>
       </ThemeProvider>
