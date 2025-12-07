@@ -161,24 +161,27 @@ const HomePage: React.FC = () => {
   return (
     <Box sx={{ pb: { xs: 4, md: 8 }, position: 'relative' }}>
       {/* Hero Banner */}
-      <Container maxWidth="lg" sx={{ pt: { xs: 4, md: 6 }, pb: { xs: 0, md: 0 } }}>
-        <HeroBanner />
-      </Container>
+      <Box sx={{ py: { xs: 6, md: 8 }, bgcolor: '#fafbfc' }}>
+        <Container maxWidth="lg">
+          <HeroBanner />
+        </Container>
+      </Box>
 
       {/* Main Content - Services and Technicians */}
-      <Container maxWidth="lg" sx={{ mt: { xs: 4, md: 6 } }}>
-        <Grid container spacing={3}>
-              {/* Services List Section */}
-              <Grid item xs={12}>
-                <Card
-                  sx={{
-                    borderRadius: 4,
-                    boxShadow: '0 8px 32px rgba(0,0,0,0.12)',
-                    border: '1px solid #e8eaed',
-                    bgcolor: 'white',
-                    overflow: 'hidden',
-                  }}
-                >
+      <Box sx={{ py: { xs: 6, md: 8 }, bgcolor: '#fafbfc' }}>
+        <Container maxWidth="lg">
+          <Grid container spacing={3}>
+            {/* Services List Section */}
+            <Grid item xs={12}>
+              <Card
+                sx={{
+                  borderRadius: 4,
+                  boxShadow: '0 8px 32px rgba(0,0,0,0.12)',
+                  border: '1px solid #e8eaed',
+                  bgcolor: 'white',
+                  overflow: 'hidden',
+                }}
+              >
                   <Box
                     sx={{
                       bgcolor: '#032B5A',
@@ -565,22 +568,22 @@ const HomePage: React.FC = () => {
                   </CardContent>
                 </Card>
               </Grid>
-        </Grid>
-      </Container>
+          </Grid>
+        </Container>
+      </Box>
 
       {/* Why Choose AlloBricolage Section */}
       <Box sx={{ py: { xs: 6, md: 8 }, bgcolor: '#fafbfc' }}>
-          <Container maxWidth="lg">
-            <Card
-              sx={{
-                borderRadius: 4,
-                boxShadow: '0 8px 32px rgba(0,0,0,0.12)',
-                border: '1px solid #e8eaed',
-                bgcolor: 'white',
-                overflow: 'hidden',
-                mb: 4,
-              }}
-            >
+        <Container maxWidth="lg">
+          <Card
+            sx={{
+              borderRadius: 4,
+              boxShadow: '0 8px 32px rgba(0,0,0,0.12)',
+              border: '1px solid #e8eaed',
+              bgcolor: 'white',
+              overflow: 'hidden',
+            }}
+          >
               <Box
                 sx={{
                   bgcolor: '#032B5A',
