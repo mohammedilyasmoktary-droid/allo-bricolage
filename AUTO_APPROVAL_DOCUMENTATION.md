@@ -169,13 +169,37 @@ verificationStatus: hasRequiredDocs ? 'APPROVED' : 'PENDING',
 
 ### Database Migration Required
 
-After updating the Prisma schema, run:
+After updating the Prisma schema, you need to apply the migration:
 
+**For Development:**
 ```bash
 cd backend
 npx prisma migrate dev --name add_diploma_document_type
 npx prisma generate
 ```
+
+**For Production (if migrate dev fails due to shadow database permissions):**
+```bash
+cd backend
+# Option 1: Use db push (for development/testing)
+npx prisma db push
+
+# Option 2: Use migrate deploy (for production)
+npx prisma migrate deploy
+
+# Always regenerate Prisma client after schema changes
+npx prisma generate
+```
+
+**Manual Migration (if needed):**
+If automatic migration fails, you can manually update the enum in MySQL:
+```sql
+ALTER TABLE TechnicianDocument 
+MODIFY COLUMN type ENUM('ID_CARD', 'DIPLOMA', 'CERTIFICATE', 'OTHER') NOT NULL;
+```
+
+**Note**: The Prisma schema has already been updated with `DIPLOMA` in the `DocumentType` enum. The migration file is located at:
+`backend/prisma/migrations/add_diploma_document_type_manual/migration.sql`
 
 ### Backward Compatibility
 
