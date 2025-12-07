@@ -156,6 +156,7 @@ router.post(
       }
 
       // Create booking
+      // Note: receiptUrl and transactionId are optional and will be null initially
       const booking = await prisma.serviceRequest.create({
         data: {
           clientId,
@@ -169,6 +170,8 @@ router.post(
           scheduledDateTime: parsedScheduledDateTime,
           estimatedPrice: finalEstimatedPrice,
           paymentStatus: 'UNPAID',
+          receiptUrl: null, // Will be set when payment is processed
+          transactionId: null, // Will be set when payment is processed
         },
         include: {
           client: {
