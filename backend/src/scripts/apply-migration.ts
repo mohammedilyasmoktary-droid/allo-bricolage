@@ -32,11 +32,26 @@ async function applyMigration() {
     }
 
     // Apply migration using raw SQL
-    await prisma.$executeRaw`
-      ALTER TABLE ServiceRequest 
-      ADD COLUMN receiptUrl VARCHAR(191) NULL,
-      ADD COLUMN transactionId VARCHAR(191) NULL
-    `;
+    // Try MySQL syntax first (backticks)
+    try {
+      await prisma.$executeRaw`
+        ALTER TABLE \`ServiceRequest\` 
+        ADD COLUMN \`receiptUrl\` VARCHAR(191) NULL,
+        ADD COLUMN \`transactionId\` VARCHAR(191) NULL
+      `;
+    } catch (mysqlError: any) {
+      // If MySQL syntax fails, try PostgreSQL syntax (double quotes)
+      if (mysqlError.message?.includes('syntax') || mysqlError.message?.includes('near')) {
+        console.log('Trying PostgreSQL syntax...');
+        await prisma.$executeRaw`
+          ALTER TABLE "ServiceRequest" 
+          ADD COLUMN "receiptUrl" VARCHAR(191) NULL,
+          ADD COLUMN "transactionId" VARCHAR(191) NULL
+        `;
+      } else {
+        throw mysqlError;
+      }
+    }
 
     console.log('✅ Migration applied successfully!');
     console.log('✅ receiptUrl and transactionId columns added to ServiceRequest table.');
