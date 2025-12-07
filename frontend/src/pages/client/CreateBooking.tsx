@@ -172,29 +172,14 @@ const CreateBooking: React.FC = () => {
     // Final submission
     setLoading(true);
     try {
-      const bookingData = { ...formData, isUrgent };
-      
-      // Ensure scheduledDateTime is properly formatted if provided
-      if (bookingData.scheduledDateTime) {
-        const dt = new Date(bookingData.scheduledDateTime);
-        if (isNaN(dt.getTime())) {
-          setError('Date et heure invalides. Veuillez sélectionner à nouveau.');
-          setShowSummary(false);
-          setLoading(false);
-          return;
-        }
-        // Ensure it's in ISO format
-        bookingData.scheduledDateTime = dt.toISOString();
-      }
-      
       // Validate required fields before sending
-      if (!bookingData.technicianId) {
+      if (!formData.technicianId) {
         setError('Veuillez sélectionner un technicien');
         setShowSummary(false);
         setLoading(false);
         return;
       }
-      if (!bookingData.categoryId) {
+      if (!formData.categoryId) {
         setError('Veuillez sélectionner une catégorie de service');
         setShowSummary(false);
         setLoading(false);
@@ -207,10 +192,33 @@ const CreateBooking: React.FC = () => {
         return;
       }
       
+      // Prepare booking data with actual File objects from selectedFiles
+      const bookingData: CreateBookingData = {
+        technicianId: formData.technicianId,
+        categoryId: formData.categoryId,
+        description: formData.description,
+        city: formData.city,
+        address: formData.address,
+        scheduledDateTime: formData.scheduledDateTime ? (() => {
+          const dt = new Date(formData.scheduledDateTime);
+          if (isNaN(dt.getTime())) {
+            throw new Error('Date et heure invalides');
+          }
+          return dt.toISOString();
+        })() : undefined,
+        photos: selectedFiles, // Use selectedFiles which contains the actual File objects
+        isUrgent,
+      };
+      
       console.log('Creating booking with data:', {
-        ...bookingData,
-        photos: selectedFiles.map(f => f.name),
+        technicianId: bookingData.technicianId,
+        categoryId: bookingData.categoryId,
+        description: bookingData.description,
+        city: bookingData.city,
+        address: bookingData.address,
         scheduledDateTime: bookingData.scheduledDateTime,
+        photosCount: bookingData.photos?.length || 0,
+        isUrgent: bookingData.isUrgent,
       });
       
       const newBooking = await bookingsApi.create(bookingData);

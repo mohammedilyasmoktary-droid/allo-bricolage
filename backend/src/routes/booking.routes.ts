@@ -122,10 +122,16 @@ router.post(
 
       // Handle photo uploads
       const photoFiles = req.files as Express.Multer.File[];
+      console.log('Photo files received:', photoFiles ? photoFiles.length : 0);
       if (!photoFiles || photoFiles.length === 0) {
+        console.error('No photos provided in request');
         return res.status(400).json({ error: 'At least one photo is required' });
       }
-      const photos = photoFiles.map(file => getFileUrl(file.filename, 'photos'));
+      const photos = photoFiles.map(file => {
+        const url = getFileUrl(file.filename, 'photos');
+        console.log('Photo file processed:', file.filename, '->', url);
+        return url;
+      });
 
       // Calculate estimated price with urgent fee if applicable
       const baseEstimatedPrice = estimatedPrice ? parseFloat(estimatedPrice) : null;
