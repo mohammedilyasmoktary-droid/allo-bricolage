@@ -1,67 +1,58 @@
-# 🔧 Configuration Vercel - URL Backend
+# Configuration des Variables d'Environnement Vercel
 
-## Problème
-Le frontend Vercel essaie de se connecter à `localhost:5001/api` qui n'existe pas en production.
+## Problème Actuel
+L'application frontend ne peut pas se connecter au backend. L'erreur indique que l'URL du backend n'est pas correctement configurée.
 
-## Solution : Configurer VITE_API_URL dans Vercel
+## Solution : Configurer VITE_API_URL sur Vercel
 
-### Étape 1 : Trouver votre URL Backend Render
+### Étape 1 : Obtenir l'URL du Backend
+1. Allez sur [Render Dashboard](https://dashboard.render.com/)
+2. Sélectionnez votre service backend
+3. Copiez l'URL du service (ex: `https://allo-bricolage-backend.onrender.com`)
+4. Ajoutez `/api` à la fin : `https://allo-bricolage-backend.onrender.com/api`
 
-1. Allez sur **https://render.com**
-2. Connectez-vous
-3. Cliquez sur votre service backend
-4. Copiez l'URL (exemple: `https://allo-bricolage-backend.onrender.com`)
+### Étape 2 : Configurer sur Vercel
+1. Allez sur [Vercel Dashboard](https://vercel.com/dashboard)
+2. Sélectionnez votre projet `allo-bricolage`
+3. Allez dans **Settings** → **Environment Variables**
+4. Ajoutez la variable suivante :
+   - **Name**: `VITE_API_URL`
+   - **Value**: `https://allo-bricolage-backend.onrender.com/api`
+   - **Environment**: Sélectionnez **Production**, **Preview**, et **Development**
+5. Cliquez sur **Save**
+6. **Important** : Redéployez l'application après avoir ajouté la variable
 
-### Étape 2 : Configurer dans Vercel
+### Étape 3 : Vérifier le Backend
+Assurez-vous que le backend est bien démarré sur Render :
+1. Vérifiez les logs sur Render
+2. Testez l'URL directement : `https://allo-bricolage-backend.onrender.com/api/health` (ou une route similaire)
+3. Vérifiez que CORS est configuré pour accepter les requêtes depuis `https://allo-bricolage.vercel.app`
 
-1. Allez sur **https://vercel.com**
-2. Connectez-vous
-3. Cliquez sur votre projet **allo-bricolage**
-4. Allez dans **Settings** → **Environment Variables**
-5. Cliquez sur **Add New**
-6. Remplissez :
-   - **Key**: `VITE_API_URL`
-   - **Value**: `https://votre-backend-url.onrender.com/api`
-     - ⚠️ Remplacez `votre-backend-url.onrender.com` par votre vraie URL Render
-     - ⚠️ N'oubliez pas `/api` à la fin
-   - Cochez toutes les cases : **Production**, **Preview**, **Development**
-7. Cliquez sur **Save**
+### Étape 4 : Redéployer
+Après avoir configuré la variable d'environnement :
+1. Sur Vercel, allez dans **Deployments**
+2. Cliquez sur les trois points (⋯) du dernier déploiement
+3. Sélectionnez **Redeploy**
+4. Attendez que le déploiement se termine
 
-### Étape 3 : Redéployer
+## Variables d'Environnement Requises
 
-1. Allez dans **Deployments**
-2. Cliquez sur les **3 points (⋯)** du dernier déploiement
-3. Cliquez sur **Redeploy**
-4. Attendez 2-3 minutes
+### Frontend (Vercel)
+- `VITE_API_URL`: URL complète du backend avec `/api` (ex: `https://allo-bricolage-backend.onrender.com/api`)
 
-### Étape 4 : Vérifier le Backend CORS
+### Backend (Render)
+- `DATABASE_URL`: URL de connexion MySQL
+- `JWT_ACCESS_SECRET`: Secret pour les tokens JWT
+- `JWT_REFRESH_SECRET`: Secret pour les refresh tokens
+- `FRONTEND_URL`: URL du frontend (ex: `https://allo-bricolage.vercel.app`)
+- `BACKEND_URL`: URL du backend (ex: `https://allo-bricolage-backend.onrender.com`)
 
-Dans Render, vérifiez que `FRONTEND_URL` est configuré :
-
-1. Allez sur **https://render.com**
-2. Ouvrez votre service backend
-3. Allez dans **Environment**
-4. Vérifiez/modifiez :
-   - **Key**: `FRONTEND_URL`
-   - **Value**: `https://allo-bricolage.vercel.app`
-5. Si vous modifiez, Render redéploiera automatiquement
-
-## ✅ Test
-
-1. Ouvrez votre site Vercel
-2. Ouvrez la console du navigateur (F12)
-3. Essayez de vous inscrire
-4. Vous devriez voir dans la console :
-   - `🔗 API Base URL: https://votre-backend-url.onrender.com/api`
-5. L'inscription devrait fonctionner !
-
-## 🆘 Si ça ne marche toujours pas
-
-1. Vérifiez que le backend Render est en ligne :
-   - Ouvrez : `https://votre-backend-url.onrender.com/health`
-   - Vous devriez voir : `{"status":"ok","message":"Allo Bricolage API is running"}`
-
-2. Vérifiez les logs Render pour voir les erreurs
-
-3. Vérifiez les logs Vercel pour voir les erreurs de build
-
+## Test de Connexion
+Après configuration, testez la connexion :
+1. Ouvrez la console du navigateur (F12)
+2. Regardez les logs qui affichent l'URL API utilisée
+3. Essayez de vous connecter
+4. Si l'erreur persiste, vérifiez :
+   - Que le backend est démarré sur Render
+   - Que l'URL est correcte (avec `/api` à la fin)
+   - Que CORS est configuré correctement
