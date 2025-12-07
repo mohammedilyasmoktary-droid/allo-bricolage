@@ -115,7 +115,23 @@ export const authApi = {
         // Request made but no response
         console.error('No response received from server');
         const apiUrl = apiClient.defaults.baseURL || 'non configuré';
-        throw new Error(`Impossible de se connecter au serveur backend (${apiUrl}). Vérifiez que le serveur est démarré et que l'URL est correctement configurée.`);
+        const isProduction = import.meta.env.PROD;
+        let errorMessage = `Impossible de se connecter au serveur backend (${apiUrl}).`;
+        
+        if (isProduction && apiUrl.includes('localhost')) {
+          errorMessage += '\n\n⚠️ La variable d\'environnement VITE_API_URL n\'est pas configurée sur Vercel.';
+          errorMessage += '\n\nPour corriger :';
+          errorMessage += '\n1. Allez sur Vercel Dashboard → Settings → Environment Variables';
+          errorMessage += '\n2. Ajoutez VITE_API_URL avec la valeur : https://allo-bricolage-backend.onrender.com/api';
+          errorMessage += '\n3. Redéployez l\'application';
+        } else {
+          errorMessage += '\n\nVérifiez que :';
+          errorMessage += '\n- Le serveur backend est démarré';
+          errorMessage += '\n- L\'URL est correctement configurée';
+          errorMessage += '\n- CORS est configuré pour accepter les requêtes depuis ce domaine';
+        }
+        
+        throw new Error(errorMessage);
       } else {
         // Something else happened
         console.error('Request setup error:', error.message);
