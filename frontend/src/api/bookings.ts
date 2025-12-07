@@ -76,8 +76,29 @@ export const bookingsApi = {
   },
 
   getMyBookings: async (): Promise<Booking[]> => {
-    const response = await apiClient.get('/bookings/my-bookings');
-    return response.data;
+    try {
+      console.log('Fetching my bookings from API...');
+      const response = await apiClient.get('/bookings/my-bookings');
+      console.log('API response status:', response.status);
+      console.log('API response data type:', typeof response.data);
+      console.log('API response data is array:', Array.isArray(response.data));
+      console.log('API response data length:', Array.isArray(response.data) ? response.data.length : 'N/A');
+      
+      // Ensure we return an array
+      if (Array.isArray(response.data)) {
+        return response.data;
+      } else if (response.data && typeof response.data === 'object') {
+        console.warn('API returned non-array data, converting to array');
+        return [response.data];
+      } else {
+        console.warn('API returned unexpected data format, returning empty array');
+        return [];
+      }
+    } catch (error: any) {
+      console.error('Error fetching my bookings:', error);
+      console.error('Error response:', error.response?.data);
+      throw error;
+    }
   },
 
   getById: async (id: string): Promise<Booking> => {
