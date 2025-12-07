@@ -566,34 +566,59 @@ const HomePage: React.FC = () => {
 
       {/* Why Choose AlloBricolage Section */}
       <Box sx={{ py: { xs: 7, md: 11 }, bgcolor: '#fafbfc' }}>
-        <Container maxWidth="lg">
-          <Box sx={{ textAlign: 'center', mb: { xs: 5, md: 7 } }}>
-            <Typography
-              variant="h3"
-              component="h2"
+          <Container maxWidth="lg">
+            <Card
               sx={{
-                fontWeight: 700,
-                color: '#032B5A',
-                mb: 2,
-                fontSize: { xs: '1.75rem', md: '2.5rem' }
+                borderRadius: 4,
+                boxShadow: '0 8px 32px rgba(0,0,0,0.12)',
+                border: '1px solid #e8eaed',
+                bgcolor: 'white',
+                overflow: 'hidden',
+                mb: 4,
               }}
             >
-              Pourquoi choisir Allo Bricolage ?
-            </Typography>
-            <Typography
-              variant="body1"
-              sx={{
-                color: 'text.secondary',
-                maxWidth: 700,
-                mx: 'auto',
-                fontSize: { xs: '0.95rem', md: '1.1rem' }
-              }}
-            >
-              La plateforme de confiance pour tous vos besoins de maintenance et réparation au Maroc
-            </Typography>
-          </Box>
-
-          <Grid container spacing={{ xs: 3, md: 4 }}>
+              <Box
+                sx={{
+                  bgcolor: '#032B5A',
+                  p: { xs: 2, md: 3 },
+                  background: 'linear-gradient(135deg, #032B5A 0%, #021d3f 100%)',
+                }}
+              >
+                <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, flexWrap: { xs: 'wrap', md: 'nowrap' } }}>
+                  <Box
+                    sx={{
+                      width: { xs: 48, md: 56 },
+                      height: { xs: 48, md: 56 },
+                      borderRadius: 3,
+                      bgcolor: '#F4C542',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      boxShadow: '0 4px 16px rgba(244, 197, 66, 0.3)',
+                    }}
+                  >
+                    <CheckCircleIcon sx={{ fontSize: { xs: 24, md: 32 }, color: '#032B5A' }} />
+                  </Box>
+                  <Box>
+                    <Typography
+                      variant="h5"
+                      sx={{
+                        fontWeight: 700,
+                        color: 'white',
+                        fontSize: { xs: '1.25rem', md: '1.5rem' },
+                        mb: 0.5,
+                      }}
+                    >
+                      Pourquoi choisir Allo Bricolage ?
+                    </Typography>
+                    <Typography variant="body2" sx={{ color: 'rgba(255,255,255,0.8)', fontSize: { xs: '0.85rem', md: '0.875rem' } }}>
+                      La plateforme de confiance pour tous vos besoins de maintenance et réparation au Maroc
+                    </Typography>
+                  </Box>
+                </Box>
+              </Box>
+              <CardContent sx={{ p: { xs: 3, md: 4 } }}>
+                <Grid container spacing={{ xs: 3, md: 4 }}>
             <Grid item xs={12} md={4}>
               <Card
                 sx={{
@@ -770,42 +795,67 @@ const HomePage: React.FC = () => {
                 </Typography>
               </Card>
             </Grid>
-          </Grid>
+              </Grid>
+            </CardContent>
+          </Card>
         </Container>
       </Box>
 
       {/* Platform Statistics Section */}
-      <Box sx={{ py: { xs: 7, md: 11 }, bgcolor: 'white' }}>
+      <Box sx={{ py: { xs: 7, md: 11 }, bgcolor: '#fafbfc' }}>
         <Container maxWidth="lg">
-          <Box sx={{ textAlign: 'center', mb: { xs: 5, md: 6 } }}>
-            <Typography
-              variant="h3"
-              component="h2"
+          <Card
+            sx={{
+              borderRadius: 4,
+              boxShadow: '0 8px 32px rgba(0,0,0,0.12)',
+              border: '1px solid #e8eaed',
+              bgcolor: 'white',
+              overflow: 'hidden',
+              mb: 4,
+            }}
+          >
+            <Box
               sx={{
-                fontWeight: 700,
-                color: '#032B5A',
-                mb: 3,
-                fontSize: { xs: '1.75rem', md: '2.5rem' }
+                bgcolor: '#032B5A',
+                p: { xs: 2, md: 3 },
+                background: 'linear-gradient(135deg, #032B5A 0%, #021d3f 100%)',
               }}
             >
-              Allo Bricolage en Chiffres
-            </Typography>
-          </Box>
-          <Box sx={{ textAlign: 'center', mb: { xs: 6, md: 8 }, maxWidth: 900, mx: 'auto' }}>
-            <Typography
-              variant="body1"
-              sx={{
-                color: '#032B5A',
-                fontSize: { xs: '1rem', md: '1.2rem' },
-                lineHeight: 1.8,
-                fontWeight: 400,
-              }}
-            >
-              Allo Bricolage accompagne depuis des années des milliers de clients dans leurs besoins de maintenance. Grâce à nos techniciens certifiés et évalués, nous garantissons un service fiable, rapide et sécurisé.
-            </Typography>
-          </Box>
-
-          <Grid container spacing={{ xs: 2, md: 4 }}>
+              <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, flexWrap: { xs: 'wrap', md: 'nowrap' } }}>
+                <Box
+                  sx={{
+                    width: { xs: 48, md: 56 },
+                    height: { xs: 48, md: 56 },
+                    borderRadius: 3,
+                    bgcolor: '#F4C542',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    boxShadow: '0 4px 16px rgba(244, 197, 66, 0.3)',
+                  }}
+                >
+                  <TrendingUpIcon sx={{ fontSize: { xs: 24, md: 32 }, color: '#032B5A' }} />
+                </Box>
+                <Box>
+                  <Typography
+                    variant="h5"
+                    sx={{
+                      fontWeight: 700,
+                      color: 'white',
+                      fontSize: { xs: '1.25rem', md: '1.5rem' },
+                      mb: 0.5,
+                    }}
+                  >
+                    Allo Bricolage en Chiffres
+                  </Typography>
+                  <Typography variant="body2" sx={{ color: 'rgba(255,255,255,0.8)', fontSize: { xs: '0.85rem', md: '0.875rem' } }}>
+                    Allo Bricolage accompagne depuis des années des milliers de clients dans leurs besoins de maintenance. Grâce à nos techniciens certifiés et évalués, nous garantissons un service fiable, rapide et sécurisé.
+                  </Typography>
+                </Box>
+              </Box>
+            </Box>
+            <CardContent sx={{ p: { xs: 3, md: 4 } }}>
+              <Grid container spacing={{ xs: 2, md: 4 }}>
             {statistics.map((stat, index) => (
               <Grid item xs={6} md={3} key={index}>
                 <Card
@@ -867,41 +917,68 @@ const HomePage: React.FC = () => {
                   </Typography>
                 </Card>
               </Grid>
-            ))}
-          </Grid>
+                ))}
+              </Grid>
+            </CardContent>
+          </Card>
         </Container>
       </Box>
 
       {/* How It Works Section */}
-      <Box sx={{ py: { xs: 7, md: 11 }, bgcolor: '#fafbfc' }}>
+      <Box sx={{ py: { xs: 7, md: 11 }, bgcolor: 'white' }}>
         <Container maxWidth="lg">
-          <Box sx={{ textAlign: 'center', mb: { xs: 5, md: 7 } }}>
-            <Typography
-              variant="h3"
-              component="h2"
+          <Card
+            sx={{
+              borderRadius: 4,
+              boxShadow: '0 8px 32px rgba(0,0,0,0.12)',
+              border: '1px solid #e8eaed',
+              bgcolor: 'white',
+              overflow: 'hidden',
+              mb: 4,
+            }}
+          >
+            <Box
               sx={{
-                fontWeight: 700,
-                color: '#032B5A',
-                mb: 2,
-                fontSize: { xs: '1.75rem', md: '2.5rem' }
+                bgcolor: '#032B5A',
+                p: { xs: 2, md: 3 },
+                background: 'linear-gradient(135deg, #032B5A 0%, #021d3f 100%)',
               }}
             >
-              Comment ça marche ?
-            </Typography>
-            <Typography
-              variant="body1"
-              sx={{
-                color: 'text.secondary',
-                maxWidth: 700,
-                mx: 'auto',
-                fontSize: { xs: '0.95rem', md: '1.1rem' }
-              }}
-            >
-              Quatre étapes simples pour obtenir le service dont vous avez besoin
-            </Typography>
-          </Box>
-
-          <Grid container spacing={{ xs: 3, md: 4 }}>
+              <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, flexWrap: { xs: 'wrap', md: 'nowrap' } }}>
+                <Box
+                  sx={{
+                    width: { xs: 48, md: 56 },
+                    height: { xs: 48, md: 56 },
+                    borderRadius: 3,
+                    bgcolor: '#F4C542',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    boxShadow: '0 4px 16px rgba(244, 197, 66, 0.3)',
+                  }}
+                >
+                  <BuildIcon sx={{ fontSize: { xs: 24, md: 32 }, color: '#032B5A' }} />
+                </Box>
+                <Box>
+                  <Typography
+                    variant="h5"
+                    sx={{
+                      fontWeight: 700,
+                      color: 'white',
+                      fontSize: { xs: '1.25rem', md: '1.5rem' },
+                      mb: 0.5,
+                    }}
+                  >
+                    Comment ça marche ?
+                  </Typography>
+                  <Typography variant="body2" sx={{ color: 'rgba(255,255,255,0.8)', fontSize: { xs: '0.85rem', md: '0.875rem' } }}>
+                    Quatre étapes simples pour obtenir le service dont vous avez besoin
+                  </Typography>
+                </Box>
+              </Box>
+            </Box>
+            <CardContent sx={{ p: { xs: 3, md: 4 } }}>
+              <Grid container spacing={{ xs: 3, md: 4 }}>
             {steps.map((step, index) => (
               <Grid item xs={12} sm={6} md={3} key={index}>
                 <Card
@@ -965,42 +1042,69 @@ const HomePage: React.FC = () => {
                   </Typography>
                 </Card>
               </Grid>
-            ))}
-          </Grid>
-        </Container>
-      </Box>
+              ))}
+            </Grid>
+          </CardContent>
+        </Card>
+      </Container>
+    </Box>
 
-      {/* Customer Reviews Section */}
-      <Box sx={{ py: { xs: 7, md: 11 }, bgcolor: 'white' }}>
-        <Container maxWidth="lg">
-          <Box sx={{ textAlign: 'center', mb: { xs: 5, md: 7 } }}>
-            <Typography
-              variant="h3"
-              component="h2"
-              sx={{
-                fontWeight: 700,
-                color: '#032B5A',
-                mb: 2,
-                fontSize: { xs: '1.75rem', md: '2.5rem' }
-              }}
-            >
-              Ce que disent nos clients
-            </Typography>
-            <Typography
-              variant="body1"
-              sx={{
-                color: 'text.secondary',
-                maxWidth: 700,
-                mx: 'auto',
-                fontSize: { xs: '0.95rem', md: '1.1rem' }
-              }}
-            >
-              Découvrez les témoignages de nos clients satisfaits
-            </Typography>
+    {/* Customer Reviews Section */}
+    <Box sx={{ py: { xs: 7, md: 11 }, bgcolor: '#fafbfc' }}>
+      <Container maxWidth="lg">
+        <Card
+          sx={{
+            borderRadius: 4,
+            boxShadow: '0 8px 32px rgba(0,0,0,0.12)',
+            border: '1px solid #e8eaed',
+            bgcolor: 'white',
+            overflow: 'hidden',
+            mb: 4,
+          }}
+        >
+          <Box
+            sx={{
+              bgcolor: '#032B5A',
+              p: { xs: 2, md: 3 },
+              background: 'linear-gradient(135deg, #032B5A 0%, #021d3f 100%)',
+            }}
+          >
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, flexWrap: { xs: 'wrap', md: 'nowrap' } }}>
+              <Box
+                sx={{
+                  width: { xs: 48, md: 56 },
+                  height: { xs: 48, md: 56 },
+                  borderRadius: 3,
+                  bgcolor: '#F4C542',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  boxShadow: '0 4px 16px rgba(244, 197, 66, 0.3)',
+                }}
+              >
+                <StarIcon sx={{ fontSize: { xs: 24, md: 32 }, color: '#032B5A' }} />
+              </Box>
+              <Box>
+                <Typography
+                  variant="h5"
+                  sx={{
+                    fontWeight: 700,
+                    color: 'white',
+                    fontSize: { xs: '1.25rem', md: '1.5rem' },
+                    mb: 0.5,
+                  }}
+                >
+                  Ce que disent nos clients
+                </Typography>
+                <Typography variant="body2" sx={{ color: 'rgba(255,255,255,0.8)', fontSize: { xs: '0.85rem', md: '0.875rem' } }}>
+                  Découvrez les témoignages de nos clients satisfaits
+                </Typography>
+              </Box>
+            </Box>
           </Box>
-
-          <Grid container spacing={{ xs: 2, md: 3 }}>
-            {testimonials.map((testimonial, index) => (
+          <CardContent sx={{ p: { xs: 3, md: 4 } }}>
+            <Grid container spacing={{ xs: 2, md: 3 }}>
+              {testimonials.map((testimonial, index) => (
               <Grid item xs={12} sm={6} md={3} key={index}>
                 <Card
                   sx={{
@@ -1072,11 +1176,12 @@ const HomePage: React.FC = () => {
                   </Box>
                 </Card>
               </Grid>
-            ))}
-          </Grid>
-        </Container>
-      </Box>
-
+              ))}
+            </Grid>
+          </CardContent>
+        </Card>
+      </Container>
+    </Box>
     </Box>
   );
 };
