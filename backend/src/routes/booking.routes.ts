@@ -249,16 +249,6 @@ router.get('/:id', authenticate, async (req, res) => {
             city: true,
           },
         },
-        technicianProfile: {
-          select: {
-            id: true,
-            skills: true,
-            yearsOfExperience: true,
-            averageRating: true,
-            profilePictureUrl: true,
-          },
-        },
-        category: true,
         reviews: {
           include: {
             reviewer: {
@@ -269,6 +259,16 @@ router.get('/:id', authenticate, async (req, res) => {
             },
           },
         },
+        technicianProfile: {
+          select: {
+            id: true,
+            skills: true,
+            yearsOfExperience: true,
+            averageRating: true,
+            profilePictureUrl: true,
+          },
+        },
+        category: true,
       },
     });
 
@@ -635,6 +635,8 @@ router.patch(
           paymentMethod,
           paymentStatus,
           status: status as any,
+          receiptUrl: receiptUrl || null,
+          transactionId: transactionId || null,
         },
         include: {
           client: {

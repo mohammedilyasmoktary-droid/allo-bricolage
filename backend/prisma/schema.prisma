@@ -184,6 +184,8 @@ model ServiceRequest {
   finalPrice          Float?
   paymentMethod       PaymentMethod?
   paymentStatus       PaymentStatus      @default(UNPAID)
+  receiptUrl          String? // Receipt URL for WAFACASH and BANK_TRANSFER payments
+  transactionId       String? // Transaction ID for CARD payments
   createdAt           DateTime           @default(now())
   updatedAt           DateTime           @updatedAt
 

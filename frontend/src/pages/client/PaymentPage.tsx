@@ -12,9 +12,13 @@ import {
   IconButton,
   Paper,
   Avatar,
+  Rating,
+  TextareaAutosize,
+  Chip,
 } from '@mui/material';
 import { useParams, useNavigate } from 'react-router-dom';
 import { bookingsApi, Booking } from '../../api/bookings';
+import { reviewsApi, CreateReviewData } from '../../api/reviews';
 import { useAuth } from '../../contexts/AuthContext';
 import PaymentIcon from '@mui/icons-material/Payment';
 import CreditCardIcon from '@mui/icons-material/CreditCard';
@@ -30,6 +34,10 @@ import InfoIcon from '@mui/icons-material/Info';
 import LockIcon from '@mui/icons-material/Lock';
 import TextField from '@mui/material/TextField';
 import CloudUploadIcon from '@mui/icons-material/CloudUpload';
+import PictureAsPdfIcon from '@mui/icons-material/PictureAsPdf';
+import ReceiptIcon from '@mui/icons-material/Receipt';
+import StarIcon from '@mui/icons-material/Star';
+import { generateBookingPDF, BookingPDFData } from '../../utils/pdfGenerator';
 
 const PaymentPage: React.FC = () => {
   const { bookingId } = useParams<{ bookingId: string }>();
@@ -43,16 +51,28 @@ const PaymentPage: React.FC = () => {
   const [paymentMethod, setPaymentMethod] = useState<'CASH' | 'CARD' | 'WAFACASH' | 'BANK_TRANSFER'>('CASH');
   const [receipt, setReceipt] = useState<File | null>(null);
   const [transactionId, setTransactionId] = useState('');
+  const [reviewRating, setReviewRating] = useState<number>(5);
+  const [reviewComment, setReviewComment] = useState('');
+  const [submittingReview, setSubmittingReview] = useState(false);
+  const [reviewSuccess, setReviewSuccess] = useState(false);
+  const [existingReview, setExistingReview] = useState<any>(null);
 
   useEffect(() => {
     const loadBooking = async () => {
       if (!bookingId) return;
       try {
         const data = await bookingsApi.getById(bookingId);
-        if (data.status !== 'AWAITING_PAYMENT') {
-          setError('Cette réservation n\'est pas en attente de paiement');
-        }
         setBooking(data);
+        
+        // Load existing review if payment is paid
+        if (data.paymentStatus === 'PAID' && data.reviews && data.reviews.length > 0) {
+          const clientReview = data.reviews.find((r: any) => r.reviewerId === user?.id);
+          if (clientReview) {
+            setExistingReview(clientReview);
+            setReviewRating(clientReview.rating);
+            setReviewComment(clientReview.comment || '');
+          }
+        }
       } catch (err: any) {
         setError(err.response?.data?.error || 'Échec du chargement de la réservation');
       } finally {
@@ -60,7 +80,7 @@ const PaymentPage: React.FC = () => {
       }
     };
     loadBooking();
-  }, [bookingId]);
+  }, [bookingId, user]);
 
   const handlePayment = async () => {
     if (!bookingId) return;
@@ -81,14 +101,77 @@ const PaymentPage: React.FC = () => {
 
     try {
       const result = await bookingsApi.processPayment(bookingId, paymentMethod, receipt || undefined, transactionId || undefined);
+      setBooking(result);
       setSuccess(true);
-      setTimeout(() => {
-        navigate('/client/bookings');
-      }, 3000);
+      // Reload booking to get updated data
+      const updated = await bookingsApi.getById(bookingId);
+      setBooking(updated);
     } catch (err: any) {
       setError(err.response?.data?.error || 'Échec du traitement du paiement');
     } finally {
       setProcessing(false);
+    }
+  };
+
+  const handleDownloadPDF = async () => {
+    if (!booking) return;
+    
+    const pdfData: BookingPDFData = {
+      bookingId: booking.id,
+      clientName: booking.client?.name || 'N/A',
+      clientEmail: booking.client?.email || 'N/A',
+      clientPhone: booking.client?.phone || 'N/A',
+      technicianName: booking.technician?.name || 'N/A',
+      technicianPhone: booking.technician?.phone || 'N/A',
+      serviceCategory: booking.category?.name || 'N/A',
+      description: booking.description,
+      address: booking.address,
+      city: booking.city,
+      scheduledDate: booking.scheduledDateTime,
+      status: booking.status,
+      estimatedPrice: booking.estimatedPrice,
+      finalPrice: booking.finalPrice,
+      paymentMethod: booking.paymentMethod,
+      paymentStatus: booking.paymentStatus,
+      receiptUrl: booking.receiptUrl,
+      transactionId: booking.transactionId,
+      createdAt: booking.createdAt,
+      review: existingReview ? {
+        rating: existingReview.rating,
+        comment: existingReview.comment,
+        createdAt: existingReview.createdAt,
+      } : undefined,
+    };
+    
+    await generateBookingPDF(pdfData);
+  };
+
+  const handleSubmitReview = async () => {
+    if (!booking || !booking.technicianId) return;
+    
+    setSubmittingReview(true);
+    try {
+      const reviewData: CreateReviewData = {
+        bookingId: booking.id,
+        revieweeId: booking.technicianId,
+        rating: reviewRating,
+        comment: reviewComment || undefined,
+      };
+      
+      await reviewsApi.create(reviewData);
+      setReviewSuccess(true);
+      
+      // Reload booking to get updated review
+      const updated = await bookingsApi.getById(booking.id);
+      setBooking(updated);
+      const clientReview = updated.reviews?.find((r: any) => r.reviewerId === user?.id);
+      if (clientReview) {
+        setExistingReview(clientReview);
+      }
+    } catch (err: any) {
+      setError(err.response?.data?.error || 'Échec de la soumission de l\'avis');
+    } finally {
+      setSubmittingReview(false);
     }
   };
 
@@ -100,7 +183,7 @@ const PaymentPage: React.FC = () => {
     );
   }
 
-  if (!booking || booking.status !== 'AWAITING_PAYMENT') {
+  if (!booking) {
     return (
       <Box sx={{ maxWidth: 800, mx: 'auto', px: { xs: 2, md: 0 }, py: 4 }}>
         <Box sx={{ mb: 4, display: 'flex', alignItems: 'center', gap: 2 }}>
@@ -141,10 +224,7 @@ const PaymentPage: React.FC = () => {
               }}
             >
               <Typography variant="body1" sx={{ fontWeight: 600, color: '#032B5A' }}>
-                {error || 'Cette réservation n\'est pas en attente de paiement'}
-              </Typography>
-              <Typography variant="body2" sx={{ mt: 1, color: '#032B5A' }}>
-                Le paiement n'est disponible que lorsque le technicien a terminé le travail.
+                {error || 'Réservation non trouvée'}
               </Typography>
             </Alert>
 
@@ -170,6 +250,10 @@ const PaymentPage: React.FC = () => {
       </Box>
     );
   }
+
+  const isPaymentPending = booking.status === 'AWAITING_PAYMENT';
+  const isPaymentProcessed = booking.paymentStatus === 'PAID' || booking.paymentStatus === 'PENDING';
+  const canReview = booking.paymentStatus === 'PAID' && booking.status === 'COMPLETED' && !existingReview;
 
   const finalPrice = booking.finalPrice || booking.estimatedPrice || 0;
 
@@ -218,8 +302,28 @@ const PaymentPage: React.FC = () => {
           <ArrowBackIcon />
         </IconButton>
         <Typography variant="h4" component="h1" sx={{ fontWeight: 700, color: '#032B5A' }}>
-          Paiement
+          {isPaymentProcessed ? 'Détails du Paiement' : 'Paiement'}
         </Typography>
+        {isPaymentProcessed && (
+          <Button
+            variant="outlined"
+            startIcon={<PictureAsPdfIcon />}
+            onClick={handleDownloadPDF}
+            sx={{
+              ml: 'auto',
+              borderColor: '#032B5A',
+              color: '#032B5A',
+              textTransform: 'none',
+              borderRadius: 2,
+              '&:hover': {
+                borderColor: '#021d3f',
+                bgcolor: 'rgba(3, 43, 90, 0.05)',
+              },
+            }}
+          >
+            Télécharger PDF
+          </Button>
+        )}
       </Box>
 
       {success && (
@@ -267,24 +371,25 @@ const PaymentPage: React.FC = () => {
       )}
 
       <Grid container spacing={4}>
-        {/* Left Panel - Payment Methods */}
+        {/* Left Panel - Payment Methods or Receipt Display */}
         <Grid item xs={12} md={8}>
-          <Card
-            sx={{
-              boxShadow: 3,
-              borderRadius: 3,
-              border: '1px solid #e0e0e0',
-              overflow: 'hidden',
-              mb: 3,
-            }}
-          >
-            <CardContent sx={{ p: 4 }}>
-              <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 3 }}>
-                <LockIcon sx={{ color: '#F4C542', fontSize: 28 }} />
-                <Typography variant="h5" sx={{ fontWeight: 700, color: '#032B5A' }}>
-                  Méthode de paiement
-                </Typography>
-              </Box>
+          {isPaymentPending ? (
+            <Card
+              sx={{
+                boxShadow: 3,
+                borderRadius: 3,
+                border: '1px solid #e0e0e0',
+                overflow: 'hidden',
+                mb: 3,
+              }}
+            >
+              <CardContent sx={{ p: 4 }}>
+                <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 3 }}>
+                  <LockIcon sx={{ color: '#F4C542', fontSize: 28 }} />
+                  <Typography variant="h5" sx={{ fontWeight: 700, color: '#032B5A' }}>
+                    Méthode de paiement
+                  </Typography>
+                </Box>
 
               <Typography variant="body2" color="text.secondary" sx={{ mb: 3, ml: 6 }}>
                 Sélectionnez votre méthode de paiement préférée
@@ -512,6 +617,114 @@ const PaymentPage: React.FC = () => {
               </Box>
             </CardContent>
           </Card>
+          ) : isPaymentProcessed ? (
+            <>
+              {/* Receipt Display Card */}
+              {booking.receiptUrl && (
+                <Card
+                  sx={{
+                    boxShadow: 3,
+                    borderRadius: 3,
+                    border: '1px solid #e0e0e0',
+                    overflow: 'hidden',
+                    mb: 3,
+                  }}
+                >
+                  <CardContent sx={{ p: 4 }}>
+                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 3 }}>
+                      <ReceiptIcon sx={{ color: '#F4C542', fontSize: 28 }} />
+                      <Typography variant="h5" sx={{ fontWeight: 700, color: '#032B5A' }}>
+                        Reçu de Paiement
+                      </Typography>
+                    </Box>
+                    <Box
+                      sx={{
+                        border: '2px solid #e0e0e0',
+                        borderRadius: 2,
+                        p: 2,
+                        bgcolor: '#f8f9fa',
+                        textAlign: 'center',
+                      }}
+                    >
+                      {booking.receiptUrl.endsWith('.pdf') ? (
+                        <Box>
+                          <PictureAsPdfIcon sx={{ fontSize: 64, color: '#F4C542', mb: 2 }} />
+                          <Typography variant="body1" sx={{ fontWeight: 600, color: '#032B5A', mb: 2 }}>
+                            Reçu PDF téléchargé
+                          </Typography>
+                          <Button
+                            variant="outlined"
+                            href={booking.receiptUrl}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            sx={{
+                              borderColor: '#032B5A',
+                              color: '#032B5A',
+                              textTransform: 'none',
+                              '&:hover': {
+                                borderColor: '#021d3f',
+                                bgcolor: 'rgba(3, 43, 90, 0.05)',
+                              },
+                            }}
+                          >
+                            Voir le reçu
+                          </Button>
+                        </Box>
+                      ) : (
+                        <Box>
+                          <img
+                            src={booking.receiptUrl}
+                            alt="Receipt"
+                            style={{
+                              maxWidth: '100%',
+                              maxHeight: '400px',
+                              borderRadius: '8px',
+                              objectFit: 'contain',
+                            }}
+                          />
+                        </Box>
+                      )}
+                    </Box>
+                    {booking.transactionId && (
+                      <Box sx={{ mt: 2 }}>
+                        <Typography variant="body2" color="text.secondary">
+                          ID de transaction: <strong>{booking.transactionId}</strong>
+                        </Typography>
+                      </Box>
+                    )}
+                  </CardContent>
+                </Card>
+              )}
+
+              {/* Payment Status Card */}
+              <Card
+                sx={{
+                  boxShadow: 3,
+                  borderRadius: 3,
+                  border: '1px solid #e0e0e0',
+                  overflow: 'hidden',
+                  mb: 3,
+                }}
+              >
+                <CardContent sx={{ p: 4 }}>
+                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 2 }}>
+                    <CheckCircleIcon sx={{ color: booking.paymentStatus === 'PAID' ? '#4caf50' : '#ff9800', fontSize: 28 }} />
+                    <Typography variant="h5" sx={{ fontWeight: 700, color: '#032B5A' }}>
+                      Statut du Paiement
+                    </Typography>
+                  </Box>
+                  <Chip
+                    label={booking.paymentStatus === 'PAID' ? 'Payé' : booking.paymentStatus === 'PENDING' ? 'En attente' : 'Non payé'}
+                    color={booking.paymentStatus === 'PAID' ? 'success' : booking.paymentStatus === 'PENDING' ? 'warning' : 'default'}
+                    sx={{ mb: 2, fontWeight: 700 }}
+                  />
+                  <Typography variant="body2" color="text.secondary">
+                    Méthode: {booking.paymentMethod === 'CASH' ? 'Espèces' : booking.paymentMethod === 'CARD' ? 'Carte bancaire' : booking.paymentMethod === 'WAFACASH' ? 'Wafacash' : 'Virement bancaire'}
+                  </Typography>
+                </CardContent>
+              </Card>
+            </>
+          ) : null}
 
           {/* Booking Details Card */}
           <Card
@@ -576,6 +789,115 @@ const PaymentPage: React.FC = () => {
               </Grid>
             </CardContent>
           </Card>
+
+          {/* Review Section */}
+          {canReview && (
+            <Card
+              sx={{
+                boxShadow: 3,
+                borderRadius: 3,
+                border: '1px solid #e0e0e0',
+                overflow: 'hidden',
+                mt: 3,
+              }}
+            >
+              <CardContent sx={{ p: 4 }}>
+                <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 3 }}>
+                  <StarIcon sx={{ color: '#F4C542', fontSize: 28 }} />
+                  <Typography variant="h5" sx={{ fontWeight: 700, color: '#032B5A' }}>
+                    Donner votre avis
+                  </Typography>
+                </Box>
+                {reviewSuccess && (
+                  <Alert severity="success" sx={{ mb: 3, borderRadius: 2 }}>
+                    Votre avis a été soumis avec succès!
+                  </Alert>
+                )}
+                <Box sx={{ mb: 3 }}>
+                  <Typography variant="body2" sx={{ mb: 1, fontWeight: 600, color: '#032B5A' }}>
+                    Note
+                  </Typography>
+                  <Rating
+                    value={reviewRating}
+                    onChange={(_, newValue) => setReviewRating(newValue || 5)}
+                    size="large"
+                    sx={{ color: '#F4C542' }}
+                  />
+                </Box>
+                <Box sx={{ mb: 3 }}>
+                  <Typography variant="body2" sx={{ mb: 1, fontWeight: 600, color: '#032B5A' }}>
+                    Commentaire (optionnel)
+                  </Typography>
+                  <TextareaAutosize
+                    minRows={4}
+                    value={reviewComment}
+                    onChange={(e) => setReviewComment(e.target.value)}
+                    placeholder="Partagez votre expérience..."
+                    style={{
+                      width: '100%',
+                      padding: '12px',
+                      borderRadius: '8px',
+                      border: '1px solid #e0e0e0',
+                      fontFamily: 'inherit',
+                      fontSize: '14px',
+                      resize: 'vertical',
+                    }}
+                  />
+                </Box>
+                <Button
+                  variant="contained"
+                  onClick={handleSubmitReview}
+                  disabled={submittingReview}
+                  startIcon={!submittingReview && <StarIcon />}
+                  sx={{
+                    bgcolor: '#F4C542',
+                    color: '#032B5A',
+                    '&:hover': { bgcolor: '#e0b038' },
+                    textTransform: 'none',
+                    borderRadius: 2,
+                    py: 1.5,
+                    px: 4,
+                    fontWeight: 700,
+                  }}
+                >
+                  {submittingReview ? 'Envoi...' : 'Soumettre l\'avis'}
+                </Button>
+              </CardContent>
+            </Card>
+          )}
+
+          {/* Existing Review Display */}
+          {existingReview && (
+            <Card
+              sx={{
+                boxShadow: 3,
+                borderRadius: 3,
+                border: '1px solid #e0e0e0',
+                overflow: 'hidden',
+                mt: 3,
+              }}
+            >
+              <CardContent sx={{ p: 4 }}>
+                <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 3 }}>
+                  <StarIcon sx={{ color: '#F4C542', fontSize: 28 }} />
+                  <Typography variant="h5" sx={{ fontWeight: 700, color: '#032B5A' }}>
+                    Votre Avis
+                  </Typography>
+                </Box>
+                <Box sx={{ mb: 2 }}>
+                  <Rating value={existingReview.rating} readOnly size="large" sx={{ color: '#F4C542' }} />
+                </Box>
+                {existingReview.comment && (
+                  <Typography variant="body1" sx={{ color: '#032B5A', mb: 2 }}>
+                    {existingReview.comment}
+                  </Typography>
+                )}
+                <Typography variant="caption" color="text.secondary">
+                  Publié le {new Date(existingReview.createdAt).toLocaleDateString('fr-FR')}
+                </Typography>
+              </CardContent>
+            </Card>
+          )}
         </Grid>
 
         {/* Right Panel - Summary */}

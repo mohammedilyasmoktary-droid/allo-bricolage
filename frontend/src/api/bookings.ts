@@ -15,6 +15,8 @@ export interface Booking {
   finalPrice?: number;
   paymentMethod?: 'CASH' | 'CARD' | 'WAFACASH' | 'BANK_TRANSFER';
   paymentStatus: 'UNPAID' | 'PENDING' | 'PAID';
+  receiptUrl?: string;
+  transactionId?: string;
   createdAt: string;
   client?: any;
   technician?: any;
