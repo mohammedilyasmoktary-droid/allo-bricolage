@@ -187,16 +187,50 @@ const CreateBooking: React.FC = () => {
         bookingData.scheduledDateTime = dt.toISOString();
       }
       
+      // Validate required fields before sending
+      if (!bookingData.technicianId) {
+        setError('Veuillez sélectionner un technicien');
+        setShowSummary(false);
+        setLoading(false);
+        return;
+      }
+      if (!bookingData.categoryId) {
+        setError('Veuillez sélectionner une catégorie de service');
+        setShowSummary(false);
+        setLoading(false);
+        return;
+      }
+      if (!selectedFiles || selectedFiles.length === 0) {
+        setError('Veuillez ajouter au moins une photo');
+        setShowSummary(false);
+        setLoading(false);
+        return;
+      }
+      
+      console.log('Creating booking with data:', {
+        ...bookingData,
+        photos: selectedFiles.map(f => f.name),
+        scheduledDateTime: bookingData.scheduledDateTime,
+      });
+      
       const newBooking = await bookingsApi.create(bookingData);
+      console.log('Booking created successfully:', newBooking.id);
       navigate(`/client/bookings/recap?bookingId=${newBooking.id}`);
     } catch (err: any) {
       console.error('Booking creation error:', err);
-      const errorMessage = err.response?.data?.error 
-        || err.response?.data?.errors?.[0]?.msg 
-        || err.response?.data?.message
-        || err.message
-        || 'Erreur lors de la création de la réservation. Veuillez vérifier tous les champs et réessayer.';
-      setError(errorMessage);
+      console.error('Error response:', err.response?.data);
+      
+      // Handle validation errors
+      if (err.response?.data?.errors && Array.isArray(err.response.data.errors)) {
+        const validationErrors = err.response.data.errors.map((e: any) => e.msg || e.message).join(', ');
+        setError(`Erreurs de validation: ${validationErrors}`);
+      } else {
+        const errorMessage = err.response?.data?.error 
+          || err.response?.data?.message
+          || err.message
+          || 'Erreur lors de la création de la réservation. Veuillez vérifier tous les champs et réessayer.';
+        setError(errorMessage);
+      }
       setShowSummary(false);
     } finally {
       setLoading(false);

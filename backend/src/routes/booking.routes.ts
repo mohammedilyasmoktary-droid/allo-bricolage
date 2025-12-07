@@ -82,9 +82,19 @@ router.post(
   ],
   async (req, res) => {
     try {
+      // Log incoming request for debugging
+      console.log('Booking creation request:', {
+        body: req.body,
+        files: req.files ? (req.files as Express.Multer.File[]).map(f => f.filename) : [],
+      });
+
       const errors = validationResult(req);
       if (!errors.isEmpty()) {
-        return res.status(400).json({ errors: errors.array() });
+        console.error('Validation errors:', errors.array());
+        return res.status(400).json({ 
+          error: 'Validation failed',
+          errors: errors.array() 
+        });
       }
 
       const {
@@ -112,6 +122,9 @@ router.post(
 
       // Handle photo uploads
       const photoFiles = req.files as Express.Multer.File[];
+      if (!photoFiles || photoFiles.length === 0) {
+        return res.status(400).json({ error: 'At least one photo is required' });
+      }
       const photos = photoFiles.map(file => getFileUrl(file.filename, 'photos'));
 
       // Calculate estimated price with urgent fee if applicable
@@ -191,10 +204,34 @@ router.post(
         },
       });
 
+      console.log('Booking created successfully:', booking.id);
       res.status(201).json(booking);
     } catch (error: any) {
       console.error('Create booking error:', error);
-      res.status(500).json({ error: 'Failed to create booking' });
+      console.error('Error details:', {
+        message: error.message,
+        code: error.code,
+        stack: error.stack,
+      });
+      
+      // Provide more specific error messages
+      if (error.code === 'P2002') {
+        return res.status(400).json({ error: 'A booking with these details already exists' });
+      }
+      if (error.code === 'P2003') {
+        return res.status(400).json({ error: 'Invalid reference to related record' });
+      }
+      if (error.message && error.message.includes('Invalid')) {
+        return res.status(400).json({ error: error.message });
+      }
+      if (error.message && error.message.includes('Record to update not found')) {
+        return res.status(404).json({ error: 'Technician or category not found' });
+      }
+      
+      res.status(500).json({ 
+        error: error.message || 'Failed to create booking. Please check all fields and try again.',
+        details: process.env.NODE_ENV === 'development' ? error.message : undefined,
+      });
     }
   }
 );
