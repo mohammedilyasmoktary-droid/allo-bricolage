@@ -293,20 +293,18 @@ const TechnicianJobs: React.FC = () => {
 
     // Status filter based on tab
     const statusMap = [
-      [], // Tab 0: All bookings (empty array means show all)
-      ['ACCEPTED', 'ON_THE_WAY', 'IN_PROGRESS'], // Tab 1: Active
-      ['AWAITING_PAYMENT'], // Tab 2: Payment
-      ['COMPLETED'], // Tab 3: Completed
+      ['ACCEPTED', 'ON_THE_WAY', 'IN_PROGRESS'], // Tab 0: Active (En cours)
+      ['AWAITING_PAYMENT'], // Tab 1: Payment (Paiement)
+      ['COMPLETED'], // Tab 2: Completed (Terminés)
     ];
     const allowedStatuses = statusMap[tabValue] || [];
-    if (tabValue === 0) {
-      // Show all bookings when "all" tab is selected
-      // Only apply statusFilter if it's not 'all'
-      if (statusFilter !== 'all') {
-        filtered = filtered.filter((b) => b.status === statusFilter);
-      }
-    } else if (allowedStatuses.length > 0) {
+    if (allowedStatuses.length > 0) {
       filtered = filtered.filter((b) => allowedStatuses.includes(b.status));
+    }
+    
+    // Additional filter for "all" tab if statusFilter is set
+    if (tabValue === 0 && statusFilter !== 'all') {
+      filtered = filtered.filter((b) => b.status === statusFilter);
     }
 
     // Sort by date (newest first)
@@ -442,28 +440,88 @@ const TechnicianJobs: React.FC = () => {
         <Card sx={{ boxShadow: 3, borderRadius: 3, border: '1px solid #e0e0e0' }}>
           <CardContent>
             <Box sx={{ textAlign: 'center', py: 8 }}>
-              <Typography variant="h6" color="text.secondary" gutterBottom sx={{ fontWeight: 600, mb: 2 }}>
+              <Box sx={{ mb: 2 }}>
+                {tabValue === 0 && (
+                  <BuildIcon sx={{ fontSize: 64, color: '#e0e0e0', mb: 2 }} />
+                )}
+                {tabValue === 1 && (
+                  <PaymentIcon sx={{ fontSize: 64, color: '#e0e0e0', mb: 2 }} />
+                )}
+                {tabValue === 2 && (
+                  <CheckCircleIcon sx={{ fontSize: 64, color: '#e0e0e0', mb: 2 }} />
+                )}
+              </Box>
+              <Typography variant="h5" color="text.secondary" gutterBottom sx={{ fontWeight: 700, mb: 1 }}>
                 {searchQuery
                   ? 'Aucun travail trouvé'
                   : tabValue === 0
-                  ? 'Aucun travail'
-                  : tabValue === 1
                   ? 'Aucun travail en cours'
-                  : tabValue === 2
+                  : tabValue === 1
                   ? 'Aucun paiement en attente'
                   : 'Aucun travail terminé'}
               </Typography>
-              <Typography variant="body2" color="text.secondary">
+              <Typography variant="body1" color="text.secondary" sx={{ maxWidth: 400, mx: 'auto' }}>
                 {searchQuery
-                  ? 'Essayez de modifier vos critères de recherche'
-                  : 'Les nouveaux travaux apparaîtront ici'}
+                  ? 'Essayez de modifier vos critères de recherche pour trouver des missions correspondantes.'
+                  : tabValue === 0
+                  ? 'Vous n\'avez actuellement aucun travail en cours. Les nouvelles missions acceptées apparaîtront ici.'
+                  : tabValue === 1
+                  ? 'Aucune mission n\'attend actuellement de paiement. Les missions terminées en attente de paiement apparaîtront ici.'
+                  : 'Vous n\'avez pas encore de missions terminées. Les missions complétées et payées apparaîtront ici.'}
               </Typography>
             </Box>
           </CardContent>
         </Card>
       ) : (
-        <Grid container spacing={3}>
-          {filteredBookings.map((booking) => {
+        <Box>
+          {/* Section Header */}
+          <Box sx={{ mb: 4, display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 2 }}>
+            <Box>
+              <Typography variant="h4" sx={{ fontWeight: 700, color: '#032B5A', mb: 0.5 }}>
+                {tabValue === 0 && 'Travaux en cours'}
+                {tabValue === 1 && 'Paiements en attente'}
+                {tabValue === 2 && 'Missions terminées'}
+              </Typography>
+              <Typography variant="body1" color="text.secondary">
+                {tabValue === 0 && `${filteredBookings.length} mission${filteredBookings.length > 1 ? 's' : ''} active${filteredBookings.length > 1 ? 's' : ''}`}
+                {tabValue === 1 && `${filteredBookings.length} paiement${filteredBookings.length > 1 ? 's' : ''} en attente de confirmation`}
+                {tabValue === 2 && `${filteredBookings.length} mission${filteredBookings.length > 1 ? 's' : ''} complétée${filteredBookings.length > 1 ? 's' : ''}`}
+              </Typography>
+            </Box>
+            {tabValue === 1 && filteredBookings.length > 0 && (
+              <Chip
+                icon={<PaymentIcon />}
+                label={`Total: ${filteredBookings.reduce((sum, b) => sum + (b.finalPrice || b.estimatedPrice || 0), 0)} MAD`}
+                sx={{
+                  bgcolor: '#fff3e0',
+                  color: '#f57c00',
+                  fontWeight: 700,
+                  fontSize: '1rem',
+                  px: 2,
+                  py: 1,
+                  border: '2px solid #ff9800',
+                }}
+              />
+            )}
+            {tabValue === 2 && filteredBookings.length > 0 && (
+              <Chip
+                icon={<CheckCircleIcon />}
+                label={`${filteredBookings.filter(b => b.paymentStatus === 'PAID').length} payée${filteredBookings.filter(b => b.paymentStatus === 'PAID').length > 1 ? 's' : ''}`}
+                sx={{
+                  bgcolor: '#e8f5e9',
+                  color: '#2e7d32',
+                  fontWeight: 700,
+                  fontSize: '1rem',
+                  px: 2,
+                  py: 1,
+                  border: '2px solid #4caf50',
+                }}
+              />
+            )}
+          </Box>
+
+          <Grid container spacing={3}>
+            {filteredBookings.map((booking) => {
             const statusColor = getStatusColor(booking.status);
             const isUrgent = booking.estimatedPrice && booking.technicianProfile?.basePrice && 
                             booking.estimatedPrice === (booking.technicianProfile.basePrice || 0) + 100;
@@ -472,15 +530,50 @@ const TechnicianJobs: React.FC = () => {
               <Grid item xs={12} key={booking.id}>
                 <Card
                   sx={{
-                    boxShadow: 3,
-                    borderRadius: 3,
-                    border: '1px solid #e0e0e0',
+                    boxShadow: tabValue === 1 ? 4 : tabValue === 2 ? 3 : 3,
+                    borderRadius: 4,
+                    border: tabValue === 1 
+                      ? '2px solid #ff9800' 
+                      : tabValue === 2 
+                      ? '2px solid #4caf50' 
+                      : '1px solid #e0e0e0',
                     overflow: 'hidden',
-                    transition: 'all 0.3s',
+                    transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+                    bgcolor: 'white',
+                    position: 'relative',
                     '&:hover': {
-                      transform: 'translateY(-4px)',
-                      boxShadow: '0 8px 24px rgba(0,0,0,0.12)',
+                      transform: 'translateY(-6px)',
+                      boxShadow: tabValue === 1 
+                        ? '0 12px 32px rgba(255, 152, 0, 0.2)' 
+                        : tabValue === 2 
+                        ? '0 12px 32px rgba(76, 175, 80, 0.2)' 
+                        : '0 8px 24px rgba(0,0,0,0.12)',
+                      borderColor: tabValue === 1 ? '#f57c00' : tabValue === 2 ? '#388e3c' : '#F4C542',
                     },
+                    ...(tabValue === 1 && {
+                      bgcolor: '#fffbf0',
+                      '&::before': {
+                        content: '""',
+                        position: 'absolute',
+                        top: 0,
+                        left: 0,
+                        right: 0,
+                        height: 4,
+                        bgcolor: '#ff9800',
+                      },
+                    }),
+                    ...(tabValue === 2 && {
+                      bgcolor: '#f1f8f4',
+                      '&::before': {
+                        content: '""',
+                        position: 'absolute',
+                        top: 0,
+                        left: 0,
+                        right: 0,
+                        height: 4,
+                        bgcolor: '#4caf50',
+                      },
+                    }),
                   }}
                 >
                   <CardContent sx={{ p: 4 }}>
@@ -790,17 +883,34 @@ const TechnicianJobs: React.FC = () => {
 
                           {booking.status === 'AWAITING_PAYMENT' && booking.paymentStatus === 'PENDING' && (
                             <>
-                              <Alert severity="warning" sx={{ borderRadius: 2, mb: 2 }}>
-                                <Typography variant="body2" sx={{ fontWeight: 600, mb: 0.5 }}>
-                                  Paiement en attente de confirmation
+                              <Alert 
+                                severity="warning" 
+                                icon={<PaymentIcon sx={{ fontSize: 24 }} />}
+                                sx={{ 
+                                  borderRadius: 3, 
+                                  mb: 2,
+                                  bgcolor: '#fffbf0',
+                                  border: '2px solid #ff9800',
+                                  '& .MuiAlert-icon': {
+                                    color: '#f57c00',
+                                  },
+                                }}
+                              >
+                                <Typography variant="body2" sx={{ fontWeight: 700, mb: 1, color: '#f57c00' }}>
+                                  💰 Paiement en attente de confirmation
                                 </Typography>
-                                <Typography variant="caption">
+                                <Typography variant="body2" sx={{ mb: 1.5, color: '#032B5A' }}>
                                   {booking.paymentMethod === 'CASH'
                                     ? 'Le client a sélectionné le paiement en espèces. Confirmez lorsque vous recevez le paiement.'
                                     : booking.paymentMethod === 'WAFACASH' || booking.paymentMethod === 'BANK_TRANSFER'
                                     ? 'Le client a uploadé un reçu. Vérifiez et confirmez le paiement.'
                                     : 'Le client a initié un paiement. Vérifiez et confirmez.'}
                                 </Typography>
+                                {booking.finalPrice && (
+                                  <Typography variant="h6" sx={{ fontWeight: 700, color: '#f57c00', mt: 1 }}>
+                                    Montant: {booking.finalPrice} MAD
+                                  </Typography>
+                                )}
                               </Alert>
                               <Button
                                 fullWidth
@@ -808,17 +918,23 @@ const TechnicianJobs: React.FC = () => {
                                 startIcon={<PaymentIcon />}
                                 onClick={() => handleConfirmPayment(booking.id)}
                                 sx={{
-                                  bgcolor: '#4caf50',
+                                  bgcolor: '#ff9800',
                                   color: 'white',
-                                  '&:hover': { bgcolor: '#388e3c' },
+                                  '&:hover': { 
+                                    bgcolor: '#f57c00',
+                                    transform: 'translateY(-2px)',
+                                    boxShadow: '0 6px 20px rgba(255, 152, 0, 0.4)',
+                                  },
                                   textTransform: 'none',
-                                  borderRadius: 2,
-                                  py: 1.25,
-                                  fontWeight: 600,
-                                  boxShadow: 2,
+                                  borderRadius: 3,
+                                  py: 1.5,
+                                  fontWeight: 700,
+                                  fontSize: '1rem',
+                                  boxShadow: '0 4px 12px rgba(255, 152, 0, 0.3)',
+                                  transition: 'all 0.3s ease',
                                 }}
                               >
-                                Confirmer le paiement
+                                ✓ Confirmer le paiement
                               </Button>
                             </>
                           )}
@@ -865,7 +981,8 @@ const TechnicianJobs: React.FC = () => {
               </Grid>
             );
           })}
-        </Grid>
+          </Grid>
+        </Box>
       )}
 
       {/* Complete Work Dialog */}
