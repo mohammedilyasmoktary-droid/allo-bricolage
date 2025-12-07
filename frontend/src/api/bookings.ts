@@ -66,8 +66,12 @@ export const bookingsApi = {
     return response.data;
   },
 
-  getAll: async (): Promise<Booking[]> => {
-    const response = await apiClient.get('/bookings');
+  getAll: async (technicianId?: string, technicianProfileId?: string): Promise<Booking[]> => {
+    const params = new URLSearchParams();
+    if (technicianId) params.append('technicianId', technicianId);
+    if (technicianProfileId) params.append('technicianProfileId', technicianProfileId);
+    const url = params.toString() ? `/bookings?${params.toString()}` : '/bookings';
+    const response = await apiClient.get(url);
     return response.data;
   },
 

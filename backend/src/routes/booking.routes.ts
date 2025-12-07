@@ -7,14 +7,22 @@ import { upload, getFileUrl } from '../utils/fileUpload';
 
 const router = express.Router();
 
-// Get all bookings (for public completed jobs display)
+// Get all bookings (for public completed jobs display and availability checking)
 router.get('/', async (req, res) => {
   try {
-    const { status } = req.query;
+    const { status, technicianId, technicianProfileId } = req.query;
     const where: any = {};
     
     if (status) {
       where.status = status;
+    }
+    
+    // Filter by technician if provided (for availability checking)
+    if (technicianId) {
+      where.technicianId = technicianId;
+    }
+    if (technicianProfileId) {
+      where.technicianProfileId = technicianProfileId;
     }
 
     const bookings = await prisma.serviceRequest.findMany({
@@ -40,7 +48,7 @@ router.get('/', async (req, res) => {
         },
       },
       orderBy: { createdAt: 'desc' },
-      take: 50,
+      take: technicianId || technicianProfileId ? 500 : 50, // Allow more bookings when filtering by technician
     });
 
     res.json(bookings);
@@ -62,7 +70,14 @@ router.post(
     body('description').trim().notEmpty().withMessage('Description is required'),
     body('city').trim().notEmpty().withMessage('City is required'),
     body('address').trim().notEmpty().withMessage('Address is required'),
-    body('scheduledDateTime').optional().isISO8601(),
+    body('scheduledDateTime').optional().custom((value) => {
+      if (!value) return true; // Optional field
+      const date = new Date(value);
+      if (isNaN(date.getTime())) {
+        throw new Error('Invalid date format');
+      }
+      return true;
+    }),
     body('estimatedPrice').optional().isFloat({ min: 0 }),
   ],
   async (req, res) => {
@@ -104,6 +119,23 @@ router.post(
       const urgentFee = isUrgent === 'true' || isUrgent === true ? 100 : 0;
       const finalEstimatedPrice = baseEstimatedPrice ? baseEstimatedPrice + urgentFee : (urgentFee > 0 ? urgentFee : null);
 
+      // Validate and parse scheduledDateTime if provided
+      let parsedScheduledDateTime: Date | null = null;
+      if (scheduledDateTime) {
+        try {
+          parsedScheduledDateTime = new Date(scheduledDateTime);
+          if (isNaN(parsedScheduledDateTime.getTime())) {
+            return res.status(400).json({ error: 'Invalid scheduledDateTime format. Please use ISO 8601 format.' });
+          }
+          // Check if date is in the past
+          if (parsedScheduledDateTime < new Date()) {
+            return res.status(400).json({ error: 'Scheduled date and time cannot be in the past' });
+          }
+        } catch (error) {
+          return res.status(400).json({ error: 'Invalid scheduledDateTime format' });
+        }
+      }
+
       // Create booking
       const booking = await prisma.serviceRequest.create({
         data: {
@@ -115,7 +147,7 @@ router.post(
           photos,
           city,
           address,
-          scheduledDateTime: scheduledDateTime ? new Date(scheduledDateTime) : null,
+          scheduledDateTime: parsedScheduledDateTime,
           estimatedPrice: finalEstimatedPrice,
           paymentStatus: 'UNPAID',
         },

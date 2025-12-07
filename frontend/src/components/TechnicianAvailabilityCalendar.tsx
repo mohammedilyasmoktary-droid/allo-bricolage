@@ -56,19 +56,27 @@ const TechnicianAvailabilityCalendar: React.FC<TechnicianAvailabilityCalendarPro
       
       setLoading(true);
       try {
-        // Get all bookings and filter for this technician's unavailable times
-        // Only include bookings with scheduledDateTime that are not cancelled/declined
-        const allBookings = await bookingsApi.getAll();
+        // Get bookings for this specific technician using query parameter
+        // technicianId here is the technicianProfileId from the technician object
+        // This will return up to 500 bookings for availability checking
+        const allBookings = await bookingsApi.getAll(undefined, technicianId);
+        
+        // Filter for this technician's unavailable times
+        // Only include bookings with scheduledDateTime that are not cancelled/declined/completed
         const technicianBookings = allBookings.filter(
           (booking) =>
-            booking.technicianId === technicianId &&
+            booking.technicianProfileId === technicianId &&
             booking.scheduledDateTime &&
             booking.status !== 'CANCELLED' &&
-            booking.status !== 'DECLINED'
+            booking.status !== 'DECLINED' &&
+            booking.status !== 'COMPLETED' && // Exclude completed bookings from unavailable times
+            new Date(booking.scheduledDateTime) >= new Date() // Only future bookings
         );
         setUnavailableBookings(technicianBookings);
       } catch (error) {
         console.error('Failed to load unavailable dates:', error);
+        // Don't block the UI if we can't load unavailable dates
+        setUnavailableBookings([]);
       } finally {
         setLoading(false);
       }

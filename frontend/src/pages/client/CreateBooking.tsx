@@ -133,9 +133,15 @@ const CreateBooking: React.FC = () => {
       errors.address = 'Veuillez entrer une adresse complète (minimum 5 caractères)';
     }
     if (formData.scheduledDateTime) {
-      const scheduledDate = new Date(formData.scheduledDateTime);
-      if (scheduledDate < new Date()) {
-        errors.scheduledDateTime = 'La date ne peut pas être dans le passé';
+      try {
+        const scheduledDate = new Date(formData.scheduledDateTime);
+        if (isNaN(scheduledDate.getTime())) {
+          errors.scheduledDateTime = 'Date et heure invalides';
+        } else if (scheduledDate < new Date()) {
+          errors.scheduledDateTime = 'La date ne peut pas être dans le passé';
+        }
+      } catch (error) {
+        errors.scheduledDateTime = 'Date et heure invalides';
       }
     }
     if (selectedFiles.length === 0) {
@@ -167,10 +173,30 @@ const CreateBooking: React.FC = () => {
     setLoading(true);
     try {
       const bookingData = { ...formData, isUrgent };
+      
+      // Ensure scheduledDateTime is properly formatted if provided
+      if (bookingData.scheduledDateTime) {
+        const dt = new Date(bookingData.scheduledDateTime);
+        if (isNaN(dt.getTime())) {
+          setError('Date et heure invalides. Veuillez sélectionner à nouveau.');
+          setShowSummary(false);
+          setLoading(false);
+          return;
+        }
+        // Ensure it's in ISO format
+        bookingData.scheduledDateTime = dt.toISOString();
+      }
+      
       const newBooking = await bookingsApi.create(bookingData);
       navigate(`/client/bookings/recap?bookingId=${newBooking.id}`);
     } catch (err: any) {
-      setError(err.response?.data?.error || 'Erreur lors de la création de la réservation');
+      console.error('Booking creation error:', err);
+      const errorMessage = err.response?.data?.error 
+        || err.response?.data?.errors?.[0]?.msg 
+        || err.response?.data?.message
+        || err.message
+        || 'Erreur lors de la création de la réservation. Veuillez vérifier tous les champs et réessayer.';
+      setError(errorMessage);
       setShowSummary(false);
     } finally {
       setLoading(false);
