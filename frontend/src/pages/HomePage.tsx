@@ -161,7 +161,9 @@ const HomePage: React.FC = () => {
   return (
     <Box sx={{ pb: { xs: 4, md: 8 }, position: 'relative' }}>
       {/* Hero Banner */}
-      <HeroBanner />
+      <Container maxWidth="lg" sx={{ pt: { xs: 4, md: 6 }, pb: { xs: 0, md: 0 } }}>
+        <HeroBanner />
+      </Container>
 
       {/* Main Content - Services and Technicians */}
       <Container maxWidth="lg" sx={{ mt: { xs: 4, md: 6 } }}>
@@ -567,7 +569,7 @@ const HomePage: React.FC = () => {
       </Container>
 
       {/* Why Choose AlloBricolage Section */}
-      <Box sx={{ py: { xs: 7, md: 11 }, bgcolor: '#fafbfc' }}>
+      <Box sx={{ py: { xs: 6, md: 8 }, bgcolor: '#fafbfc' }}>
           <Container maxWidth="lg">
             <Card
               sx={{
@@ -804,7 +806,7 @@ const HomePage: React.FC = () => {
       </Box>
 
       {/* Customer Reviews Section */}
-      <Box sx={{ py: { xs: 7, md: 11 }, bgcolor: 'white' }}>
+      <Box sx={{ py: { xs: 6, md: 8 }, bgcolor: '#fafbfc' }}>
         <Container maxWidth="lg">
           <Card
             sx={{
@@ -938,7 +940,7 @@ const HomePage: React.FC = () => {
       </Box>
 
       {/* Platform Statistics Section */}
-      <Box sx={{ py: { xs: 7, md: 11 }, bgcolor: '#fafbfc' }}>
+      <Box sx={{ py: { xs: 6, md: 8 }, bgcolor: 'white' }}>
         <Container maxWidth="lg">
           <Card
             sx={{
@@ -1061,7 +1063,7 @@ const HomePage: React.FC = () => {
       </Box>
 
       {/* How It Works Section */}
-      <Box sx={{ py: { xs: 7, md: 11 }, bgcolor: '#fafbfc' }}>
+      <Box sx={{ py: { xs: 6, md: 8 }, bgcolor: 'white' }}>
         <Container maxWidth="lg">
           <Card
             sx={{
