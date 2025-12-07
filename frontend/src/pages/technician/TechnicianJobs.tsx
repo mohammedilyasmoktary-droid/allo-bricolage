@@ -81,10 +81,19 @@ const TechnicianJobs: React.FC = () => {
   const loadJobs = async () => {
     setLoading(true);
     try {
+      console.log('Loading technician jobs...');
       const data = await bookingsApi.getMyBookings();
-      setBookings(data);
-    } catch (error) {
+      console.log('Technician jobs loaded:', data?.length || 0, 'bookings');
+      console.log('Jobs data:', data);
+      setBookings(data || []);
+    } catch (error: any) {
       console.error('Failed to load jobs:', error);
+      console.error('Error details:', {
+        message: error.message,
+        response: error.response?.data,
+        status: error.response?.status,
+      });
+      setBookings([]);
     } finally {
       setLoading(false);
     }

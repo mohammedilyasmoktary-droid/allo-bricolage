@@ -71,11 +71,22 @@ const ClientBookings: React.FC = () => {
   }, []);
 
   const loadBookings = async () => {
+    setLoading(true);
     try {
+      console.log('Loading bookings...');
       const data = await bookingsApi.getMyBookings();
-      setBookings(data);
-    } catch (error) {
+      console.log('Bookings loaded:', data?.length || 0, 'bookings');
+      console.log('Bookings data:', data);
+      setBookings(data || []);
+    } catch (error: any) {
       console.error('Failed to load bookings:', error);
+      console.error('Error details:', {
+        message: error.message,
+        response: error.response?.data,
+        status: error.response?.status,
+      });
+      // Set empty array on error to prevent undefined issues
+      setBookings([]);
     } finally {
       setLoading(false);
     }
@@ -167,11 +178,19 @@ const ClientBookings: React.FC = () => {
 
   // Filter and sort bookings
   const filteredAndSortedBookings = useMemo(() => {
+    // Ensure bookings is an array
+    if (!bookings || !Array.isArray(bookings)) {
+      console.warn('Bookings is not an array:', bookings);
+      return [];
+    }
+
     let filtered = [...bookings];
+    console.log('Filtering bookings. Total:', bookings.length, 'Status filter:', statusFilter, 'Search:', searchQuery);
 
     // Status filter
     if (statusFilter !== 'all') {
       filtered = filtered.filter((b) => b.status === statusFilter);
+      console.log('After status filter:', filtered.length);
     }
 
     // Search filter
@@ -184,6 +203,7 @@ const ClientBookings: React.FC = () => {
           b.address?.toLowerCase().includes(query) ||
           b.description?.toLowerCase().includes(query)
       );
+      console.log('After search filter:', filtered.length);
     }
 
     // Sort
@@ -202,6 +222,7 @@ const ClientBookings: React.FC = () => {
       }
     });
 
+    console.log('Final filtered bookings:', filtered.length);
     return filtered;
   }, [bookings, statusFilter, searchQuery, sortBy]);
 

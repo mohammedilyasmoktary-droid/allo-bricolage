@@ -248,7 +248,11 @@ router.get('/my-bookings', authenticate, async (req, res) => {
     const userId = req.user!.userId;
     const role = req.user!.role;
 
+    console.log('Getting bookings for user:', userId, 'role:', role);
+
     const where: any = role === 'CLIENT' ? { clientId: userId } : { technicianId: userId };
+
+    console.log('Query where clause:', where);
 
     const bookings = await prisma.serviceRequest.findMany({
       where,
@@ -293,9 +297,17 @@ router.get('/my-bookings', authenticate, async (req, res) => {
       orderBy: { createdAt: 'desc' },
     });
 
+    console.log('Found bookings:', bookings.length);
+    console.log('Bookings IDs:', bookings.map(b => b.id));
+
     res.json(bookings);
   } catch (error: any) {
     console.error('Get my bookings error:', error);
+    console.error('Error details:', {
+      message: error.message,
+      code: error.code,
+      stack: error.stack,
+    });
     res.status(500).json({ error: 'Failed to get bookings' });
   }
 });
