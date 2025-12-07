@@ -18,7 +18,7 @@ const storage = multer.diskStorage({
   destination: (req, file, cb) => {
     // Create subdirectories for different file types
     let subDir = 'photos';
-    if (file.fieldname === 'documents') {
+    if (file.fieldname === 'documents' || file.fieldname.startsWith('documents[')) {
       subDir = 'documents';
     } else if (file.fieldname === 'profilePicture') {
       subDir = 'profile-pictures';

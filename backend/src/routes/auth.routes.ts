@@ -10,9 +10,11 @@ import { upload, getFileUrl } from '../utils/fileUpload';
 const router = express.Router();
 
 // Register
+// Support both old format (single nationalIdCard) and new format (multiple documents array)
+// Use upload.any() to handle dynamic field names like documents[0][file], documents[1][file], etc.
 router.post(
   '/register',
-  upload.single('nationalIdCard'),
+  upload.any(),
   [
     body('name').trim().notEmpty().withMessage('Name is required'),
     body('email').isEmail().withMessage('Valid email is required'),
@@ -28,11 +30,29 @@ router.post(
         return res.status(400).json({ errors: errors.array() });
       }
 
-      const { name, email, phone, password, city, role = 'CLIENT' } = req.body;
-      const nationalIdCardFile = req.file;
+      const { name, email, phone, password, city, role = 'CLIENT', serviceCategory } = req.body;
+      const allFiles = (req.files as Express.Multer.File[]) || [];
+      
+      // Parse documents from FormData format: documents[0][file], documents[1][file], etc.
+      const documents: Array<{ file: Express.Multer.File; type: string }> = [];
+      const nationalIdCardFile = allFiles.find(f => f.fieldname === 'nationalIdCard');
+      
+      // Extract documents from array format
+      for (let i = 0; i < 20; i++) { // Support up to 20 documents
+        const fileField = `documents[${i}][file]`;
+        const typeField = `documents[${i}][type]`;
+        const file = allFiles.find(f => f.fieldname === fileField);
+        const type = req.body[typeField];
+        
+        if (file && type) {
+          documents.push({ file, type });
+        }
+      }
 
       // Validate national ID card for technicians
-      if (role === 'TECHNICIAN' && !nationalIdCardFile) {
+      const hasCIN = !!nationalIdCardFile || documents.some(doc => doc.type === 'CIN');
+      
+      if (role === 'TECHNICIAN' && !hasCIN) {
         return res.status(400).json({ error: 'La carte nationale est requise pour les techniciens' });
       }
 
@@ -66,26 +86,73 @@ router.post(
         },
       });
 
-      // If technician, create technician profile and document
+      // If technician, create technician profile and documents
       if (role === 'TECHNICIAN') {
-        // Create technician profile
+        // Auto-approve verification if CIN is uploaded (works for all document types)
+
         const technicianProfile = await prisma.technicianProfile.create({
           data: {
             userId: user.id,
             skills: [],
             yearsOfExperience: 0,
-            verificationStatus: 'PENDING',
+            // Auto-approve if CIN is uploaded
+            verificationStatus: hasCIN ? 'APPROVED' : 'PENDING',
           },
         });
 
-        // Create national ID card document if file was uploaded
-        if (nationalIdCardFile) {
+        // Helper function to map document type from frontend to Prisma enum
+        const mapDocumentType = (type: string): 'ID_CARD' | 'DIPLOMA' | 'CERTIFICATE' | 'OTHER' => {
+          switch (type) {
+            case 'CIN':
+              return 'ID_CARD';
+            case 'DIPLOMA':
+              return 'DIPLOMA';
+            case 'CERTIFICATE':
+              return 'CERTIFICATE';
+            case 'OTHER':
+              return 'OTHER';
+            default:
+              return 'OTHER';
+          }
+        };
+
+        // Create documents from new format (documents array)
+        // Auto-approve verification when any document is uploaded (not just CIN)
+        // This allows all document types (CIN, DIPLOMA, CERTIFICATE, OTHER) to trigger auto-approval
+        if (documents.length > 0) {
+          for (const doc of documents) {
+            const fileUrl = getFileUrl(doc.file.filename, 'documents');
+            
+            await prisma.technicianDocument.create({
+              data: {
+                technicianProfileId: technicianProfile.id,
+                type: mapDocumentType(doc.type),
+                fileUrl,
+              },
+            });
+          }
+        }
+
+        // Create national ID card document if file was uploaded (old format for backward compatibility)
+        // Only create if not already in documents array
+        if (nationalIdCardFile && !documents.some(doc => doc.type === 'CIN')) {
           const fileUrl = getFileUrl(nationalIdCardFile.filename, 'documents');
           await prisma.technicianDocument.create({
             data: {
               technicianProfileId: technicianProfile.id,
               type: 'ID_CARD',
               fileUrl,
+            },
+          });
+        }
+
+        // Create notification for auto-approval
+        if (hasCIN) {
+          await prisma.notification.create({
+            data: {
+              userId: user.id,
+              type: 'VERIFICATION_APPROVED',
+              message: 'Votre compte technicien a été approuvé automatiquement après l\'upload de votre CIN.',
             },
           });
         }

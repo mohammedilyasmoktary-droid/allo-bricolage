@@ -48,6 +48,7 @@ enum PaymentStatus {
 
 enum DocumentType {
   ID_CARD
+  DIPLOMA
   CERTIFICATE
   OTHER
 }
