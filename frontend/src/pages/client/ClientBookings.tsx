@@ -44,6 +44,7 @@ import HourglassEmptyIcon from '@mui/icons-material/HourglassEmpty';
 import DirectionsCarIcon from '@mui/icons-material/DirectionsCar';
 import SearchIcon from '@mui/icons-material/Search';
 import SortIcon from '@mui/icons-material/Sort';
+import MessageIcon from '@mui/icons-material/Message';
 
 const ClientBookings: React.FC = () => {
   const navigate = useNavigate();
@@ -642,6 +643,28 @@ const ClientBookings: React.FC = () => {
                           >
                             Voir les détails
                           </Button>
+
+                          {(booking.status === 'ACCEPTED' || booking.status === 'ON_THE_WAY' || booking.status === 'IN_PROGRESS' || booking.status === 'AWAITING_PAYMENT') && booking.technicianId && (
+                            <Button
+                              fullWidth
+                              variant="contained"
+                              startIcon={<MessageIcon />}
+                              onClick={() => navigate(`/messages?bookingId=${booking.id}`)}
+                              sx={{
+                                bgcolor: '#F4C542',
+                                color: '#032B5A',
+                                '&:hover': { bgcolor: '#e0b038' },
+                                textTransform: 'none',
+                                borderRadius: 2,
+                                py: 1.25,
+                                fontWeight: 700,
+                                boxShadow: 2,
+                                mb: booking.status === 'AWAITING_PAYMENT' ? 0 : 1,
+                              }}
+                            >
+                              Message
+                            </Button>
+                          )}
 
                           {booking.status === 'AWAITING_PAYMENT' && (
                             <Button
