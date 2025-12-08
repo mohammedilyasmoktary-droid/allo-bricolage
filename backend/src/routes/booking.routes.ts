@@ -485,15 +485,34 @@ router.patch('/:id/decline', authenticate, authorize('TECHNICIAN'), async (req, 
     });
 
     // Notify client
-    await prisma.notification.create({
-      data: {
-        userId: booking.clientId,
-        type: 'BOOKING_DECLINED',
-        message: 'Your booking request has been declined',
-      },
-    });
+      const declineMessage = `Votre réservation a été refusée par ${updated.technician?.name}.`;
+      
+      await prisma.notification.create({
+        data: {
+          userId: booking.clientId,
+          type: 'BOOKING_DECLINED',
+          message: declineMessage,
+        },
+      });
 
-    res.json(updated);
+      // Create automatic chat message
+      if (booking.technicianId && booking.clientId) {
+        try {
+          await prisma.chatMessage.create({
+            data: {
+              bookingId: booking.id,
+              senderId: booking.technicianId,
+              receiverId: booking.clientId,
+              message: declineMessage,
+              messageType: 'TEXT',
+            },
+          });
+        } catch (messageError) {
+          console.error('Failed to create decline message:', messageError);
+        }
+      }
+
+      res.json(updated);
   } catch (error: any) {
     console.error('Decline booking error:', error);
     res.status(500).json({ error: 'Failed to decline booking' });
@@ -602,6 +621,24 @@ router.patch(
         },
       });
 
+      // Create automatic chat message when status changes
+      if (booking.technicianId && booking.clientId && updateData.status !== booking.status) {
+        try {
+          await prisma.chatMessage.create({
+            data: {
+              bookingId: booking.id,
+              senderId: booking.technicianId,
+              receiverId: booking.clientId,
+              message: notificationMessage,
+              messageType: 'TEXT',
+            },
+          });
+        } catch (messageError) {
+          // Don't fail the status update if message creation fails
+          console.error('Failed to create status change message:', messageError);
+        }
+      }
+
       res.json(updated);
     } catch (error: any) {
       console.error('Update booking status error:', error);
@@ -656,13 +693,34 @@ router.patch('/:id/cancel', authenticate, async (req, res) => {
 
     // Notify the other party
     const notifyUserId = booking.clientId === userId ? booking.technicianId! : booking.clientId;
+    const cancelMessage = userId === booking.clientId
+      ? `La réservation a été annulée par le client.`
+      : `La réservation a été annulée par le technicien.`;
+    
     await prisma.notification.create({
       data: {
         userId: notifyUserId,
         type: 'BOOKING_CANCELLED',
-        message: 'A booking has been cancelled',
+        message: cancelMessage,
       },
     });
+
+    // Create automatic chat message
+    if (booking.technicianId && booking.clientId) {
+      try {
+        await prisma.chatMessage.create({
+          data: {
+            bookingId: booking.id,
+            senderId: userId,
+            receiverId: notifyUserId,
+            message: cancelMessage,
+            messageType: 'TEXT',
+          },
+        });
+      } catch (messageError) {
+        console.error('Failed to create cancel message:', messageError);
+      }
+    }
 
     res.json(updated);
   } catch (error: any) {
