@@ -222,12 +222,17 @@ const CreateBooking: React.FC = () => {
         city: bookingData.city,
         address: bookingData.address,
         scheduledDateTime: bookingData.scheduledDateTime,
+        scheduledDateTimeLocal: bookingData.scheduledDateTime ? new Date(bookingData.scheduledDateTime).toLocaleString() : null,
         photosCount: bookingData.photos?.length || 0,
         isUrgent: bookingData.isUrgent,
       });
       
       const newBooking = await bookingsApi.create(bookingData);
-      console.log('Booking created successfully:', newBooking.id);
+      console.log('Booking created successfully:', {
+        id: newBooking.id,
+        scheduledDateTime: newBooking.scheduledDateTime,
+        scheduledDateTimeLocal: newBooking.scheduledDateTime ? new Date(newBooking.scheduledDateTime).toLocaleString() : null,
+      });
       navigate(`/client/bookings/recap?bookingId=${newBooking.id}`);
     } catch (err: any) {
       console.error('Booking creation error:', err);
