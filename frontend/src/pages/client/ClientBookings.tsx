@@ -499,7 +499,18 @@ const ClientBookings: React.FC = () => {
                                 </Typography>
                               </Box>
                               <Typography variant="body1" sx={{ fontWeight: 500, color: '#032B5A', ml: 4 }}>
-                                {format(new Date(booking.scheduledDateTime), 'PPp')}
+                                {(() => {
+                                  try {
+                                    const date = new Date(booking.scheduledDateTime);
+                                    if (isNaN(date.getTime())) {
+                                      return 'Date invalide';
+                                    }
+                                    return format(date, 'PPp');
+                                  } catch (error) {
+                                    console.error('Error formatting scheduledDateTime:', error, booking.scheduledDateTime);
+                                    return booking.scheduledDateTime || 'Date non disponible';
+                                  }
+                                })()}
                               </Typography>
                             </Grid>
                           )}
