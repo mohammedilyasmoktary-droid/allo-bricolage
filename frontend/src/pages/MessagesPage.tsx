@@ -28,9 +28,11 @@ import SendIcon from '@mui/icons-material/Send';
 import MessageIcon from '@mui/icons-material/Message';
 import { format, formatDistanceToNow } from 'date-fns';
 import { fr } from 'date-fns/locale';
+import { useSearchParams } from 'react-router-dom';
 
 const MessagesPage: React.FC = () => {
   const { user } = useAuth();
+  const [searchParams] = useSearchParams();
   const [conversations, setConversations] = useState<Conversation[]>([]);
   const [selectedConversation, setSelectedConversation] = useState<Conversation | null>(null);
   const [messages, setMessages] = useState<Message[]>([]);
@@ -46,6 +48,17 @@ const MessagesPage: React.FC = () => {
       loadConversations();
     }
   }, [user]);
+
+  // Auto-select conversation from URL parameter
+  useEffect(() => {
+    const bookingId = searchParams.get('bookingId');
+    if (bookingId && conversations.length > 0) {
+      const conversation = conversations.find(conv => conv.bookingId === bookingId);
+      if (conversation) {
+        setSelectedConversation(conversation);
+      }
+    }
+  }, [searchParams, conversations]);
 
   useEffect(() => {
     if (selectedConversation) {

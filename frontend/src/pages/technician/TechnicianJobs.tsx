@@ -54,8 +54,11 @@ import PictureAsPdfIcon from '@mui/icons-material/PictureAsPdf';
 import StarIcon from '@mui/icons-material/Star';
 import ReceiptIcon from '@mui/icons-material/Receipt';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
+import MessageIcon from '@mui/icons-material/Message';
+import { useNavigate } from 'react-router-dom';
 
 const TechnicianJobs: React.FC = () => {
+  const navigate = useNavigate();
   const [bookings, setBookings] = useState<Booking[]>([]);
   const [loading, setLoading] = useState(true);
   const [statusFilter, setStatusFilter] = useState<string>('all');
@@ -794,23 +797,44 @@ const TechnicianJobs: React.FC = () => {
                           )}
 
                           {booking.status === 'ACCEPTED' && (
-                            <Button
-                              fullWidth
-                              variant="contained"
-                              startIcon={<DirectionsCarIcon />}
-                              onClick={() => updateStatus(booking.id, 'ON_THE_WAY')}
-                              sx={{
-                                bgcolor: '#2196f3',
-                                color: 'white',
-                                '&:hover': { bgcolor: '#1976d2' },
-                                textTransform: 'none',
-                                borderRadius: 2,
-                                py: 1.25,
-                                fontWeight: 600,
-                              }}
-                            >
-                              En route
-                            </Button>
+                            <>
+                              <Button
+                                fullWidth
+                                variant="contained"
+                                startIcon={<MessageIcon />}
+                                onClick={() => navigate(`/messages?bookingId=${booking.id}`)}
+                                sx={{
+                                  bgcolor: '#F4C542',
+                                  color: '#032B5A',
+                                  '&:hover': { bgcolor: '#e0b038' },
+                                  textTransform: 'none',
+                                  borderRadius: 2,
+                                  py: 1.25,
+                                  fontWeight: 600,
+                                  mb: 1,
+                                  boxShadow: 2,
+                                }}
+                              >
+                                Message
+                              </Button>
+                              <Button
+                                fullWidth
+                                variant="contained"
+                                startIcon={<DirectionsCarIcon />}
+                                onClick={() => updateStatus(booking.id, 'ON_THE_WAY')}
+                                sx={{
+                                  bgcolor: '#2196f3',
+                                  color: 'white',
+                                  '&:hover': { bgcolor: '#1976d2' },
+                                  textTransform: 'none',
+                                  borderRadius: 2,
+                                  py: 1.25,
+                                  fontWeight: 600,
+                                }}
+                              >
+                                En route
+                              </Button>
+                            </>
                           )}
 
                           {booking.status === 'ON_THE_WAY' && (
