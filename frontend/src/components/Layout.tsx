@@ -221,12 +221,14 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
         position="sticky" 
         sx={{ 
           bgcolor: '#032B5A', 
-          boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
+          background: 'linear-gradient(135deg, #032B5A 0%, #021d3f 100%)',
+          boxShadow: '0 4px 20px rgba(0,0,0,0.15)',
           top: 0, 
           zIndex: 1100,
+          borderBottom: '1px solid rgba(255, 255, 255, 0.08)',
         }}
       >
-        <Toolbar sx={{ px: { xs: 2, sm: 3 }, py: 1.5 }}>
+        <Toolbar sx={{ px: { xs: 2, sm: 3, md: 4 }, py: { xs: 1.5, md: 2 }, maxWidth: '1400px', mx: 'auto', width: '100%' }}>
           {/* Logo Section */}
           <Box
             sx={{
@@ -241,31 +243,33 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
           >
             <Box
               sx={{
-                width: 44,
-                height: 44,
-                borderRadius: 2,
+                width: { xs: 44, md: 48 },
+                height: { xs: 44, md: 48 },
+                borderRadius: 2.5,
                 bgcolor: '#F4C542',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                boxShadow: '0 2px 8px rgba(244, 197, 66, 0.3)',
-                transition: 'transform 0.2s',
+                boxShadow: '0 4px 16px rgba(244, 197, 66, 0.35)',
+                transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
                 '&:hover': {
-                  transform: 'scale(1.05)',
+                  transform: 'scale(1.08) rotate(2deg)',
+                  boxShadow: '0 6px 24px rgba(244, 197, 66, 0.45)',
                 },
               }}
             >
-              <BuildIcon sx={{ fontSize: 26, color: '#032B5A' }} />
+              <BuildIcon sx={{ fontSize: { xs: 26, md: 28 }, color: '#032B5A' }} />
             </Box>
             <Box>
               <Typography 
                 variant="h6" 
                 component="div" 
                 sx={{ 
-                  fontWeight: 700,
+                  fontWeight: 800,
                   color: 'white',
                   lineHeight: 1.2,
-                  fontSize: { xs: '1rem', sm: '1.25rem' },
+                  fontSize: { xs: '1.1rem', sm: '1.3rem', md: '1.4rem' },
+                  letterSpacing: '-0.01em',
                 }}
               >
                 Allo Bricolage
@@ -273,10 +277,11 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
               <Typography 
                 variant="caption" 
                 sx={{ 
-                  color: 'rgba(255, 255, 255, 0.8)',
-                  fontSize: '0.7rem',
+                  color: 'rgba(255, 255, 255, 0.85)',
+                  fontSize: { xs: '0.7rem', sm: '0.75rem' },
                   display: { xs: 'none', sm: 'block' },
-                  lineHeight: 1,
+                  lineHeight: 1.2,
+                  fontWeight: 400,
                 }}
               >
                 Plateforme de maintenance
@@ -299,29 +304,88 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
               <MenuIcon />
             </IconButton>
           ) : (
-            <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5, flexGrow: 1 }}>
-              {navItems.map((item) => (
-                <Button
-                  key={item.path}
-                  onClick={() => navigate(item.path)}
-                  sx={{ 
-                    textTransform: 'none',
-                    color: 'white',
-                    fontWeight: 500,
-                    px: 2,
-                    py: 1,
-                    borderRadius: 2,
-                    fontSize: '0.9rem',
-                    '&:hover': { 
-                      bgcolor: 'rgba(244, 197, 66, 0.15)',
-                      color: '#F4C542',
-                    },
-                  }}
-                >
-                  {item.label}
-                </Button>
-              ))}
-            </Box>
+            <>
+              {/* Left side - Menu items (excluding auth buttons) */}
+              <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, flexGrow: 1 }}>
+                {navItems
+                  .filter(item => item.label !== 'Connexion' && item.label !== 'Inscription')
+                  .map((item) => (
+                    <Button
+                      key={item.path}
+                      onClick={() => navigate(item.path)}
+                      sx={{ 
+                        textTransform: 'none',
+                        color: 'rgba(255, 255, 255, 0.9)',
+                        fontWeight: 500,
+                        px: 2.5,
+                        py: 1,
+                        borderRadius: 2,
+                        fontSize: '0.95rem',
+                        letterSpacing: '0.01em',
+                        transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)',
+                        '&:hover': { 
+                          bgcolor: 'rgba(244, 197, 66, 0.15)',
+                          color: '#F4C542',
+                          transform: 'translateY(-1px)',
+                        },
+                      }}
+                    >
+                      {item.label}
+                    </Button>
+                  ))}
+              </Box>
+
+              {/* Right side - Auth buttons (only when not logged in) */}
+              {!user && (
+                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, ml: 'auto' }}>
+                  <Button
+                    onClick={() => navigate('/login')}
+                    sx={{
+                      textTransform: 'none',
+                      color: 'rgba(255, 255, 255, 0.95)',
+                      fontWeight: 600,
+                      px: 2.5,
+                      py: 1,
+                      borderRadius: 2.5,
+                      fontSize: '0.95rem',
+                      letterSpacing: '0.01em',
+                      transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)',
+                      '&:hover': {
+                        bgcolor: 'rgba(255, 255, 255, 0.1)',
+                        color: 'white',
+                        transform: 'translateY(-1px)',
+                      },
+                    }}
+                  >
+                    Connexion
+                  </Button>
+                  <Button
+                    variant="contained"
+                    onClick={() => navigate('/register')}
+                    sx={{
+                      textTransform: 'none',
+                      bgcolor: '#F4C542',
+                      color: '#032B5A',
+                      fontWeight: 700,
+                      px: 3,
+                      py: 1,
+                      borderRadius: 2.5,
+                      fontSize: '0.95rem',
+                      letterSpacing: '0.01em',
+                      boxShadow: '0 4px 12px rgba(244, 197, 66, 0.3)',
+                      transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)',
+                      '&:hover': {
+                        bgcolor: '#e0b038',
+                        transform: 'translateY(-2px)',
+                        boxShadow: '0 6px 20px rgba(244, 197, 66, 0.4)',
+                      },
+                    }}
+                  >
+                    Inscription
+                  </Button>
+                </Box>
+              )}
+            </>
           )}
 
           {/* User Section */}
