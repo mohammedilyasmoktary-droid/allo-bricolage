@@ -684,6 +684,57 @@ const TechnicianJobs: React.FC = () => {
                             Actions
                           </Typography>
 
+                          {/* Status Update Dropdown - Available for all editable statuses */}
+                          {(booking.status === 'PENDING' || 
+                            booking.status === 'ACCEPTED' || 
+                            booking.status === 'ON_THE_WAY' || 
+                            booking.status === 'IN_PROGRESS' || 
+                            booking.status === 'AWAITING_PAYMENT') && (
+                            <FormControl fullWidth size="small" sx={{ mb: 2 }}>
+                              <InputLabel>Changer le statut</InputLabel>
+                              <Select
+                                value={booking.status}
+                                onChange={(e) => {
+                                  const newStatus = e.target.value;
+                                  if (newStatus !== booking.status) {
+                                    if (newStatus === 'COMPLETED') {
+                                      handleCompleteClick(booking);
+                                    } else {
+                                      updateStatus(booking.id, newStatus);
+                                    }
+                                  }
+                                }}
+                                label="Changer le statut"
+                                sx={{ borderRadius: 2 }}
+                              >
+                                {booking.status === 'PENDING' && (
+                                  <>
+                                    <MenuItem value="ACCEPTED">Accepter</MenuItem>
+                                    <MenuItem value="DECLINED">Refuser</MenuItem>
+                                  </>
+                                )}
+                                {booking.status === 'ACCEPTED' && (
+                                  <MenuItem value="ON_THE_WAY">En route</MenuItem>
+                                )}
+                                {booking.status === 'ON_THE_WAY' && (
+                                  <>
+                                    <MenuItem value="ACCEPTED">Retour à Accepté</MenuItem>
+                                    <MenuItem value="IN_PROGRESS">En cours</MenuItem>
+                                  </>
+                                )}
+                                {booking.status === 'IN_PROGRESS' && (
+                                  <>
+                                    <MenuItem value="ON_THE_WAY">Retour à En route</MenuItem>
+                                    <MenuItem value="COMPLETED">Terminer</MenuItem>
+                                  </>
+                                )}
+                                {booking.status === 'AWAITING_PAYMENT' && booking.paymentStatus !== 'PAID' && (
+                                  <MenuItem value="IN_PROGRESS">Retour à En cours</MenuItem>
+                                )}
+                              </Select>
+                            </FormControl>
+                          )}
+
                           {booking.status === 'PENDING' && (
                             <>
                               <Button
