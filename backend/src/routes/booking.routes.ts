@@ -576,16 +576,24 @@ router.patch(
       }
 
       const updateData: any = { status };
+      let actualNewStatus = status; // Track the actual new status for message creation
+      
       if (finalPrice && status === 'COMPLETED') {
         updateData.finalPrice = parseFloat(finalPrice);
         // When technician marks as completed, set status to AWAITING_PAYMENT
         updateData.status = 'AWAITING_PAYMENT';
+        actualNewStatus = 'AWAITING_PAYMENT';
       }
       
       // If going back to IN_PROGRESS from AWAITING_PAYMENT, clear payment status if not paid
       if (status === 'IN_PROGRESS' && booking.status === 'AWAITING_PAYMENT' && booking.paymentStatus !== 'PAID') {
         updateData.paymentStatus = 'UNPAID';
+        updateData.receiptUrl = null;
+        updateData.transactionId = null;
       }
+
+      // Check if status is actually changing
+      const statusChanged = actualNewStatus !== booking.status;
 
       const updated = await prisma.serviceRequest.update({
         where: { id: req.params.id },
@@ -615,7 +623,7 @@ router.patch(
       let notificationType: string;
       let notificationMessage: string;
 
-      if (updateData.status === 'AWAITING_PAYMENT') {
+      if (actualNewStatus === 'AWAITING_PAYMENT') {
         notificationType = 'BOOKING_COMPLETED';
         const finalPriceAmount = updateData.finalPrice || updated.finalPrice;
         notificationMessage = finalPriceAmount
@@ -627,9 +635,12 @@ router.patch(
       } else if (status === 'IN_PROGRESS') {
         notificationType = 'BOOKING_IN_PROGRESS';
         notificationMessage = `${updated.technician?.name} a commencé l'intervention.`;
+      } else if (status === 'ACCEPTED') {
+        notificationType = 'BOOKING_ACCEPTED';
+        notificationMessage = `${updated.technician?.name} a accepté votre réservation.`;
       } else {
         notificationType = 'BOOKING_COMPLETED';
-        notificationMessage = `Le statut de votre réservation a été mis à jour.`;
+        notificationMessage = `Le statut de votre réservation a été mis à jour à "${actualNewStatus}".`;
       }
 
       await prisma.notification.create({
@@ -641,21 +652,33 @@ router.patch(
       });
 
       // Create automatic chat message when status changes
-      if (booking.technicianId && booking.clientId && updateData.status !== booking.status) {
+      // Always send a message when technician updates status (if status actually changed)
+      if (statusChanged && booking.clientId) {
         try {
           await prisma.chatMessage.create({
             data: {
               bookingId: booking.id,
-              senderId: booking.technicianId,
+              senderId: req.user!.userId, // Use the current user (technician) as sender
               receiverId: booking.clientId,
               message: notificationMessage,
               messageType: 'TEXT',
             },
           });
-        } catch (messageError) {
-          // Don't fail the status update if message creation fails
-          console.error('Failed to create status change message:', messageError);
+          console.log(`✅ Status change message sent: ${booking.status} → ${actualNewStatus} for booking ${booking.id}`);
+        } catch (messageError: any) {
+          // Don't fail the status update if message creation fails, but log the error
+          console.error('❌ Failed to create status change message:', messageError);
+          console.error('Message error details:', {
+            bookingId: booking.id,
+            senderId: req.user!.userId,
+            receiverId: booking.clientId,
+            message: notificationMessage,
+            error: messageError?.message || messageError,
+            stack: messageError?.stack,
+          });
         }
+      } else {
+        console.log(`⏭️ Skipping message creation: status unchanged (${booking.status} === ${actualNewStatus}) or missing clientId`);
       }
 
       res.json(updated);
