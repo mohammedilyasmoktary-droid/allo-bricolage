@@ -284,79 +284,93 @@ export const generateBookingPDF = async (data: BookingPDFData): Promise<void> =>
     doc.text('Reçu de Paiement', margin, yPos);
     yPos += 8;
     
-    // Try to load and embed the receipt image
-    if (!data.receiptUrl.endsWith('.pdf')) {
-      try {
-        // Use html2canvas to convert image to base64 for PDF
-        const img = new Image();
-        img.crossOrigin = 'anonymous';
-        
-        // Load image and convert to base64
-        const loadImageAsBase64 = (url: string): Promise<string> => {
-          return new Promise((resolve, reject) => {
-            const img = new Image();
-            img.crossOrigin = 'anonymous';
-            img.onload = () => {
-              const canvas = document.createElement('canvas');
-              canvas.width = img.width;
-              canvas.height = img.height;
-              const ctx = canvas.getContext('2d');
-              if (ctx) {
-                ctx.drawImage(img, 0, 0);
-                resolve(canvas.toDataURL('image/jpeg', 0.8));
-              } else {
-                reject(new Error('Could not get canvas context'));
-              }
-            };
-            img.onerror = reject;
-            img.src = url;
-          });
-        };
-
+      // Try to load and embed the receipt image
+      if (!data.receiptUrl.endsWith('.pdf')) {
         try {
-          const base64Image = await loadImageAsBase64(data.receiptUrl);
-          const maxWidth = pageWidth - 2 * margin;
-          const maxHeight = 70; // Max height for receipt in PDF
-          
-          // Get image dimensions from base64
-          const img = new Image();
-          await new Promise((resolve, reject) => {
-            img.onload = resolve;
-            img.onerror = reject;
-            img.src = base64Image;
-          });
-          
-          let imgWidth = img.width;
-          let imgHeight = img.height;
-          
-          // Scale to fit
-          if (imgWidth > maxWidth) {
-            const ratio = maxWidth / imgWidth;
-            imgWidth = maxWidth;
-            imgHeight = imgHeight * ratio;
+          // Load image and convert to base64 for PDF embedding
+          const loadImageAsBase64 = (url: string): Promise<string> => {
+            return new Promise((resolve, reject) => {
+              const img = new Image();
+              img.crossOrigin = 'anonymous';
+              img.onload = () => {
+                try {
+                  const canvas = document.createElement('canvas');
+                  canvas.width = img.width;
+                  canvas.height = img.height;
+                  const ctx = canvas.getContext('2d');
+                  if (ctx) {
+                    ctx.drawImage(img, 0, 0);
+                    const base64 = canvas.toDataURL('image/jpeg', 0.8);
+                    resolve(base64);
+                  } else {
+                    reject(new Error('Could not get canvas context'));
+                  }
+                } catch (err) {
+                  reject(err);
+                }
+              };
+              img.onerror = () => reject(new Error('Failed to load image'));
+              img.src = url;
+            });
+          };
+
+          try {
+            const base64Image = await loadImageAsBase64(data.receiptUrl);
+            const maxWidth = pageWidth - 2 * margin;
+            const maxHeight = 70; // Max height for receipt in PDF
+            
+            // Get image dimensions from base64
+            const img = new Image();
+            await new Promise<void>((resolve, reject) => {
+              img.onload = () => resolve();
+              img.onerror = () => reject(new Error('Failed to load image for dimensions'));
+              img.src = base64Image;
+            });
+            
+            let imgWidth = img.width;
+            let imgHeight = img.height;
+            
+            // Scale to fit
+            if (imgWidth > maxWidth) {
+              const ratio = maxWidth / imgWidth;
+              imgWidth = maxWidth;
+              imgHeight = imgHeight * ratio;
+            }
+            if (imgHeight > maxHeight) {
+              const ratio = maxHeight / imgHeight;
+              imgHeight = maxHeight;
+              imgWidth = imgWidth * ratio;
+            }
+            
+            // Add image to PDF
+            doc.addImage(
+              base64Image,
+              'JPEG',
+              margin,
+              yPos,
+              imgWidth,
+              imgHeight
+            );
+            yPos += imgHeight + 10;
+          } catch (imgError) {
+            // If image loading fails, just show the URL
+            doc.setFontSize(9);
+            doc.setTextColor(100, 100, 100);
+            doc.setFont('helvetica', 'normal');
+            doc.text('Reçu disponible à:', margin, yPos);
+            yPos += 5;
+            const urlLines = doc.splitTextToSize(data.receiptUrl, pageWidth - 2 * margin);
+            doc.text(urlLines, margin, yPos);
+            yPos += urlLines.length * 5 + 5;
+            doc.setFontSize(10);
+            doc.setTextColor(0, 0, 0);
           }
-          if (imgHeight > maxHeight) {
-            const ratio = maxHeight / imgHeight;
-            imgHeight = maxHeight;
-            imgWidth = imgWidth * ratio;
-          }
-          
-          // Add image to PDF
-          doc.addImage(
-            base64Image,
-            'JPEG',
-            margin,
-            yPos,
-            imgWidth,
-            imgHeight
-          );
-          yPos += imgHeight + 10;
-        } catch (imgError) {
-          // If image loading fails, just show the URL
+        } catch (error) {
+          // Fallback: just show text
           doc.setFontSize(9);
           doc.setTextColor(100, 100, 100);
           doc.setFont('helvetica', 'normal');
-          doc.text('Reçu disponible à:', margin, yPos);
+          doc.text('Reçu disponible (voir URL ci-dessous)', margin, yPos);
           yPos += 5;
           const urlLines = doc.splitTextToSize(data.receiptUrl, pageWidth - 2 * margin);
           doc.text(urlLines, margin, yPos);
@@ -364,19 +378,6 @@ export const generateBookingPDF = async (data: BookingPDFData): Promise<void> =>
           doc.setFontSize(10);
           doc.setTextColor(0, 0, 0);
         }
-      } catch (error) {
-        // Fallback: just show text
-        doc.setFontSize(9);
-        doc.setTextColor(100, 100, 100);
-        doc.setFont('helvetica', 'normal');
-        doc.text('Reçu disponible (voir URL ci-dessous)', margin, yPos);
-        yPos += 5;
-        const urlLines = doc.splitTextToSize(data.receiptUrl, pageWidth - 2 * margin);
-        doc.text(urlLines, margin, yPos);
-        yPos += urlLines.length * 5 + 5;
-        doc.setFontSize(10);
-        doc.setTextColor(0, 0, 0);
-      }
     } else {
       // PDF receipt - just show link text
       doc.setFontSize(9);
