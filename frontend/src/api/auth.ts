@@ -1,4 +1,5 @@
 import { apiClient } from './client';
+import { connectionManager } from '../utils/connectionManager';
 
 export interface LoginCredentials {
   email: string;
@@ -30,7 +31,12 @@ export const authApi = {
   login: async (credentials: LoginCredentials) => {
     try {
       console.log('Sending login request to:', `${apiClient.defaults.baseURL}/auth/login`);
-      const response = await apiClient.post('/auth/login', credentials);
+      
+      // Use connection manager to retry on connection errors
+      const response = await connectionManager.retryRequest(() =>
+        apiClient.post('/auth/login', credentials)
+      );
+      
       console.log('Login response received:', { 
         hasToken: !!response.data.accessToken, 
         hasUser: !!response.data.user 
@@ -54,12 +60,21 @@ export const authApi = {
         console.error('Server error response:', error.response.data);
         const errorMessage = error.response.data?.error || error.response.data?.message || 'Erreur lors de la connexion';
         throw new Error(errorMessage);
-      } else if (error.request) {
-        // Request made but no response
+      } else if (error.request || error.code === 'ECONNREFUSED' || error.code === 'ETIMEDOUT' || error.message?.includes('Network Error')) {
+        // Request made but no response - connection issue
         console.error('No response received from server');
         const apiUrl = apiClient.defaults.baseURL || 'non configuré';
         const isProduction = import.meta.env.PROD;
-        let errorMessage = `Impossible de se connecter au serveur backend (${apiUrl}).`;
+        
+        // Check connection status
+        const status = connectionManager.getStatus();
+        let errorMessage = 'Impossible de se connecter au serveur backend.';
+        
+        if (status.isChecking) {
+          errorMessage += ' Vérification de la connexion en cours...';
+        } else if (!status.isConnected) {
+          errorMessage += ' Le serveur semble être hors ligne.';
+        }
         
         if (isProduction && apiUrl.includes('localhost')) {
           errorMessage += '\n\n⚠️ La variable d\'environnement VITE_API_URL n\'est pas configurée sur Vercel.';
@@ -72,6 +87,7 @@ export const authApi = {
           errorMessage += '\n- Le serveur backend est démarré';
           errorMessage += '\n- L\'URL est correctement configurée';
           errorMessage += '\n- CORS est configuré pour accepter les requêtes depuis ce domaine';
+          errorMessage += '\n\nLa connexion sera réessayée automatiquement.';
         }
         
         throw new Error(errorMessage);
@@ -96,7 +112,12 @@ export const authApi = {
         : {};
 
       console.log('Sending register request to:', `${apiClient.defaults.baseURL}/auth/register`);
-      const response = await apiClient.post('/auth/register', data, config);
+      
+      // Use connection manager to retry on connection errors
+      const response = await connectionManager.retryRequest(() =>
+        apiClient.post('/auth/register', data, config)
+      );
+      
       if (response.data.accessToken) {
         localStorage.setItem('accessToken', response.data.accessToken);
       }
@@ -111,12 +132,21 @@ export const authApi = {
         console.error('Server error response:', error.response.data);
         const errorMessage = error.response.data?.error || error.response.data?.message || 'Erreur lors de l\'inscription';
         throw new Error(errorMessage);
-      } else if (error.request) {
-        // Request made but no response
+      } else if (error.request || error.code === 'ECONNREFUSED' || error.code === 'ETIMEDOUT' || error.message?.includes('Network Error')) {
+        // Request made but no response - connection issue
         console.error('No response received from server');
         const apiUrl = apiClient.defaults.baseURL || 'non configuré';
         const isProduction = import.meta.env.PROD;
-        let errorMessage = `Impossible de se connecter au serveur backend (${apiUrl}).`;
+        
+        // Check connection status
+        const status = connectionManager.getStatus();
+        let errorMessage = 'Impossible de se connecter au serveur backend.';
+        
+        if (status.isChecking) {
+          errorMessage += ' Vérification de la connexion en cours...';
+        } else if (!status.isConnected) {
+          errorMessage += ' Le serveur semble être hors ligne.';
+        }
         
         if (isProduction && apiUrl.includes('localhost')) {
           errorMessage += '\n\n⚠️ La variable d\'environnement VITE_API_URL n\'est pas configurée sur Vercel.';
@@ -129,6 +159,7 @@ export const authApi = {
           errorMessage += '\n- Le serveur backend est démarré';
           errorMessage += '\n- L\'URL est correctement configurée';
           errorMessage += '\n- CORS est configuré pour accepter les requêtes depuis ce domaine';
+          errorMessage += '\n\nLa connexion sera réessayée automatiquement.';
         }
         
         throw new Error(errorMessage);

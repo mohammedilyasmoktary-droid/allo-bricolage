@@ -5,6 +5,7 @@ import Layout from './components/Layout';
 import DashboardLayout from './components/DashboardLayout';
 import ConditionalLayout from './components/ConditionalLayout';
 import NotificationPopup from './components/NotificationPopup';
+import ConnectionStatusIndicator from './components/ConnectionStatus';
 import HomePage from './pages/HomePage';
 import LoginPage from './pages/LoginPage';
 import RegisterPage from './pages/RegisterPage';
@@ -65,6 +66,7 @@ const ProtectedRoute: React.FC<{ children: React.ReactNode; allowedRoles?: strin
 function App() {
   return (
     <>
+      <ConnectionStatusIndicator position="top-right" />
       <NotificationPopup />
       <Routes>
       <Route path="/login" element={<LoginPage />} />

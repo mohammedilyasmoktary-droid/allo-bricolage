@@ -1,4 +1,5 @@
 import axios from 'axios';
+import { connectionManager } from '../utils/connectionManager';
 
 const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5001/api';
 
@@ -17,7 +18,7 @@ export const apiClient = axios.create({
     'Content-Type': 'application/json',
   },
   withCredentials: true,
-  timeout: 10000, // 10 second timeout
+  timeout: 15000, // 15 second timeout (increased for better reliability)
 });
 
 // Request interceptor to add auth token
@@ -34,9 +35,15 @@ apiClient.interceptors.request.use(
   }
 );
 
-// Response interceptor to handle token refresh
+// Response interceptor to handle token refresh and connection errors
 apiClient.interceptors.response.use(
-  (response) => response,
+  (response) => {
+    // Mark connection as healthy on successful response
+    connectionManager.checkConnection().catch(() => {
+      // Silently handle check errors
+    });
+    return response;
+  },
   async (error) => {
     const originalRequest = error.config;
 
@@ -45,6 +52,27 @@ apiClient.interceptors.response.use(
       return Promise.reject(error);
     }
 
+    // Handle connection errors with automatic retry
+    const isConnectionError =
+      error.code === 'ECONNREFUSED' ||
+      error.code === 'ETIMEDOUT' ||
+      error.message?.includes('Network Error') ||
+      error.message?.includes('ERR_NETWORK') ||
+      error.message?.includes('timeout') ||
+      !error.response;
+
+    if (isConnectionError && !originalRequest._connectionRetry) {
+      originalRequest._connectionRetry = true;
+      
+      // Try to check connection and retry once
+      const isConnected = await connectionManager.checkConnection();
+      if (isConnected) {
+        // Connection is back, retry the request
+        return apiClient(originalRequest);
+      }
+    }
+
+    // Handle 401 errors with token refresh
     if (error.response?.status === 401 && !originalRequest._retry) {
       originalRequest._retry = true;
 
