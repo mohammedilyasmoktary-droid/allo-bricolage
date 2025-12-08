@@ -387,16 +387,35 @@ const PaymentPage: React.FC = () => {
               }}
             >
               <CardContent sx={{ p: 4 }}>
-                <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 3 }}>
+                <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 2 }}>
                   <LockIcon sx={{ color: '#F4C542', fontSize: 28 }} />
                   <Typography variant="h5" sx={{ fontWeight: 700, color: '#032B5A' }}>
                     Méthode de paiement
                   </Typography>
                 </Box>
 
-              <Typography variant="body2" color="text.secondary" sx={{ mb: 3, ml: 6 }}>
-                Sélectionnez votre méthode de paiement préférée
-              </Typography>
+              <Alert
+                severity="info"
+                icon={<AttachMoneyIcon />}
+                sx={{
+                  mb: 3,
+                  borderRadius: 2,
+                  bgcolor: '#fffbf0',
+                  border: '2px solid #F4C542',
+                  '& .MuiAlert-icon': {
+                    color: '#F4C542',
+                  },
+                }}
+              >
+                <Typography variant="body1" sx={{ fontWeight: 700, color: '#032B5A', mb: 0.5 }}>
+                  Montant à payer: {finalPrice.toFixed(2)} MAD
+                </Typography>
+                <Typography variant="body2" sx={{ color: '#032B5A' }}>
+                  {booking.finalPrice 
+                    ? 'Le technicien a finalisé le service. Veuillez procéder au paiement.'
+                    : 'Sélectionnez votre méthode de paiement préférée.'}
+                </Typography>
+              </Alert>
 
               <Grid container spacing={2}>
                 {paymentMethods.map((method) => (

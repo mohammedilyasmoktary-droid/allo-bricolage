@@ -1052,14 +1052,20 @@ const TechnicianJobs: React.FC = () => {
             </Alert>
           )}
           <Alert severity="info" sx={{ mb: 3, borderRadius: 2 }}>
-            Veuillez entrer le prix final facturé au client. Ce montant sera utilisé pour le paiement.
+            <Typography variant="body2" sx={{ fontWeight: 600, mb: 1 }}>
+              💰 Montant à payer par le client
+            </Typography>
+            <Typography variant="body2">
+              Entrez le montant total que le client doit payer pour ce service. Une fois confirmé, le client recevra une notification et pourra procéder au paiement.
+            </Typography>
           </Alert>
           <TextField
             fullWidth
-            label="Prix final (MAD)"
+            label="Montant à payer par le client (MAD)"
             type="number"
             value={finalPrice}
             onChange={(e) => setFinalPrice(e.target.value)}
+            required
             InputProps={{
               startAdornment: (
                 <InputAdornment position="start">
@@ -1072,7 +1078,15 @@ const TechnicianJobs: React.FC = () => {
                 borderRadius: 2,
               },
             }}
-            helperText={selectedBooking?.estimatedPrice ? `Prix estimé: ${selectedBooking.estimatedPrice} MAD` : ''}
+            helperText={
+              selectedBooking?.estimatedPrice 
+                ? `Prix estimé initial: ${selectedBooking.estimatedPrice} MAD` 
+                : 'Entrez le montant total à facturer au client'
+            }
+            inputProps={{
+              min: 0,
+              step: 0.01,
+            }}
           />
         </DialogContent>
         <DialogActions sx={{ p: 3, bgcolor: '#f5f5f5' }}>
@@ -1091,17 +1105,19 @@ const TechnicianJobs: React.FC = () => {
           <Button
             onClick={handleCompleteSubmit}
             variant="contained"
+            disabled={!finalPrice || parseFloat(finalPrice) <= 0}
             sx={{
               bgcolor: '#4caf50',
               color: 'white',
               '&:hover': { bgcolor: '#388e3c' },
+              '&:disabled': { bgcolor: '#cccccc', color: '#666666' },
               textTransform: 'none',
               borderRadius: 2,
               px: 4,
               fontWeight: 600,
             }}
           >
-            Confirmer
+            ✓ Confirmer le montant et finaliser
           </Button>
         </DialogActions>
       </Dialog>
