@@ -52,6 +52,8 @@ const TechnicianDashboard: React.FC = () => {
   const [bookings, setBookings] = useState<Booking[]>([]);
   const [subscriptionStatus, setSubscriptionStatus] = useState<any>(null);
   const [loading, setLoading] = useState(true);
+  const [jobsPanelOpen, setJobsPanelOpen] = useState(true);
+  const [selectedJob, setSelectedJob] = useState<Booking | null>(null);
 
   useEffect(() => {
     loadDashboardData();
