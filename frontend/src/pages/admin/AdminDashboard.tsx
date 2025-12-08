@@ -10,6 +10,19 @@ import {
   Divider,
   Chip,
   LinearProgress,
+  Drawer,
+  List,
+  ListItem,
+  ListItemText,
+  ListItemButton,
+  IconButton,
+  Select,
+  MenuItem,
+  FormControl,
+  InputLabel,
+  Button,
+  Paper,
+  Collapse,
 } from '@mui/material';
 import { adminApi } from '../../api/admin';
 import { bookingsApi } from '../../api/bookings';
@@ -34,6 +47,9 @@ import TableContainer from '@mui/material/TableContainer';
 import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
 import Paper from '@mui/material/Paper';
+import CloseIcon from '@mui/icons-material/Close';
+import EditIcon from '@mui/icons-material/Edit';
+import SaveIcon from '@mui/icons-material/Save';
 
 interface ClientStats {
   totalClients: number;
@@ -59,6 +75,9 @@ interface TechnicianStats {
 const AdminDashboard: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+  const [ordersPanelOpen, setOrdersPanelOpen] = useState(true);
+  const [bookings, setBookings] = useState<any[]>([]);
+  const [selectedBooking, setSelectedBooking] = useState<any | null>(null);
   const [clientStats, setClientStats] = useState<ClientStats>({
     totalClients: 0,
     activeClients: 0,
@@ -94,6 +113,10 @@ const AdminDashboard: React.FC = () => {
     setLoading(true);
     setError('');
     try {
+      // Load bookings for orders panel
+      const bookingsData = await adminApi.getBookings();
+      setBookings(bookingsData.slice(0, 20)); // Show latest 20 bookings
+      
       // Get overall stats
       const stats = await adminApi.getStats();
       setOverallStats({
@@ -197,15 +220,114 @@ const AdminDashboard: React.FC = () => {
 
   return (
     <Box sx={{ maxWidth: 1400, mx: 'auto', py: 4, p: { xs: 2, md: 0 } }}>
-      {/* Header */}
-      <Box sx={{ mb: 4 }}>
-        <Typography variant="h4" component="h1" gutterBottom sx={{ fontWeight: 700, color: '#032B5A' }}>
-          Tableau de Bord Administrateur
-        </Typography>
-        <Typography variant="body1" color="text.secondary">
-          Vue d'ensemble complète de la plateforme Allo Bricolage
-        </Typography>
-      </Box>
+      <Box sx={{ display: 'flex', gap: 3 }}>
+        {/* Left Panel - Orders Management */}
+        <Drawer
+          variant="persistent"
+          anchor="left"
+          open={ordersPanelOpen}
+          sx={{
+            width: ordersPanelOpen ? 380 : 0,
+            flexShrink: 0,
+            '& .MuiDrawer-paper': {
+              width: 380,
+              boxSizing: 'border-box',
+              position: 'relative',
+              height: 'auto',
+              borderRight: '1px solid #e0e0e0',
+              bgcolor: '#fafbfc',
+            },
+          }}
+        >
+          <Box sx={{ p: 2, borderBottom: '1px solid #e0e0e0', bgcolor: '#032B5A', color: 'white' }}>
+            <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 1 }}>
+              <Typography variant="h6" sx={{ fontWeight: 700 }}>
+                Gestion des Commandes
+              </Typography>
+              <IconButton
+                size="small"
+                onClick={() => setOrdersPanelOpen(false)}
+                sx={{ color: 'white' }}
+              >
+                <CloseIcon />
+              </IconButton>
+            </Box>
+            <Typography variant="caption" sx={{ opacity: 0.9 }}>
+              {bookings.length} commandes récentes
+            </Typography>
+          </Box>
+          <Box sx={{ overflowY: 'auto', maxHeight: 'calc(100vh - 120px)' }}>
+            <List sx={{ p: 1 }}>
+              {bookings.map((booking) => (
+                <ListItem key={booking.id} disablePadding sx={{ mb: 1 }}>
+                  <Paper
+                    sx={{
+                      width: '100%',
+                      p: 2,
+                      borderRadius: 2,
+                      border: selectedBooking?.id === booking.id ? '2px solid #F4C542' : '1px solid #e0e0e0',
+                      bgcolor: selectedBooking?.id === booking.id ? '#fffbf0' : 'white',
+                      cursor: 'pointer',
+                      '&:hover': {
+                        borderColor: '#F4C542',
+                        bgcolor: '#fffbf0',
+                      },
+                    }}
+                    onClick={() => setSelectedBooking(booking)}
+                  >
+                    <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 1 }}>
+                      <Typography variant="subtitle2" sx={{ fontWeight: 700, color: '#032B5A' }}>
+                        {booking.category?.name || 'Service'}
+                      </Typography>
+                      <Chip
+                        label={booking.status === 'PENDING' ? 'En attente' : 
+                               booking.status === 'ACCEPTED' ? 'Accepté' :
+                               booking.status === 'COMPLETED' ? 'Terminé' : booking.status}
+                        size="small"
+                        color={booking.status === 'COMPLETED' ? 'success' : 
+                               booking.status === 'PENDING' ? 'warning' : 'default'}
+                        sx={{ fontSize: '0.7rem', height: 20 }}
+                      />
+                    </Box>
+                    <Typography variant="caption" color="text.secondary" sx={{ display: 'block', mb: 1 }}>
+                      {booking.client?.name || 'Client'} • {booking.city}
+                    </Typography>
+                    <Typography variant="caption" sx={{ fontWeight: 600, color: '#F4C542' }}>
+                      {booking.finalPrice || booking.estimatedPrice || 0} MAD
+                    </Typography>
+                  </Paper>
+                </ListItem>
+              ))}
+            </List>
+          </Box>
+        </Drawer>
+
+        {/* Main Content */}
+        <Box sx={{ flex: 1, minWidth: 0 }}>
+          {/* Header */}
+          <Box sx={{ mb: 4, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+            <Box>
+              <Typography variant="h4" component="h1" gutterBottom sx={{ fontWeight: 700, color: '#032B5A' }}>
+                Tableau de Bord Administrateur
+              </Typography>
+              <Typography variant="body1" color="text.secondary">
+                Vue d'ensemble complète de la plateforme Allo Bricolage
+              </Typography>
+            </Box>
+            {!ordersPanelOpen && (
+              <Button
+                variant="contained"
+                onClick={() => setOrdersPanelOpen(true)}
+                sx={{
+                  bgcolor: '#032B5A',
+                  '&:hover': { bgcolor: '#021d3f' },
+                  textTransform: 'none',
+                }}
+              >
+                Ouvrir les commandes
+              </Button>
+            )}
+          </Box>
 
       {/* Overall Platform Stats */}
       <Grid container spacing={3} sx={{ mb: 4 }}>
@@ -777,6 +899,86 @@ const AdminDashboard: React.FC = () => {
             </Table>
           </TableContainer>
         )}
+
+          {/* Order Edit Dialog */}
+          {selectedBooking && (
+            <Paper
+              sx={{
+                position: 'fixed',
+                bottom: 20,
+                right: ordersPanelOpen ? 400 : 20,
+                width: 350,
+                p: 3,
+                borderRadius: 3,
+                boxShadow: '0 8px 32px rgba(0,0,0,0.2)',
+                zIndex: 1000,
+                bgcolor: 'white',
+                border: '2px solid #F4C542',
+              }}
+            >
+              <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 2 }}>
+                <Typography variant="h6" sx={{ fontWeight: 700, color: '#032B5A' }}>
+                  Modifier la commande
+                </Typography>
+                <IconButton size="small" onClick={() => setSelectedBooking(null)}>
+                  <CloseIcon />
+                </IconButton>
+              </Box>
+              <Divider sx={{ mb: 2 }} />
+              <Box sx={{ mb: 2 }}>
+                <Typography variant="body2" sx={{ fontWeight: 600, mb: 1, color: '#032B5A' }}>
+                  Client: {selectedBooking.client?.name}
+                </Typography>
+                <Typography variant="body2" sx={{ fontWeight: 600, mb: 1, color: '#032B5A' }}>
+                  Service: {selectedBooking.category?.name}
+                </Typography>
+                <Typography variant="body2" sx={{ fontWeight: 600, mb: 2, color: '#032B5A' }}>
+                  Prix: {selectedBooking.finalPrice || selectedBooking.estimatedPrice || 0} MAD
+                </Typography>
+              </Box>
+              <FormControl fullWidth sx={{ mb: 2 }}>
+                <InputLabel>Statut</InputLabel>
+                <Select
+                  value={selectedBooking.status}
+                  label="Statut"
+                  onChange={(e) => setSelectedBooking({ ...selectedBooking, status: e.target.value })}
+                >
+                  <MenuItem value="PENDING">En attente</MenuItem>
+                  <MenuItem value="ACCEPTED">Accepté</MenuItem>
+                  <MenuItem value="ON_THE_WAY">En route</MenuItem>
+                  <MenuItem value="IN_PROGRESS">En cours</MenuItem>
+                  <MenuItem value="AWAITING_PAYMENT">En attente de paiement</MenuItem>
+                  <MenuItem value="COMPLETED">Terminé</MenuItem>
+                  <MenuItem value="CANCELLED">Annulé</MenuItem>
+                  <MenuItem value="DECLINED">Refusé</MenuItem>
+                </Select>
+              </FormControl>
+              <Button
+                fullWidth
+                variant="contained"
+                startIcon={<SaveIcon />}
+                onClick={async () => {
+                  try {
+                    await bookingsApi.updateStatus(selectedBooking.id, { status: selectedBooking.status });
+                    await loadDashboardData();
+                    setSelectedBooking(null);
+                  } catch (error) {
+                    console.error('Failed to update booking status:', error);
+                  }
+                }}
+                sx={{
+                  bgcolor: '#F4C542',
+                  color: '#032B5A',
+                  '&:hover': { bgcolor: '#e0b038' },
+                  textTransform: 'none',
+                  fontWeight: 600,
+                }}
+              >
+                Enregistrer
+              </Button>
+            </Paper>
+          )}
+        </Box>
       </Box>
     </Box>
   );

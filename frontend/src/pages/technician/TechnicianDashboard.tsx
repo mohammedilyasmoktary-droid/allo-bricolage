@@ -14,6 +14,13 @@ import {
   Divider,
   Paper,
   Alert,
+  Drawer,
+  List,
+  ListItem,
+  ListItemText,
+  ListItemButton,
+  IconButton,
+  ListItemIcon,
 } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
@@ -32,6 +39,11 @@ import PersonIcon from '@mui/icons-material/Person';
 import AttachMoneyIcon from '@mui/icons-material/AttachMoney';
 import EditIcon from '@mui/icons-material/Edit';
 import BuildIcon from '@mui/icons-material/Build';
+import CloseIcon from '@mui/icons-material/Close';
+import VisibilityIcon from '@mui/icons-material/Visibility';
+import DeleteIcon from '@mui/icons-material/Delete';
+import CheckCircleIcon from '@mui/icons-material/CheckCircle';
+import CancelIcon from '@mui/icons-material/Cancel';
 
 const TechnicianDashboard: React.FC = () => {
   const navigate = useNavigate();
@@ -498,6 +510,98 @@ const TechnicianDashboard: React.FC = () => {
           </Card>
         </Grid>
       </Grid>
+
+          {/* Job Actions Dialog */}
+          {selectedJob && (
+            <Paper
+              sx={{
+                position: 'fixed',
+                bottom: 20,
+                right: jobsPanelOpen ? 400 : 20,
+                width: 350,
+                p: 3,
+                borderRadius: 3,
+                boxShadow: '0 8px 32px rgba(0,0,0,0.2)',
+                zIndex: 1000,
+                bgcolor: 'white',
+                border: '2px solid #F4C542',
+              }}
+            >
+              <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 2 }}>
+                <Typography variant="h6" sx={{ fontWeight: 700, color: '#032B5A' }}>
+                  Actions Mission
+                </Typography>
+                <IconButton size="small" onClick={() => setSelectedJob(null)}>
+                  <CloseIcon />
+                </IconButton>
+              </Box>
+              <Divider sx={{ mb: 2 }} />
+              <Box sx={{ mb: 2 }}>
+                <Typography variant="body2" sx={{ fontWeight: 600, mb: 1, color: '#032B5A' }}>
+                  Client: {selectedJob.client?.name}
+                </Typography>
+                <Typography variant="body2" sx={{ fontWeight: 600, mb: 1, color: '#032B5A' }}>
+                  Service: {selectedJob.category?.name}
+                </Typography>
+                <Typography variant="body2" sx={{ fontWeight: 600, mb: 1, color: '#032B5A' }}>
+                  Statut: {getStatusLabel(selectedJob.status)}
+                </Typography>
+                <Typography variant="body2" sx={{ fontWeight: 600, mb: 2, color: '#032B5A' }}>
+                  Prix: {selectedJob.finalPrice || selectedJob.estimatedPrice || 0} MAD
+                </Typography>
+              </Box>
+              <Button
+                fullWidth
+                variant="contained"
+                startIcon={<VisibilityIcon />}
+                onClick={() => {
+                  navigate(`/technician/jobs`);
+                  setSelectedJob(null);
+                }}
+                sx={{
+                  bgcolor: '#032B5A',
+                  color: 'white',
+                  '&:hover': { bgcolor: '#021d3f' },
+                  textTransform: 'none',
+                  fontWeight: 600,
+                  mb: 1,
+                }}
+              >
+                Voir les détails
+              </Button>
+              <FormControlLabel
+                control={
+                  <Switch
+                    checked={isOnline}
+                    onChange={handleToggleOnline}
+                    color="primary"
+                  />
+                }
+                label={isOnline ? 'En ligne' : 'Hors ligne'}
+                sx={{ mb: 2, width: '100%', justifyContent: 'space-between' }}
+              />
+              <Button
+                fullWidth
+                variant="outlined"
+                startIcon={isOnline ? <CancelIcon /> : <CheckCircleIcon />}
+                onClick={handleToggleOnline}
+                sx={{
+                  borderColor: isOnline ? '#dc3545' : '#4caf50',
+                  color: isOnline ? '#dc3545' : '#4caf50',
+                  '&:hover': {
+                    borderColor: isOnline ? '#c82333' : '#388e3c',
+                    bgcolor: isOnline ? 'rgba(220, 53, 69, 0.05)' : 'rgba(76, 175, 80, 0.05)',
+                  },
+                  textTransform: 'none',
+                  fontWeight: 600,
+                }}
+              >
+                {isOnline ? 'Désactiver disponibilité' : 'Activer disponibilité'}
+              </Button>
+            </Paper>
+          )}
+        </Box>
+      </Box>
     </Box>
   );
 };
