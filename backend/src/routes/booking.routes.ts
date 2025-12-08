@@ -652,10 +652,10 @@ router.patch(
 
       if (actualNewStatus === 'AWAITING_PAYMENT') {
         notificationType = 'BOOKING_COMPLETED';
-        const finalPriceAmount = updateData.finalPrice || updated.finalPrice;
+        const finalPriceAmount = parsedFinalPrice || updateData.finalPrice || updated.finalPrice;
         notificationMessage = finalPriceAmount
-          ? `Le service a été complété par ${updated.technician?.name}. Montant à payer: ${finalPriceAmount} MAD. Veuillez procéder au paiement.`
-          : `Le service a été complété par ${updated.technician?.name}. Veuillez procéder au paiement.`;
+          ? `Le service a été complété par ${updated.technician?.name || 'le technicien'}. Montant à payer: ${finalPriceAmount} MAD. Veuillez procéder au paiement.`
+          : `Le service a été complété par ${updated.technician?.name || 'le technicien'}. Veuillez procéder au paiement.`;
       } else if (status === 'ON_THE_WAY') {
         notificationType = 'BOOKING_ON_THE_WAY';
         notificationMessage = `${updated.technician?.name} est en route vers votre adresse.`;
