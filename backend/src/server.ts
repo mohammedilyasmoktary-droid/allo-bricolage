@@ -13,6 +13,7 @@ import { reviewRouter } from './routes/review.routes';
 import { adminRouter } from './routes/admin.routes';
 import { notificationRouter } from './routes/notification.routes';
 import { subscriptionRouter } from './routes/subscription.routes';
+import messageRouter from './routes/message.routes';
 import { applyReceiptColumnsMigration } from './utils/migration';
 
 dotenv.config();
@@ -114,6 +115,7 @@ app.use('/api/reviews', reviewRouter);
 app.use('/api/admin', adminRouter);
 app.use('/api/notifications', notificationRouter);
 app.use('/api/subscriptions', subscriptionRouter);
+app.use('/api/messages', messageRouter);
 app.use('/api/files', fileRouter);
 
 // Error handling middleware
