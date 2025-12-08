@@ -1230,17 +1230,31 @@ const TechnicianJobs: React.FC = () => {
                     {selectedBooking.description}
                   </Typography>
                 </Paper>
-                {/* Payment Receipt Display */}
-                {selectedBooking.receiptUrl && selectedBooking.paymentStatus === 'PENDING' && (
+                {/* Payment Receipt Display - Show for all payment statuses if receipt exists */}
+                {selectedBooking.receiptUrl && (
                   <Box sx={{ mt: 3 }}>
-                    <Paper sx={{ p: 2, bgcolor: '#fffbf0', borderRadius: 2, border: '2px solid #ff9800' }}>
-                      <Typography variant="subtitle2" sx={{ fontWeight: 700, color: '#f57c00', mb: 1, display: 'flex', alignItems: 'center', gap: 1 }}>
+                    <Paper 
+                      sx={{ 
+                        p: 2, 
+                        bgcolor: selectedBooking.paymentStatus === 'PENDING' ? '#fffbf0' : '#f8f9fa',
+                        borderRadius: 2, 
+                        border: selectedBooking.paymentStatus === 'PENDING' ? '2px solid #ff9800' : '1px solid #e0e0e0'
+                      }}
+                    >
+                      <Typography variant="subtitle2" sx={{ fontWeight: 700, color: selectedBooking.paymentStatus === 'PENDING' ? '#f57c00' : '#032B5A', mb: 1, display: 'flex', alignItems: 'center', gap: 1 }}>
                         <ReceiptIcon sx={{ fontSize: 20 }} />
-                        Reçu de Paiement Uploadé
+                        {selectedBooking.paymentStatus === 'PENDING' ? 'Reçu de Paiement Uploadé' : 'Reçu de Paiement'}
                       </Typography>
-                      <Typography variant="body2" sx={{ color: '#032B5A', mb: 2 }}>
-                        Le client a uploadé un reçu. Veuillez vérifier et confirmer le paiement.
-                      </Typography>
+                      {selectedBooking.paymentStatus === 'PENDING' && (
+                        <Typography variant="body2" sx={{ color: '#032B5A', mb: 2 }}>
+                          Le client a uploadé un reçu. Veuillez vérifier et confirmer le paiement.
+                        </Typography>
+                      )}
+                      {selectedBooking.paymentStatus === 'PAID' && (
+                        <Typography variant="body2" sx={{ color: '#032B5A', mb: 2 }}>
+                          Reçu de paiement confirmé.
+                        </Typography>
+                      )}
                       {selectedBooking.receiptUrl.endsWith('.pdf') ? (
                         <Button
                           variant="outlined"
@@ -1249,12 +1263,12 @@ const TechnicianJobs: React.FC = () => {
                           rel="noopener noreferrer"
                           startIcon={<PictureAsPdfIcon />}
                           sx={{
-                            borderColor: '#ff9800',
-                            color: '#f57c00',
+                            borderColor: selectedBooking.paymentStatus === 'PENDING' ? '#ff9800' : '#032B5A',
+                            color: selectedBooking.paymentStatus === 'PENDING' ? '#f57c00' : '#032B5A',
                             textTransform: 'none',
                             '&:hover': {
-                              borderColor: '#f57c00',
-                              bgcolor: 'rgba(255, 152, 0, 0.1)',
+                              borderColor: selectedBooking.paymentStatus === 'PENDING' ? '#f57c00' : '#021d3f',
+                              bgcolor: selectedBooking.paymentStatus === 'PENDING' ? 'rgba(255, 152, 0, 0.1)' : 'rgba(3, 43, 90, 0.05)',
                             },
                           }}
                         >
@@ -1267,7 +1281,12 @@ const TechnicianJobs: React.FC = () => {
                             borderRadius: 2,
                             overflow: 'hidden',
                             mt: 1,
+                            cursor: 'pointer',
+                            '&:hover': {
+                              borderColor: '#F4C542',
+                            },
                           }}
+                          onClick={() => window.open(selectedBooking.receiptUrl, '_blank')}
                         >
                           <img
                             src={selectedBooking.receiptUrl}
@@ -1280,6 +1299,11 @@ const TechnicianJobs: React.FC = () => {
                             }}
                           />
                         </Box>
+                      )}
+                      {selectedBooking.transactionId && (
+                        <Typography variant="caption" sx={{ color: '#666', mt: 1, display: 'block' }}>
+                          ID de transaction: {selectedBooking.transactionId}
+                        </Typography>
                       )}
                     </Paper>
                   </Box>
