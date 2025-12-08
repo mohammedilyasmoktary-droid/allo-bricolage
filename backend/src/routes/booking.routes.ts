@@ -962,13 +962,32 @@ router.patch(
         });
 
         // Notify client
+        const paymentConfirmedMessage = 'Le paiement a été confirmé par le technicien. Merci !';
+        
         await prisma.notification.create({
           data: {
             userId: booking.clientId,
             type: 'PAYMENT_CONFIRMED',
-            message: 'Your cash payment has been confirmed by the technician',
+            message: paymentConfirmedMessage,
           },
         });
+
+        // Create automatic chat message for payment confirmation
+        if (booking.technicianId && booking.clientId) {
+          try {
+            await prisma.chatMessage.create({
+              data: {
+                bookingId: booking.id,
+                senderId: booking.technicianId,
+                receiverId: booking.clientId,
+                message: paymentConfirmedMessage,
+                messageType: 'TEXT',
+              },
+            });
+          } catch (messageError) {
+            console.error('Failed to create payment confirmation message:', messageError);
+          }
+        }
 
         res.json(updated);
       } else if (booking.paymentMethod === 'WAFACASH' || booking.paymentMethod === 'BANK_TRANSFER') {
@@ -1002,13 +1021,32 @@ router.patch(
         });
 
         // Notify client
-        await prisma.notification.create({
-          data: {
-            userId: booking.clientId,
-            type: 'PAYMENT_CONFIRMED',
-            message: 'Your payment receipt has been verified and confirmed',
-          },
-        });
+            const paymentVerifiedMessage = 'Le paiement a été confirmé par le technicien. Merci !';
+            
+            await prisma.notification.create({
+              data: {
+                userId: booking.clientId,
+                type: 'PAYMENT_CONFIRMED',
+                message: paymentVerifiedMessage,
+              },
+            });
+
+            // Create automatic chat message for payment verification
+            if (booking.technicianId && booking.clientId) {
+              try {
+                await prisma.chatMessage.create({
+                  data: {
+                    bookingId: booking.id,
+                    senderId: booking.technicianId,
+                    receiverId: booking.clientId,
+                    message: paymentVerifiedMessage,
+                    messageType: 'TEXT',
+                  },
+                });
+              } catch (messageError) {
+                console.error('Failed to create payment verification message:', messageError);
+              }
+            }
 
         res.json(updated);
       } else {
