@@ -33,6 +33,7 @@ import TableCell from '@mui/material/TableCell';
 import TableContainer from '@mui/material/TableContainer';
 import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
+import Paper from '@mui/material/Paper';
 
 interface ClientStats {
   totalClients: number;
@@ -776,87 +777,6 @@ const AdminDashboard: React.FC = () => {
             </Table>
           </TableContainer>
         )}
-      </Box>
-
-        {/* Order Edit Dialog */}
-        {selectedBooking && (
-          <Paper
-              sx={{
-                position: 'fixed',
-                bottom: 20,
-                right: ordersPanelOpen ? 400 : 20,
-                width: 350,
-                p: 3,
-                borderRadius: 3,
-                boxShadow: '0 8px 32px rgba(0,0,0,0.2)',
-                zIndex: 1000,
-                bgcolor: 'white',
-                border: '2px solid #F4C542',
-              }}
-            >
-              <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 2 }}>
-                <Typography variant="h6" sx={{ fontWeight: 700, color: '#032B5A' }}>
-                  Modifier la commande
-                </Typography>
-                <IconButton size="small" onClick={() => setSelectedBooking(null)}>
-                  <CloseIcon />
-                </IconButton>
-              </Box>
-              <Divider sx={{ mb: 2 }} />
-              <Box sx={{ mb: 2 }}>
-                <Typography variant="body2" sx={{ fontWeight: 600, mb: 1, color: '#032B5A' }}>
-                  Client: {selectedBooking.client?.name}
-                </Typography>
-                <Typography variant="body2" sx={{ fontWeight: 600, mb: 1, color: '#032B5A' }}>
-                  Service: {selectedBooking.category?.name}
-                </Typography>
-                <Typography variant="body2" sx={{ fontWeight: 600, mb: 2, color: '#032B5A' }}>
-                  Prix: {selectedBooking.finalPrice || selectedBooking.estimatedPrice || 0} MAD
-                </Typography>
-              </Box>
-              <FormControl fullWidth sx={{ mb: 2 }}>
-                <InputLabel>Statut</InputLabel>
-                <Select
-                  value={selectedBooking.status}
-                  label="Statut"
-                  onChange={(e) => setSelectedBooking({ ...selectedBooking, status: e.target.value })}
-                >
-                  <MenuItem value="PENDING">En attente</MenuItem>
-                  <MenuItem value="ACCEPTED">Accepté</MenuItem>
-                  <MenuItem value="ON_THE_WAY">En route</MenuItem>
-                  <MenuItem value="IN_PROGRESS">En cours</MenuItem>
-                  <MenuItem value="AWAITING_PAYMENT">En attente de paiement</MenuItem>
-                  <MenuItem value="COMPLETED">Terminé</MenuItem>
-                  <MenuItem value="CANCELLED">Annulé</MenuItem>
-                  <MenuItem value="DECLINED">Refusé</MenuItem>
-                </Select>
-              </FormControl>
-              <Button
-                fullWidth
-                variant="contained"
-                startIcon={<SaveIcon />}
-                onClick={async () => {
-                  try {
-                    await bookingsApi.updateStatus(selectedBooking.id, { status: selectedBooking.status });
-                    await loadDashboardData();
-                    setSelectedBooking(null);
-                  } catch (error) {
-                    console.error('Failed to update booking status:', error);
-                  }
-                }}
-                sx={{
-                  bgcolor: '#F4C542',
-                  color: '#032B5A',
-                  '&:hover': { bgcolor: '#e0b038' },
-                  textTransform: 'none',
-                  fontWeight: 600,
-                }}
-              >
-                Enregistrer
-              </Button>
-            </Paper>
-          )}
-        </Box>
       </Box>
     </Box>
   );
