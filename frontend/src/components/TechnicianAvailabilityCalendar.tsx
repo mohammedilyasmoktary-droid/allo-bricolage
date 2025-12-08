@@ -295,7 +295,7 @@ const TechnicianAvailabilityCalendar: React.FC<TechnicianAvailabilityCalendarPro
                         transition: 'all 0.2s ease',
                       }}
                     >
-                      <Box sx={{ textAlign: 'center', width: '100%' }}>
+                      <Box sx={{ textAlign: 'center', width: '100%', position: 'relative' }}>
                         <Typography 
                           variant="caption" 
                           sx={{ 
@@ -305,7 +305,7 @@ const TechnicianAvailabilityCalendar: React.FC<TechnicianAvailabilityCalendarPro
                             mb: 0.5,
                             textTransform: 'uppercase',
                             letterSpacing: 0.5,
-                            opacity: isPast ? 0.5 : 1,
+                            opacity: isUnavailable || isPast ? 0.6 : 1,
                           }}
                         >
                           {format(day, 'EEE')}
@@ -313,13 +313,39 @@ const TechnicianAvailabilityCalendar: React.FC<TechnicianAvailabilityCalendarPro
                         <Typography 
                           variant="body1" 
                           sx={{ 
-                            fontSize: '1.1rem',
+                            fontSize: '1.3rem',
                             fontWeight: isSelected || isToday ? 700 : 600,
-                            opacity: isPast ? 0.5 : 1,
+                            opacity: isUnavailable || isPast ? 0.6 : 1,
                           }}
                         >
                           {format(day, 'd')}
                         </Typography>
+                        <Typography 
+                          variant="caption" 
+                          sx={{ 
+                            fontSize: '0.65rem',
+                            color: isToday ? '#F4C542' : 'inherit',
+                            fontWeight: isToday ? 700 : 500,
+                            mt: 0.5,
+                            opacity: isUnavailable || isPast ? 0.6 : 1,
+                          }}
+                        >
+                          {format(day, 'MMM')}
+                        </Typography>
+                        {isUnavailable && (
+                          <Box
+                            sx={{
+                              position: 'absolute',
+                              top: 4,
+                              right: 4,
+                              width: 8,
+                              height: 8,
+                              borderRadius: '50%',
+                              bgcolor: '#d32f2f',
+                              border: '1px solid white',
+                            }}
+                          />
+                        )}
                       </Box>
                     </Button>
                   );
