@@ -70,7 +70,11 @@ const MessagesPage: React.FC = () => {
       setConversations(data);
     } catch (err: any) {
       console.error('Failed to load conversations:', err);
-      setError(err.message || 'Erreur lors du chargement des conversations');
+      if (err.response?.status === 404) {
+        setError('Les routes de messagerie ne sont pas encore disponibles. Le backend est en cours de déploiement. Veuillez réessayer dans quelques instants.');
+      } else {
+        setError(err.response?.data?.error || err.message || 'Erreur lors du chargement des conversations');
+      }
     } finally {
       setLoading(false);
     }
@@ -92,7 +96,11 @@ const MessagesPage: React.FC = () => {
     } catch (err: any) {
       console.error('Failed to load messages:', err);
       if (!silent) {
-        setError(err.message || 'Erreur lors du chargement des messages');
+        if (err.response?.status === 404) {
+          setError('Les routes de messagerie ne sont pas encore disponibles. Le backend est en cours de déploiement.');
+        } else {
+          setError(err.response?.data?.error || err.message || 'Erreur lors du chargement des messages');
+        }
       }
     } finally {
       if (!silent) {
