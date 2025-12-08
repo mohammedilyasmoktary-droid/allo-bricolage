@@ -522,11 +522,22 @@ router.patch(
         return res.status(403).json({ error: 'Not your booking' });
       }
 
+      // Allow status updates for active statuses (not CANCELLED, DECLINED, COMPLETED)
+      const allowedFromStatuses = ['PENDING', 'ACCEPTED', 'ON_THE_WAY', 'IN_PROGRESS', 'AWAITING_PAYMENT'];
+      if (!allowedFromStatuses.includes(booking.status)) {
+        return res.status(400).json({ error: 'Cannot update status from current status' });
+      }
+
       const updateData: any = { status };
       if (finalPrice && status === 'COMPLETED') {
         updateData.finalPrice = parseFloat(finalPrice);
         // When technician marks as completed, set status to AWAITING_PAYMENT
         updateData.status = 'AWAITING_PAYMENT';
+      }
+      
+      // If going back to IN_PROGRESS from AWAITING_PAYMENT, clear payment status if not paid
+      if (status === 'IN_PROGRESS' && booking.status === 'AWAITING_PAYMENT' && booking.paymentStatus !== 'PAID') {
+        updateData.paymentStatus = 'UNPAID';
       }
 
       const updated = await prisma.serviceRequest.update({
