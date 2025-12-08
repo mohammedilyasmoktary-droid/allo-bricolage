@@ -352,48 +352,6 @@ const TechnicianJobs: React.FC = () => {
               />
             </Grid>
             <Grid item xs={12} md={6}>
-              <Tabs
-                value={tabValue}
-                onChange={(_, newValue) => {
-                  setTabValue(newValue);
-                  setStatusFilter('all');
-                }}
-                variant="scrollable"
-                scrollButtons="auto"
-                sx={{
-                  '& .MuiTab-root': {
-                    textTransform: 'none',
-                    fontWeight: 600,
-                    minWidth: 140,
-                  },
-                }}
-              >
-                <Tab
-                  label={
-                    <Badge badgeContent={activeCount} color="primary">
-                      En cours
-                    </Badge>
-                  }
-                />
-                <Tab
-                  label={
-                    <Badge badgeContent={paymentCount} color="warning">
-                      Paiement
-                    </Badge>
-                  }
-                />
-                <Tab
-                  label={
-                    <Badge badgeContent={completedCount} color="success">
-                      Terminés
-                    </Badge>
-                  }
-                />
-              </Tabs>
-            </Grid>
-          </Grid>
-          {tabValue === 0 && (
-            <Box sx={{ mt: 2 }}>
               <FormControl size="small" sx={{ minWidth: 200 }}>
                 <InputLabel>Filtrer par statut</InputLabel>
                 <Select
@@ -413,8 +371,8 @@ const TechnicianJobs: React.FC = () => {
                   <MenuItem value="CANCELLED">Annulé</MenuItem>
                 </Select>
               </FormControl>
-            </Box>
-          )}
+            </Grid>
+          </Grid>
         </CardContent>
       </Card>
 
