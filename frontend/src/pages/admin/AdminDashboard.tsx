@@ -46,7 +46,6 @@ import TableCell from '@mui/material/TableCell';
 import TableContainer from '@mui/material/TableContainer';
 import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
-import Paper from '@mui/material/Paper';
 import CloseIcon from '@mui/icons-material/Close';
 import EditIcon from '@mui/icons-material/Edit';
 import SaveIcon from '@mui/icons-material/Save';
@@ -899,10 +898,11 @@ const AdminDashboard: React.FC = () => {
             </Table>
           </TableContainer>
         )}
+      </Box>
 
-          {/* Order Edit Dialog */}
-          {selectedBooking && (
-            <Paper
+        {/* Order Edit Dialog */}
+        {selectedBooking && (
+          <Paper
               sx={{
                 position: 'fixed',
                 bottom: 20,

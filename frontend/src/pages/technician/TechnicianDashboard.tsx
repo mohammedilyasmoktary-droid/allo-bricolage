@@ -42,7 +42,6 @@ import BuildIcon from '@mui/icons-material/Build';
 import CloseIcon from '@mui/icons-material/Close';
 import VisibilityIcon from '@mui/icons-material/Visibility';
 import DeleteIcon from '@mui/icons-material/Delete';
-import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import CancelIcon from '@mui/icons-material/Cancel';
 
 const TechnicianDashboard: React.FC = () => {
@@ -259,76 +258,76 @@ const TechnicianDashboard: React.FC = () => {
 
         {/* Main Content */}
         <Box sx={{ flex: 1, minWidth: 0 }}>
-      {/* Welcome Section */}
-      <Box sx={{ mb: 4, display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 2 }}>
-        <Box>
-          <Typography variant="h4" component="h1" sx={{ fontWeight: 700, color: '#032B5A', mb: 1 }}>
-            Bienvenue, {user?.name} 👋
-          </Typography>
-          <Typography variant="body1" color="text.secondary">
-            Gérez vos missions et suivez vos performances
-          </Typography>
-        </Box>
-        <FormControlLabel
-          control={
-            <Switch
-              checked={isOnline}
-              onChange={handleToggleOnline}
-              sx={{
-                '& .MuiSwitch-switchBase.Mui-checked': {
-                  color: '#4caf50',
-                },
-                '& .MuiSwitch-switchBase.Mui-checked + .MuiSwitch-track': {
-                  backgroundColor: '#4caf50',
-                },
-              }}
+          {/* Welcome Section */}
+          <Box sx={{ mb: 4, display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 2 }}>
+            <Box>
+              <Typography variant="h4" component="h1" sx={{ fontWeight: 700, color: '#032B5A', mb: 1 }}>
+                Bienvenue, {user?.name} 👋
+              </Typography>
+              <Typography variant="body1" color="text.secondary">
+                Gérez vos missions et suivez vos performances
+              </Typography>
+            </Box>
+            <FormControlLabel
+              control={
+                <Switch
+                  checked={isOnline}
+                  onChange={handleToggleOnline}
+                  sx={{
+                    '& .MuiSwitch-switchBase.Mui-checked': {
+                      color: '#4caf50',
+                    },
+                    '& .MuiSwitch-switchBase.Mui-checked + .MuiSwitch-track': {
+                      backgroundColor: '#4caf50',
+                    },
+                  }}
+                />
+              }
+              label={
+                <Typography sx={{ fontWeight: 600, color: isOnline ? '#4caf50' : '#666' }}>
+                  {isOnline ? 'En ligne' : 'Hors ligne'}
+                </Typography>
+              }
             />
-          }
-          label={
-            <Typography sx={{ fontWeight: 600, color: isOnline ? '#4caf50' : '#666' }}>
-              {isOnline ? 'En ligne' : 'Hors ligne'}
-            </Typography>
-          }
-        />
-      </Box>
+          </Box>
 
-      {/* Subscription Warning */}
-      {subscriptionStatus && !subscriptionStatus.canAcceptJobs && (
-        <Alert
-          severity="warning"
-          sx={{ mb: 3, borderRadius: 2 }}
-          action={
-            <Button
-              color="inherit"
-              size="small"
-              onClick={() => navigate('/technician/subscription')}
-              sx={{ textTransform: 'none', fontWeight: 600 }}
+          {/* Subscription Warning */}
+          {subscriptionStatus && !subscriptionStatus.canAcceptJobs && (
+            <Alert
+              severity="warning"
+              sx={{ mb: 3, borderRadius: 2 }}
+              action={
+                <Button
+                  color="inherit"
+                  size="small"
+                  onClick={() => navigate('/technician/subscription')}
+                  sx={{ textTransform: 'none', fontWeight: 600 }}
+                >
+                  Renouveler
+                </Button>
+              }
             >
-              Renouveler
-            </Button>
-          }
-        >
-          Votre abonnement a expiré. Renouvelez pour continuer à recevoir des missions.
-        </Alert>
-      )}
+              Votre abonnement a expiré. Renouvelez pour continuer à recevoir des missions.
+            </Alert>
+          )}
 
-      {subscriptionStatus && subscriptionStatus.subscription && subscriptionStatus.daysRemaining <= 7 && subscriptionStatus.daysRemaining > 0 && (
-        <Alert severity="info" sx={{ mb: 3, borderRadius: 2 }}>
-          Votre abonnement expire dans {subscriptionStatus.daysRemaining} jour(s).{' '}
-          <Button
-            size="small"
-            onClick={() => navigate('/technician/subscription')}
-            sx={{ textTransform: 'none', ml: 1, fontWeight: 600 }}
-          >
-            Renouveler maintenant
-          </Button>
-        </Alert>
-      )}
+          {subscriptionStatus && subscriptionStatus.subscription && subscriptionStatus.daysRemaining <= 7 && subscriptionStatus.daysRemaining > 0 && (
+            <Alert severity="info" sx={{ mb: 3, borderRadius: 2 }}>
+              Votre abonnement expire dans {subscriptionStatus.daysRemaining} jour(s).{' '}
+              <Button
+                size="small"
+                onClick={() => navigate('/technician/subscription')}
+                sx={{ textTransform: 'none', ml: 1, fontWeight: 600 }}
+              >
+                Renouveler maintenant
+              </Button>
+            </Alert>
+          )}
 
-      <Grid container spacing={3}>
-        {/* Current Job */}
-        {currentJob && (
-          <Grid item xs={12}>
+          <Grid container spacing={3}>
+            {/* Current Job */}
+            {currentJob && (
+              <Grid item xs={12}>
             <Card sx={{ borderRadius: 3, boxShadow: '0 2px 8px rgba(0,0,0,0.08)', border: '1px solid #e8eaed', bgcolor: '#fff3e0' }}>
               <CardContent sx={{ p: 3 }}>
                 <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 2 }}>
@@ -420,13 +419,13 @@ const TechnicianDashboard: React.FC = () => {
                     )}
                   </Box>
                 </Paper>
-              </CardContent>
-            </Card>
-          </Grid>
-        )}
+                </CardContent>
+              </Card>
+            </Grid>
+            )}
 
-        {/* Upcoming Jobs */}
-        <Grid item xs={12} md={6}>
+            {/* Upcoming Jobs */}
+            <Grid item xs={12} md={6}>
           <Card sx={{ borderRadius: 3, boxShadow: '0 2px 8px rgba(0,0,0,0.08)', border: '1px solid #e8eaed' }}>
             <CardContent sx={{ p: 3 }}>
               <Typography variant="h6" sx={{ fontWeight: 700, color: '#032B5A', mb: 3, fontSize: '1.25rem' }}>
@@ -463,12 +462,12 @@ const TechnicianDashboard: React.FC = () => {
                   ))}
                 </Box>
               )}
-            </CardContent>
-          </Card>
-        </Grid>
+              </CardContent>
+            </Card>
+          </Grid>
 
-        {/* Stats */}
-        <Grid item xs={12} md={6}>
+          {/* Stats */}
+          <Grid item xs={12} md={6}>
           <Grid container spacing={2}>
             <Grid item xs={12}>
               <Card sx={{ borderRadius: 3, boxShadow: '0 2px 8px rgba(0,0,0,0.08)', border: '1px solid #e8eaed' }}>
@@ -492,13 +491,13 @@ const TechnicianDashboard: React.FC = () => {
                     {totalEarnings.toFixed(2)} MAD
                   </Typography>
                 </CardContent>
-              </Card>
+                </Card>
+              </Grid>
             </Grid>
           </Grid>
-        </Grid>
 
-        {/* Quick Actions */}
-        <Grid item xs={12}>
+          {/* Quick Actions */}
+          <Grid item xs={12}>
           <Card sx={{ borderRadius: 3, boxShadow: '0 2px 8px rgba(0,0,0,0.08)', border: '1px solid #e8eaed' }}>
             <CardContent sx={{ p: 3 }}>
               <Typography variant="h6" sx={{ fontWeight: 700, color: '#032B5A', mb: 3, fontSize: '1.25rem' }}>
@@ -594,13 +593,10 @@ const TechnicianDashboard: React.FC = () => {
                   </Button>
                 </Grid>
               </Grid>
-            </CardContent>
-          </Card>
-        </Grid>
-      </Grid>
-
-        </Box>
-      </Box>
+              </CardContent>
+            </Card>
+          </Grid>
+          </Grid>
 
           {/* Job Actions Dialog */}
           {selectedJob && (

@@ -687,6 +687,7 @@ const AdminBookings: React.FC = () => {
         </DialogTitle>
         <DialogContent sx={{ p: 4 }}>
           {selectedBooking && (
+            <>
             <Grid container spacing={3}>
               <Grid item xs={12} sm={6}>
                 <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1 }}>
@@ -935,6 +936,7 @@ const AdminBookings: React.FC = () => {
                 </Paper>
               </Box>
             )}
+            </>
           )}
         </DialogContent>
         <DialogActions sx={{ p: 3, borderTop: '1px solid #e0e0e0' }}>
