@@ -497,7 +497,7 @@ router.patch(
   authenticate,
   authorize('TECHNICIAN'),
   [
-    body('status').isIn(['ON_THE_WAY', 'IN_PROGRESS', 'COMPLETED']).withMessage('Invalid status'),
+    body('status').isIn(['ACCEPTED', 'ON_THE_WAY', 'IN_PROGRESS', 'COMPLETED', 'AWAITING_PAYMENT']).withMessage('Invalid status'),
     body('finalPrice').optional().isFloat({ min: 0 }),
   ],
   async (req, res) => {

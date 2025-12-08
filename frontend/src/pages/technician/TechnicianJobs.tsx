@@ -704,23 +704,46 @@ const TechnicianJobs: React.FC = () => {
                           )}
 
                           {booking.status === 'ON_THE_WAY' && (
-                            <Button
-                              fullWidth
-                              variant="contained"
-                              startIcon={<BuildIcon />}
-                              onClick={() => updateStatus(booking.id, 'IN_PROGRESS')}
-                              sx={{
-                                bgcolor: '#03a9f4',
-                                color: 'white',
-                                '&:hover': { bgcolor: '#0288d1' },
-                                textTransform: 'none',
-                                borderRadius: 2,
-                                py: 1.25,
-                                fontWeight: 600,
-                              }}
-                            >
-                              Arrivé - Commencer
-                            </Button>
+                            <>
+                              <Button
+                                fullWidth
+                                variant="contained"
+                                startIcon={<BuildIcon />}
+                                onClick={() => updateStatus(booking.id, 'IN_PROGRESS')}
+                                sx={{
+                                  bgcolor: '#03a9f4',
+                                  color: 'white',
+                                  '&:hover': { bgcolor: '#0288d1' },
+                                  textTransform: 'none',
+                                  borderRadius: 2,
+                                  py: 1.25,
+                                  fontWeight: 600,
+                                  mb: 1,
+                                }}
+                              >
+                                Arrivé - Commencer
+                              </Button>
+                              <Button
+                                fullWidth
+                                variant="outlined"
+                                startIcon={<ArrowBackIcon />}
+                                onClick={() => updateStatus(booking.id, 'ACCEPTED')}
+                                sx={{
+                                  borderColor: '#9e9e9e',
+                                  color: '#666',
+                                  '&:hover': { 
+                                    borderColor: '#757575', 
+                                    bgcolor: 'rgba(158, 158, 158, 0.05)' 
+                                  },
+                                  textTransform: 'none',
+                                  borderRadius: 2,
+                                  py: 1,
+                                  fontWeight: 600,
+                                }}
+                              >
+                                Retour à Accepté
+                              </Button>
+                            </>
                           )}
 
                           {booking.status === 'IN_PROGRESS' && (
