@@ -251,9 +251,10 @@ const PaymentPage: React.FC = () => {
     );
   }
 
-  const isPaymentPending = booking.status === 'AWAITING_PAYMENT';
-  const isPaymentProcessed = booking.paymentStatus === 'PAID' || booking.paymentStatus === 'PENDING';
+  const isPaymentPending = booking.status === 'AWAITING_PAYMENT' && booking.paymentStatus !== 'PAID';
+  const isPaymentProcessed = booking.paymentStatus === 'PAID' || (booking.paymentStatus === 'PENDING' && booking.paymentMethod);
   const canReview = booking.paymentStatus === 'PAID' && booking.status === 'COMPLETED' && !existingReview;
+  const canDownloadPDF = isPaymentProcessed; // Allow PDF download once payment is processed
 
   const finalPrice = booking.finalPrice || booking.estimatedPrice || 0;
 
@@ -304,24 +305,26 @@ const PaymentPage: React.FC = () => {
         <Typography variant="h4" component="h1" sx={{ fontWeight: 700, color: '#032B5A' }}>
           {isPaymentProcessed ? 'Détails du Paiement' : 'Paiement'}
         </Typography>
-        {isPaymentProcessed && (
+        {canDownloadPDF && (
           <Button
-            variant="outlined"
+            variant="contained"
             startIcon={<PictureAsPdfIcon />}
             onClick={handleDownloadPDF}
             sx={{
               ml: 'auto',
-              borderColor: '#032B5A',
+              bgcolor: '#F4C542',
               color: '#032B5A',
               textTransform: 'none',
               borderRadius: 2,
+              fontWeight: 700,
+              boxShadow: 2,
               '&:hover': {
-                borderColor: '#021d3f',
-                bgcolor: 'rgba(3, 43, 90, 0.05)',
+                bgcolor: '#e0b038',
+                boxShadow: 4,
               },
             }}
           >
-            Télécharger PDF
+            Télécharger Reçu PDF
           </Button>
         )}
       </Box>

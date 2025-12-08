@@ -55,6 +55,7 @@ import EmailIcon from '@mui/icons-material/Email';
 import AccessTimeIcon from '@mui/icons-material/AccessTime';
 import PictureAsPdfIcon from '@mui/icons-material/PictureAsPdf';
 import StarIcon from '@mui/icons-material/Star';
+import ReceiptIcon from '@mui/icons-material/Receipt';
 
 const TechnicianJobs: React.FC = () => {
   const [bookings, setBookings] = useState<Booking[]>([]);
@@ -1195,6 +1196,61 @@ const TechnicianJobs: React.FC = () => {
                     {selectedBooking.description}
                   </Typography>
                 </Paper>
+                {/* Payment Receipt Display */}
+                {selectedBooking.receiptUrl && selectedBooking.paymentStatus === 'PENDING' && (
+                  <Box sx={{ mt: 3 }}>
+                    <Paper sx={{ p: 2, bgcolor: '#fffbf0', borderRadius: 2, border: '2px solid #ff9800' }}>
+                      <Typography variant="subtitle2" sx={{ fontWeight: 700, color: '#f57c00', mb: 1, display: 'flex', alignItems: 'center', gap: 1 }}>
+                        <ReceiptIcon sx={{ fontSize: 20 }} />
+                        Reçu de Paiement Uploadé
+                      </Typography>
+                      <Typography variant="body2" sx={{ color: '#032B5A', mb: 2 }}>
+                        Le client a uploadé un reçu. Veuillez vérifier et confirmer le paiement.
+                      </Typography>
+                      {selectedBooking.receiptUrl.endsWith('.pdf') ? (
+                        <Button
+                          variant="outlined"
+                          href={selectedBooking.receiptUrl}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          startIcon={<PictureAsPdfIcon />}
+                          sx={{
+                            borderColor: '#ff9800',
+                            color: '#f57c00',
+                            textTransform: 'none',
+                            '&:hover': {
+                              borderColor: '#f57c00',
+                              bgcolor: 'rgba(255, 152, 0, 0.1)',
+                            },
+                          }}
+                        >
+                          Voir le reçu PDF
+                        </Button>
+                      ) : (
+                        <Box
+                          sx={{
+                            border: '1px solid #e0e0e0',
+                            borderRadius: 2,
+                            overflow: 'hidden',
+                            mt: 1,
+                          }}
+                        >
+                          <img
+                            src={selectedBooking.receiptUrl}
+                            alt="Payment Receipt"
+                            style={{
+                              width: '100%',
+                              maxHeight: '300px',
+                              objectFit: 'contain',
+                              display: 'block',
+                            }}
+                          />
+                        </Box>
+                      )}
+                    </Paper>
+                  </Box>
+                )}
+                
                 {selectedBooking.photos && selectedBooking.photos.length > 0 && (
                   <Box sx={{ mt: 3 }}>
                     <Typography variant="subtitle2" sx={{ fontWeight: 600, color: '#032B5A', mb: 2 }}>
