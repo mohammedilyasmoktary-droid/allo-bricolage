@@ -433,13 +433,32 @@ router.patch('/:id/accept', authenticate, authorize('TECHNICIAN'), checkSubscrip
     });
 
     // Notify client
+    const acceptMessage = `Votre réservation a été acceptée par ${updated.technician?.name}. Le technicien vous contactera bientôt.`;
+    
     await prisma.notification.create({
       data: {
         userId: booking.clientId,
         type: 'BOOKING_ACCEPTED',
-        message: `Votre réservation a été acceptée par ${updated.technician?.name}. Le technicien vous contactera bientôt.`,
+        message: acceptMessage,
       },
     });
+
+    // Create automatic chat message
+    if (booking.technicianId && booking.clientId) {
+      try {
+        await prisma.chatMessage.create({
+          data: {
+            bookingId: booking.id,
+            senderId: booking.technicianId,
+            receiverId: booking.clientId,
+            message: acceptMessage,
+            messageType: 'TEXT',
+          },
+        });
+      } catch (messageError) {
+        console.error('Failed to create accept message:', messageError);
+      }
+    }
 
     res.json(updated);
   } catch (error: any) {
@@ -844,6 +863,29 @@ router.patch(
           message: notificationMessage,
         },
       });
+
+      // Create automatic chat message for payment
+      if (booking.technicianId && booking.clientId) {
+        try {
+          const paymentMessage = paymentMethod === 'CASH'
+            ? 'J\'ai sélectionné le paiement en espèces. Le technicien confirmera la réception.'
+            : paymentMethod === 'CARD'
+            ? 'J\'ai initié le paiement par carte. Vérification en cours.'
+            : 'J\'ai uploadé le reçu de paiement. Veuillez vérifier et confirmer.';
+          
+          await prisma.chatMessage.create({
+            data: {
+              bookingId: booking.id,
+              senderId: booking.clientId,
+              receiverId: booking.technicianId,
+              message: paymentMessage,
+              messageType: 'TEXT',
+            },
+          });
+        } catch (messageError) {
+          console.error('Failed to create payment message:', messageError);
+        }
+      }
 
       res.json({
         ...updated,
