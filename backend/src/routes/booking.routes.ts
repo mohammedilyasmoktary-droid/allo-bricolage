@@ -658,13 +658,13 @@ router.patch(
           : `Le service a été complété par ${updated.technician?.name || 'le technicien'}. Veuillez procéder au paiement.`;
       } else if (status === 'ON_THE_WAY') {
         notificationType = 'BOOKING_ON_THE_WAY';
-        notificationMessage = `${updated.technician?.name} est en route vers votre adresse.`;
+        notificationMessage = `${updated.technician?.name || 'Le technicien'} est en route vers votre adresse.`;
       } else if (status === 'IN_PROGRESS') {
         notificationType = 'BOOKING_IN_PROGRESS';
-        notificationMessage = `${updated.technician?.name} a commencé l'intervention.`;
+        notificationMessage = `${updated.technician?.name || 'Le technicien'} a commencé l'intervention.`;
       } else if (status === 'ACCEPTED') {
         notificationType = 'BOOKING_ACCEPTED';
-        notificationMessage = `${updated.technician?.name} a accepté votre réservation.`;
+        notificationMessage = `${updated.technician?.name || 'Le technicien'} a accepté votre réservation.`;
       } else {
         notificationType = 'BOOKING_COMPLETED';
         notificationMessage = `Le statut de votre réservation a été mis à jour à "${actualNewStatus}".`;
