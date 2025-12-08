@@ -856,6 +856,85 @@ const AdminBookings: React.FC = () => {
                 </Box>
               </Grid>
             </Grid>
+
+            {/* Payment Receipt Display */}
+            {selectedBooking.receiptUrl && (
+              <Box sx={{ mt: 3 }}>
+                <Paper 
+                  sx={{ 
+                    p: 2, 
+                    bgcolor: selectedBooking.paymentStatus === 'PENDING' ? '#fffbf0' : '#f8f9fa',
+                    borderRadius: 2, 
+                    border: selectedBooking.paymentStatus === 'PENDING' ? '2px solid #ff9800' : '1px solid #e0e0e0'
+                  }}
+                >
+                  <Typography variant="subtitle2" sx={{ fontWeight: 700, color: selectedBooking.paymentStatus === 'PENDING' ? '#f57c00' : '#032B5A', mb: 1, display: 'flex', alignItems: 'center', gap: 1 }}>
+                    <ReceiptIcon sx={{ fontSize: 20 }} />
+                    {selectedBooking.paymentStatus === 'PENDING' ? 'Reçu de Paiement Uploadé' : 'Reçu de Paiement'}
+                  </Typography>
+                  {selectedBooking.paymentStatus === 'PENDING' && (
+                    <Typography variant="body2" sx={{ color: '#032B5A', mb: 2 }}>
+                      Le client a uploadé un reçu. En attente de confirmation par le technicien.
+                    </Typography>
+                  )}
+                  {selectedBooking.paymentStatus === 'PAID' && (
+                    <Typography variant="body2" sx={{ color: '#032B5A', mb: 2 }}>
+                      Reçu de paiement confirmé.
+                    </Typography>
+                  )}
+                  {selectedBooking.receiptUrl.endsWith('.pdf') ? (
+                    <Button
+                      variant="outlined"
+                      href={selectedBooking.receiptUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      startIcon={<PictureAsPdfIcon />}
+                      sx={{
+                        borderColor: selectedBooking.paymentStatus === 'PENDING' ? '#ff9800' : '#032B5A',
+                        color: selectedBooking.paymentStatus === 'PENDING' ? '#f57c00' : '#032B5A',
+                        textTransform: 'none',
+                        '&:hover': {
+                          borderColor: selectedBooking.paymentStatus === 'PENDING' ? '#f57c00' : '#021d3f',
+                          bgcolor: selectedBooking.paymentStatus === 'PENDING' ? 'rgba(255, 152, 0, 0.1)' : 'rgba(3, 43, 90, 0.05)',
+                        },
+                      }}
+                    >
+                      Voir le reçu PDF
+                    </Button>
+                  ) : (
+                    <Box
+                      sx={{
+                        border: '1px solid #e0e0e0',
+                        borderRadius: 2,
+                        overflow: 'hidden',
+                        mt: 1,
+                        cursor: 'pointer',
+                        '&:hover': {
+                          borderColor: '#F4C542',
+                        },
+                      }}
+                      onClick={() => window.open(selectedBooking.receiptUrl, '_blank')}
+                    >
+                      <img
+                        src={selectedBooking.receiptUrl}
+                        alt="Payment Receipt"
+                        style={{
+                          width: '100%',
+                          maxHeight: '300px',
+                          objectFit: 'contain',
+                          display: 'block',
+                        }}
+                      />
+                    </Box>
+                  )}
+                  {selectedBooking.transactionId && (
+                    <Typography variant="caption" sx={{ color: '#666', mt: 1, display: 'block' }}>
+                      ID de transaction: {selectedBooking.transactionId}
+                    </Typography>
+                  )}
+                </Paper>
+              </Box>
+            )}
           )}
         </DialogContent>
         <DialogActions sx={{ p: 3, borderTop: '1px solid #e0e0e0' }}>
