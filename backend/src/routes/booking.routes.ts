@@ -142,15 +142,24 @@ router.post(
       let parsedScheduledDateTime: Date | null = null;
       if (scheduledDateTime) {
         try {
+          // Parse the ISO string - it should already be in UTC format
           parsedScheduledDateTime = new Date(scheduledDateTime);
           if (isNaN(parsedScheduledDateTime.getTime())) {
             return res.status(400).json({ error: 'Invalid scheduledDateTime format. Please use ISO 8601 format.' });
           }
-          // Check if date is in the past
-          if (parsedScheduledDateTime < new Date()) {
+          // Check if date is in the past (compare in UTC to avoid timezone issues)
+          const now = new Date();
+          if (parsedScheduledDateTime < now) {
             return res.status(400).json({ error: 'Scheduled date and time cannot be in the past' });
           }
+          // Log for debugging
+          console.log('Parsed scheduledDateTime:', {
+            input: scheduledDateTime,
+            parsed: parsedScheduledDateTime.toISOString(),
+            local: parsedScheduledDateTime.toLocaleString(),
+          });
         } catch (error) {
+          console.error('Error parsing scheduledDateTime:', error);
           return res.status(400).json({ error: 'Invalid scheduledDateTime format' });
         }
       }

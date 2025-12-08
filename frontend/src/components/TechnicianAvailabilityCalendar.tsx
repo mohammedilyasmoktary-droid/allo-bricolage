@@ -130,8 +130,14 @@ const TechnicianAvailabilityCalendar: React.FC<TechnicianAvailabilityCalendarPro
     
     setSelectedTime(time);
     const [hours, minutes] = time.split(':');
-    const dateTime = new Date(selectedDate);
-    dateTime.setHours(parseInt(hours), parseInt(minutes), 0, 0);
+    // Create date in local timezone by combining date and time
+    const year = selectedDate.getFullYear();
+    const month = selectedDate.getMonth();
+    const day = selectedDate.getDate();
+    const dateTime = new Date(year, month, day, parseInt(hours), parseInt(minutes), 0, 0);
+    
+    // Convert to ISO string - this will include timezone offset
+    // The backend should store this as-is, and we'll display it in local time
     onDateTimeSelect(dateTime.toISOString());
   };
 

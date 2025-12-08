@@ -202,10 +202,13 @@ const CreateBooking: React.FC = () => {
         city: formData.city,
         address: formData.address,
         scheduledDateTime: formData.scheduledDateTime ? (() => {
+          // Parse the ISO string to ensure it's valid
           const dt = new Date(formData.scheduledDateTime);
           if (isNaN(dt.getTime())) {
             throw new Error('Date et heure invalides');
           }
+          // Return ISO string - backend will store this correctly
+          // The date/time is already in the correct format from the calendar component
           return dt.toISOString();
         })() : undefined,
         photos: selectedFiles, // Use selectedFiles which contains the actual File objects
