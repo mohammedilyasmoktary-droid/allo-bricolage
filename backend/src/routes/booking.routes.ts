@@ -621,6 +621,7 @@ router.patch(
 
       // Check if status is actually changing
       const statusChanged = actualNewStatus !== booking.status;
+      const oldStatus = booking.status; // Store old status for logging
 
       const updated = await prisma.serviceRequest.update({
         where: { id: req.params.id },
@@ -679,10 +680,10 @@ router.patch(
       });
 
       // Create automatic chat message when status changes
-      // Always send a message when technician updates status (if status actually changed)
-      if (statusChanged && booking.clientId) {
+      // Always send a message when technician updates status (if status actually changed and clientId exists)
+      if (statusChanged && booking.clientId && req.user!.userId) {
         try {
-          await prisma.chatMessage.create({
+          const chatMessage = await prisma.chatMessage.create({
             data: {
               bookingId: booking.id,
               senderId: req.user!.userId, // Use the current user (technician) as sender
@@ -691,7 +692,8 @@ router.patch(
               messageType: 'TEXT',
             },
           });
-          console.log(`✅ Status change message sent: ${booking.status} → ${actualNewStatus} for booking ${booking.id}`);
+          console.log(`✅ Status change message sent: ${oldStatus} → ${actualNewStatus} for booking ${booking.id}`);
+          console.log(`✅ Chat message created with ID: ${chatMessage.id}`);
         } catch (messageError: any) {
           // Don't fail the status update if message creation fails, but log the error
           console.error('❌ Failed to create status change message:', messageError);
@@ -700,12 +702,23 @@ router.patch(
             senderId: req.user!.userId,
             receiverId: booking.clientId,
             message: notificationMessage,
+            oldStatus,
+            newStatus: actualNewStatus,
+            statusChanged,
             error: messageError?.message || messageError,
+            code: messageError?.code,
             stack: messageError?.stack,
           });
         }
       } else {
-        console.log(`⏭️ Skipping message creation: status unchanged (${booking.status} === ${actualNewStatus}) or missing clientId`);
+        console.log(`⏭️ Skipping message creation:`, {
+          statusChanged,
+          hasClientId: !!booking.clientId,
+          hasUserId: !!req.user!.userId,
+          oldStatus,
+          newStatus: actualNewStatus,
+          bookingId: booking.id,
+        });
       }
 
       res.json(updated);
