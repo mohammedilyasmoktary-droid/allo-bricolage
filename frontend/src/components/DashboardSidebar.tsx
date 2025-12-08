@@ -51,6 +51,20 @@ const DashboardSidebar: React.FC<DashboardSidebarProps> = ({ onLogout, onNavigat
       path: user.role === 'CLIENT' ? '/dashboard' : user.role === 'TECHNICIAN' ? '/dashboard/technicien' : '/admin/dashboard',
       roles: ['CLIENT', 'TECHNICIAN', 'ADMIN'],
     },
+    ...(user.role === 'ADMIN' ? [
+      {
+        label: 'Gestion des Commandes',
+        icon: <CalendarTodayIcon />,
+        path: '/admin/bookings',
+        roles: ['ADMIN'],
+      },
+      {
+        label: 'Gestion des Techniciens',
+        icon: <WorkIcon />,
+        path: '/admin/technicians',
+        roles: ['ADMIN'],
+      },
+    ] : []),
     {
       label: 'Rechercher un technicien',
       icon: <SearchIcon />,
