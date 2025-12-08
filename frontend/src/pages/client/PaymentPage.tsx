@@ -956,7 +956,7 @@ const PaymentPage: React.FC = () => {
                 <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 2 }}>
                   <AttachMoneyIcon sx={{ color: '#F4C542', fontSize: 28 }} />
                   <Typography variant="body2" color="text.secondary" sx={{ fontWeight: 500 }}>
-                    Montant total
+                    {booking.finalPrice ? 'Montant à payer' : 'Montant estimé'}
                   </Typography>
                 </Box>
                 <Typography
@@ -970,6 +970,11 @@ const PaymentPage: React.FC = () => {
                 >
                   {finalPrice.toFixed(2)} MAD
                 </Typography>
+                {booking.finalPrice && booking.estimatedPrice && booking.finalPrice !== booking.estimatedPrice && (
+                  <Typography variant="body2" sx={{ color: '#666', fontStyle: 'italic', ml: 4, mt: 0.5 }}>
+                    (Prix estimé initial: {booking.estimatedPrice.toFixed(2)} MAD)
+                  </Typography>
+                )}
               </Box>
 
               <Divider sx={{ my: 3, borderColor: '#e0e0e0' }} />
