@@ -52,13 +52,17 @@ const MessagesPage: React.FC = () => {
   // Auto-select conversation from URL parameter
   useEffect(() => {
     const bookingId = searchParams.get('bookingId');
-    if (bookingId && conversations.length > 0) {
+    if (bookingId && conversations.length > 0 && !selectedConversation) {
       const conversation = conversations.find(conv => conv.bookingId === bookingId);
       if (conversation) {
         setSelectedConversation(conversation);
+        // Clear the URL parameter after selecting
+        const newSearchParams = new URLSearchParams(searchParams);
+        newSearchParams.delete('bookingId');
+        window.history.replaceState({}, '', `${window.location.pathname}${newSearchParams.toString() ? `?${newSearchParams.toString()}` : ''}`);
       }
     }
-  }, [searchParams, conversations]);
+  }, [searchParams, conversations, selectedConversation]);
 
   useEffect(() => {
     if (selectedConversation) {
