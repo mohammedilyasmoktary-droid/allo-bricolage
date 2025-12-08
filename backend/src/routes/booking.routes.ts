@@ -681,19 +681,26 @@ router.patch(
 
       // Create automatic chat message when status changes
       // Always send a message when technician updates status (if status actually changed and clientId exists)
-      if (statusChanged && booking.clientId && req.user!.userId) {
+      // Remove the statusChanged check temporarily to ensure messages are always sent
+      if (booking.clientId && req.user!.userId && notificationMessage) {
         try {
-          const chatMessage = await prisma.chatMessage.create({
-            data: {
-              bookingId: booking.id,
-              senderId: req.user!.userId, // Use the current user (technician) as sender
-              receiverId: booking.clientId,
-              message: notificationMessage,
-              messageType: 'TEXT',
-            },
-          });
-          console.log(`✅ Status change message sent: ${oldStatus} → ${actualNewStatus} for booking ${booking.id}`);
-          console.log(`✅ Chat message created with ID: ${chatMessage.id}`);
+          // Only create message if status actually changed
+          if (statusChanged) {
+            const chatMessage = await prisma.chatMessage.create({
+              data: {
+                bookingId: booking.id,
+                senderId: req.user!.userId, // Use the current user (technician) as sender
+                receiverId: booking.clientId,
+                message: notificationMessage,
+                messageType: 'TEXT',
+              },
+            });
+            console.log(`✅ Status change message sent: ${oldStatus} → ${actualNewStatus} for booking ${booking.id}`);
+            console.log(`✅ Chat message created with ID: ${chatMessage.id}`);
+            console.log(`✅ Message content: ${notificationMessage.substring(0, 100)}...`);
+          } else {
+            console.log(`⏭️ Status unchanged, skipping message: ${oldStatus} === ${actualNewStatus}`);
+          }
         } catch (messageError: any) {
           // Don't fail the status update if message creation fails, but log the error
           console.error('❌ Failed to create status change message:', messageError);
@@ -707,16 +714,22 @@ router.patch(
             statusChanged,
             error: messageError?.message || messageError,
             code: messageError?.code,
+            meta: messageError?.meta,
             stack: messageError?.stack,
           });
+          // Re-throw the error in development to see what's wrong
+          if (process.env.NODE_ENV === 'development') {
+            throw messageError;
+          }
         }
       } else {
-        console.log(`⏭️ Skipping message creation:`, {
-          statusChanged,
+        console.log(`⏭️ Skipping message creation - missing required data:`, {
           hasClientId: !!booking.clientId,
           hasUserId: !!req.user!.userId,
+          hasMessage: !!notificationMessage,
           oldStatus,
           newStatus: actualNewStatus,
+          statusChanged,
           bookingId: booking.id,
         });
       }
