@@ -499,12 +499,20 @@ router.patch('/:id/decline', authenticate, authorize('TECHNICIAN'), async (req, 
             phone: true,
           },
         },
+        technician: {
+          select: {
+            id: true,
+            name: true,
+            email: true,
+            phone: true,
+          },
+        },
         category: true,
       },
     });
 
     // Notify client
-      const declineMessage = `Votre réservation a été refusée par ${updated.technician?.name}.`;
+      const declineMessage = `Votre réservation a été refusée par ${updated.technician?.name || 'le technicien'}.`;
       
       await prisma.notification.create({
         data: {
@@ -545,16 +553,35 @@ router.patch(
   authorize('TECHNICIAN'),
   [
     body('status').isIn(['ACCEPTED', 'ON_THE_WAY', 'IN_PROGRESS', 'COMPLETED', 'AWAITING_PAYMENT']).withMessage('Invalid status'),
-    body('finalPrice').optional().isFloat({ min: 0 }),
+    body('finalPrice').optional().custom((value) => {
+      if (value === undefined || value === null || value === '') {
+        return true; // Optional field, allow empty
+      }
+      const numValue = typeof value === 'string' ? parseFloat(value) : value;
+      if (isNaN(numValue) || numValue < 0) {
+        throw new Error('finalPrice must be a positive number');
+      }
+      return true;
+    }),
   ],
   async (req, res) => {
     try {
       const errors = validationResult(req);
       if (!errors.isEmpty()) {
+        console.error('Validation errors:', errors.array());
         return res.status(400).json({ errors: errors.array() });
       }
 
       const { status, finalPrice } = req.body;
+      
+      // Parse finalPrice if it's a string
+      let parsedFinalPrice: number | undefined = undefined;
+      if (finalPrice !== undefined && finalPrice !== null && finalPrice !== '') {
+        parsedFinalPrice = typeof finalPrice === 'string' ? parseFloat(finalPrice) : finalPrice;
+        if (isNaN(parsedFinalPrice) || parsedFinalPrice < 0) {
+          return res.status(400).json({ error: 'finalPrice must be a positive number' });
+        }
+      }
 
       const booking = await prisma.serviceRequest.findUnique({
         where: { id: req.params.id },
@@ -578,8 +605,8 @@ router.patch(
       const updateData: any = { status };
       let actualNewStatus = status; // Track the actual new status for message creation
       
-      if (finalPrice && status === 'COMPLETED') {
-        updateData.finalPrice = parseFloat(finalPrice);
+      if (parsedFinalPrice !== undefined && status === 'COMPLETED') {
+        updateData.finalPrice = parsedFinalPrice;
         // When technician marks as completed, set status to AWAITING_PAYMENT
         updateData.status = 'AWAITING_PAYMENT';
         actualNewStatus = 'AWAITING_PAYMENT';
