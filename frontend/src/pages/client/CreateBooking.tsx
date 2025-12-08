@@ -845,11 +845,92 @@ const CreateBooking: React.FC = () => {
               </Grid>
             </Grid>
 
+            {/* Date and Time Display - Above Summary */}
+            {showSummary && formData.scheduledDateTime && (
+              <Card
+                sx={{
+                  mt: 5,
+                  mb: 3,
+                  bgcolor: 'linear-gradient(135deg, #F4C542 0%, #e0b038 100%)',
+                  border: 'none',
+                  borderRadius: 4,
+                  boxShadow: '0 8px 24px rgba(244, 197, 66, 0.3)',
+                  overflow: 'hidden',
+                }}
+              >
+                <CardContent sx={{ p: 4 }}>
+                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 3, flexWrap: 'wrap' }}>
+                    <Box
+                      sx={{
+                        width: 64,
+                        height: 64,
+                        borderRadius: 3,
+                        bgcolor: 'rgba(255, 255, 255, 0.25)',
+                        backdropFilter: 'blur(10px)',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        boxShadow: '0 4px 12px rgba(0, 0, 0, 0.1)',
+                        flexShrink: 0,
+                      }}
+                    >
+                      <CalendarTodayIcon sx={{ color: '#032B5A', fontSize: 36 }} />
+                    </Box>
+                    <Box sx={{ flexGrow: 1, minWidth: 200 }}>
+                      <Typography variant="caption" sx={{ color: 'rgba(3, 43, 90, 0.8)', mb: 1, display: 'block', fontWeight: 600, textTransform: 'uppercase', letterSpacing: 1, fontSize: '0.7rem' }}>
+                        Date et Heure sélectionnées
+                      </Typography>
+                      <Typography variant="h5" sx={{ fontWeight: 700, color: '#032B5A', mb: 0.5, fontSize: { xs: '1.25rem', sm: '1.5rem' } }}>
+                        {(() => {
+                          try {
+                            const date = new Date(formData.scheduledDateTime);
+                            if (isNaN(date.getTime())) {
+                              return 'Date invalide';
+                            }
+                            // Format: "Lundi 15 Janvier 2024 à 14:00"
+                            return format(date, "EEEE d MMMM yyyy 'à' HH:mm", { locale: fr });
+                          } catch (error) {
+                            return formData.scheduledDateTime;
+                          }
+                        })()}
+                      </Typography>
+                      <Typography variant="body2" sx={{ color: 'rgba(3, 43, 90, 0.7)', fontWeight: 500, mt: 0.5 }}>
+                        {(() => {
+                          try {
+                            const date = new Date(formData.scheduledDateTime);
+                            if (isNaN(date.getTime())) {
+                              return '';
+                            }
+                            // Relative time: "Dans 2 jours" or "Aujourd'hui"
+                            const now = new Date();
+                            const diffTime = date.getTime() - now.getTime();
+                            const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+                            
+                            if (diffDays === 0) {
+                              return 'Aujourd\'hui';
+                            } else if (diffDays === 1) {
+                              return 'Demain';
+                            } else if (diffDays > 1 && diffDays <= 7) {
+                              return `Dans ${diffDays} jours`;
+                            } else {
+                              return '';
+                            }
+                          } catch (error) {
+                            return '';
+                          }
+                        })()}
+                      </Typography>
+                    </Box>
+                  </Box>
+                </CardContent>
+              </Card>
+            )}
+
             {/* Summary Card */}
             {showSummary && (
               <Card
                 sx={{
-                  mt: 5,
+                  mt: showSummary && formData.scheduledDateTime ? 0 : 5,
                   mb: 3,
                   bgcolor: '#fafbfc',
                   border: '2px solid #F4C542',
@@ -909,26 +990,6 @@ const CreateBooking: React.FC = () => {
                         {formData.address}, {formData.city}
                       </Typography>
                     </Grid>
-                    {formData.scheduledDateTime && (
-                      <Grid item xs={12}>
-                        <Typography variant="caption" sx={{ color: '#666', mb: 1, display: 'block', fontWeight: 600, textTransform: 'uppercase', letterSpacing: 0.5, fontSize: '0.75rem' }}>
-                          Date et Heure
-                        </Typography>
-                        <Typography variant="body1" sx={{ fontWeight: 600, color: '#032B5A', fontSize: '1rem' }}>
-                          {(() => {
-                            try {
-                              const date = new Date(formData.scheduledDateTime);
-                              if (isNaN(date.getTime())) {
-                                return 'Date invalide';
-                              }
-                              return format(date, "EEEE d MMMM yyyy 'à' HH:mm", { locale: fr });
-                            } catch (error) {
-                              return formData.scheduledDateTime;
-                            }
-                          })()}
-                        </Typography>
-                      </Grid>
-                    )}
                     {isUrgent && (
                       <Grid item xs={12}>
                         <Alert 

@@ -62,7 +62,8 @@ const TechnicianAvailabilityCalendar: React.FC<TechnicianAvailabilityCalendarPro
         const allBookings = await bookingsApi.getAll(undefined, technicianId);
         
         // Filter for this technician's unavailable times
-        // Only include bookings with scheduledDateTime that are not cancelled/declined/completed
+        // Include bookings with scheduledDateTime that are ACCEPTED or in progress (not cancelled/declined/completed)
+        // When a technician accepts a booking, that date/time becomes unavailable
         const technicianBookings = allBookings.filter(
           (booking) =>
             (booking.technicianProfile?.id === technicianId || booking.technicianId === technicianId) &&
@@ -70,6 +71,11 @@ const TechnicianAvailabilityCalendar: React.FC<TechnicianAvailabilityCalendarPro
             booking.status !== 'CANCELLED' &&
             booking.status !== 'DECLINED' &&
             booking.status !== 'COMPLETED' && // Exclude completed bookings from unavailable times
+            (booking.status === 'ACCEPTED' || 
+             booking.status === 'ON_THE_WAY' || 
+             booking.status === 'IN_PROGRESS' || 
+             booking.status === 'AWAITING_PAYMENT' ||
+             booking.status === 'PENDING') && // Include PENDING and ACCEPTED as unavailable
             new Date(booking.scheduledDateTime) >= new Date() // Only future bookings
         );
         setUnavailableBookings(technicianBookings);
@@ -233,15 +239,21 @@ const TechnicianAvailabilityCalendar: React.FC<TechnicianAvailabilityCalendarPro
                   const isToday = isSameDay(day, new Date());
 
                   return (
-                    <Button
+                    <Box
                       key={index}
-                      onClick={() => handleDateSelect(day)}
-                      disabled={isUnavailable || isPast}
                       sx={{
-                        minWidth: 44,
-                        height: 64,
-                        p: 0,
-                        borderRadius: 3,
+                        position: 'relative',
+                      }}
+                    >
+                      <Button
+                        onClick={() => handleDateSelect(day)}
+                        disabled={isUnavailable || isPast}
+                        sx={{
+                          minWidth: 44,
+                          height: 64,
+                          p: 0,
+                          borderRadius: 3,
+                          position: 'relative',
                         bgcolor: isSelected
                           ? '#F4C542'
                           : isUnavailable
@@ -288,9 +300,11 @@ const TechnicianAvailabilityCalendar: React.FC<TechnicianAvailabilityCalendarPro
                           variant="caption" 
                           sx={{ 
                             display: 'block', 
-                            fontSize: '0.7rem',
+                            fontSize: '0.65rem',
                             fontWeight: 600,
                             mb: 0.5,
+                            textTransform: 'uppercase',
+                            letterSpacing: 0.5,
                             opacity: isPast ? 0.5 : 1,
                           }}
                         >
