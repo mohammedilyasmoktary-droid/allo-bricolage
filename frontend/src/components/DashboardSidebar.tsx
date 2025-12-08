@@ -20,6 +20,7 @@ import MessageIcon from '@mui/icons-material/Message';
 import NotificationsIcon from '@mui/icons-material/Notifications';
 import PersonIcon from '@mui/icons-material/Person';
 import LogoutIcon from '@mui/icons-material/Logout';
+import SearchIcon from '@mui/icons-material/Search';
 
 interface DashboardSidebarProps {
   onLogout: () => void;
@@ -49,6 +50,12 @@ const DashboardSidebar: React.FC<DashboardSidebarProps> = ({ onLogout, onNavigat
       icon: <HomeIcon />,
       path: user.role === 'CLIENT' ? '/dashboard' : user.role === 'TECHNICIAN' ? '/dashboard/technicien' : '/admin/dashboard',
       roles: ['CLIENT', 'TECHNICIAN', 'ADMIN'],
+    },
+    {
+      label: 'Rechercher un technicien',
+      icon: <SearchIcon />,
+      path: '/search',
+      roles: ['CLIENT'],
     },
     {
       label: user.role === 'CLIENT' ? 'Mes Réservations' : 'Mes Missions',
