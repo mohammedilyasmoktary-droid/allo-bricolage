@@ -37,7 +37,7 @@ import Rating from '@mui/material/Rating';
 import DeleteIcon from '@mui/icons-material/Delete';
 import TechnicianAvailabilityCalendar from '../../components/TechnicianAvailabilityCalendar';
 import { format } from 'date-fns';
-import { fr } from 'date-fns/locale';
+import { fr } from 'date-fns/locale/fr';
 
 const CreateBooking: React.FC = () => {
   const navigate = useNavigate();
