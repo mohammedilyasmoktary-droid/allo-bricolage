@@ -23,9 +23,6 @@ import {
   Paper,
   CircularProgress,
   InputAdornment,
-  Badge,
-  Tabs,
-  Tab,
   List,
   ListItem,
   ListItemText,
@@ -61,7 +58,6 @@ const TechnicianJobs: React.FC = () => {
   const [bookings, setBookings] = useState<Booking[]>([]);
   const [loading, setLoading] = useState(true);
   const [statusFilter, setStatusFilter] = useState<string>('all');
-  const [tabValue, setTabValue] = useState(0);
   const [searchQuery, setSearchQuery] = useState('');
   const [completeDialogOpen, setCompleteDialogOpen] = useState(false);
   const [detailDialogOpen, setDetailDialogOpen] = useState(false);
@@ -292,19 +288,8 @@ const TechnicianJobs: React.FC = () => {
       );
     }
 
-    // Status filter based on tab
-    const statusMap = [
-      ['ACCEPTED', 'ON_THE_WAY', 'IN_PROGRESS'], // Tab 0: Active (En cours)
-      ['AWAITING_PAYMENT'], // Tab 1: Payment (Paiement)
-      ['COMPLETED'], // Tab 2: Completed (Terminés)
-    ];
-    const allowedStatuses = statusMap[tabValue] || [];
-    if (allowedStatuses.length > 0) {
-      filtered = filtered.filter((b) => allowedStatuses.includes(b.status));
-    }
-    
-    // Additional filter for "all" tab if statusFilter is set
-    if (tabValue === 0 && statusFilter !== 'all') {
+    // Status filter - show all if 'all' is selected, otherwise filter by status
+    if (statusFilter !== 'all') {
       filtered = filtered.filter((b) => b.status === statusFilter);
     }
 
@@ -312,11 +297,8 @@ const TechnicianJobs: React.FC = () => {
     filtered.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
 
     return filtered;
-  }, [bookings, tabValue, statusFilter, searchQuery]);
+  }, [bookings, statusFilter, searchQuery]);
 
-  const activeCount = bookings.filter((b) => ['ACCEPTED', 'ON_THE_WAY', 'IN_PROGRESS'].includes(b.status)).length;
-  const paymentCount = bookings.filter((b) => b.status === 'AWAITING_PAYMENT').length;
-  const completedCount = bookings.filter((b) => b.status === 'COMPLETED').length;
 
   if (loading) {
     return (
@@ -442,33 +424,21 @@ const TechnicianJobs: React.FC = () => {
           <CardContent>
             <Box sx={{ textAlign: 'center', py: 8 }}>
               <Box sx={{ mb: 2 }}>
-                {tabValue === 0 && (
-                  <BuildIcon sx={{ fontSize: 64, color: '#e0e0e0', mb: 2 }} />
-                )}
-                {tabValue === 1 && (
-                  <PaymentIcon sx={{ fontSize: 64, color: '#e0e0e0', mb: 2 }} />
-                )}
-                {tabValue === 2 && (
-                  <CheckCircleIcon sx={{ fontSize: 64, color: '#e0e0e0', mb: 2 }} />
-                )}
+                <BuildIcon sx={{ fontSize: 64, color: '#e0e0e0', mb: 2 }} />
               </Box>
               <Typography variant="h5" color="text.secondary" gutterBottom sx={{ fontWeight: 700, mb: 1 }}>
                 {searchQuery
                   ? 'Aucun travail trouvé'
-                  : tabValue === 0
-                  ? 'Aucun travail en cours'
-                  : tabValue === 1
-                  ? 'Aucun paiement en attente'
-                  : 'Aucun travail terminé'}
+                  : statusFilter !== 'all'
+                  ? 'Aucun travail avec ce statut'
+                  : 'Aucun travail'}
               </Typography>
               <Typography variant="body1" color="text.secondary" sx={{ maxWidth: 400, mx: 'auto' }}>
                 {searchQuery
                   ? 'Essayez de modifier vos critères de recherche pour trouver des missions correspondantes.'
-                  : tabValue === 0
-                  ? 'Vous n\'avez actuellement aucun travail en cours. Les nouvelles missions acceptées apparaîtront ici.'
-                  : tabValue === 1
-                  ? 'Aucune mission n\'attend actuellement de paiement. Les missions terminées en attente de paiement apparaîtront ici.'
-                  : 'Vous n\'avez pas encore de missions terminées. Les missions complétées et payées apparaîtront ici.'}
+                  : statusFilter !== 'all'
+                  ? 'Aucune mission ne correspond au filtre sélectionné. Essayez de changer le filtre de statut.'
+                  : 'Vous n\'avez actuellement aucune mission. Les nouvelles missions apparaîtront ici.'}
               </Typography>
             </Box>
           </CardContent>
@@ -479,46 +449,12 @@ const TechnicianJobs: React.FC = () => {
           <Box sx={{ mb: 4, display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 2 }}>
             <Box>
               <Typography variant="h4" sx={{ fontWeight: 700, color: '#032B5A', mb: 0.5 }}>
-                {tabValue === 0 && 'Travaux en cours'}
-                {tabValue === 1 && 'Paiements en attente'}
-                {tabValue === 2 && 'Missions terminées'}
+                Toutes les missions
               </Typography>
               <Typography variant="body1" color="text.secondary">
-                {tabValue === 0 && `${filteredBookings.length} mission${filteredBookings.length > 1 ? 's' : ''} active${filteredBookings.length > 1 ? 's' : ''}`}
-                {tabValue === 1 && `${filteredBookings.length} paiement${filteredBookings.length > 1 ? 's' : ''} en attente de confirmation`}
-                {tabValue === 2 && `${filteredBookings.length} mission${filteredBookings.length > 1 ? 's' : ''} complétée${filteredBookings.length > 1 ? 's' : ''}`}
+                {filteredBookings.length} mission{filteredBookings.length > 1 ? 's' : ''} {statusFilter !== 'all' ? 'avec ce statut' : 'au total'}
               </Typography>
             </Box>
-            {tabValue === 1 && filteredBookings.length > 0 && (
-              <Chip
-                icon={<PaymentIcon />}
-                label={`Total: ${filteredBookings.reduce((sum, b) => sum + (b.finalPrice || b.estimatedPrice || 0), 0)} MAD`}
-                sx={{
-                  bgcolor: '#fff3e0',
-                  color: '#f57c00',
-                  fontWeight: 700,
-                  fontSize: '1rem',
-                  px: 2,
-                  py: 1,
-                  border: '2px solid #ff9800',
-                }}
-              />
-            )}
-            {tabValue === 2 && filteredBookings.length > 0 && (
-              <Chip
-                icon={<CheckCircleIcon />}
-                label={`${filteredBookings.filter(b => b.paymentStatus === 'PAID').length} payée${filteredBookings.filter(b => b.paymentStatus === 'PAID').length > 1 ? 's' : ''}`}
-                sx={{
-                  bgcolor: '#e8f5e9',
-                  color: '#2e7d32',
-                  fontWeight: 700,
-                  fontSize: '1rem',
-                  px: 2,
-                  py: 1,
-                  border: '2px solid #4caf50',
-                }}
-              />
-            )}
           </Box>
 
           <Grid container spacing={3}>
@@ -531,50 +467,18 @@ const TechnicianJobs: React.FC = () => {
               <Grid item xs={12} key={booking.id}>
                 <Card
                   sx={{
-                    boxShadow: tabValue === 1 ? 4 : tabValue === 2 ? 3 : 3,
+                    boxShadow: 3,
                     borderRadius: 4,
-                    border: tabValue === 1 
-                      ? '2px solid #ff9800' 
-                      : tabValue === 2 
-                      ? '2px solid #4caf50' 
-                      : '1px solid #e0e0e0',
+                    border: '1px solid #e0e0e0',
                     overflow: 'hidden',
                     transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
                     bgcolor: 'white',
                     position: 'relative',
                     '&:hover': {
                       transform: 'translateY(-6px)',
-                      boxShadow: tabValue === 1 
-                        ? '0 12px 32px rgba(255, 152, 0, 0.2)' 
-                        : tabValue === 2 
-                        ? '0 12px 32px rgba(76, 175, 80, 0.2)' 
-                        : '0 8px 24px rgba(0,0,0,0.12)',
-                      borderColor: tabValue === 1 ? '#f57c00' : tabValue === 2 ? '#388e3c' : '#F4C542',
+                      boxShadow: '0 8px 24px rgba(0,0,0,0.12)',
+                      borderColor: '#F4C542',
                     },
-                    ...(tabValue === 1 && {
-                      bgcolor: '#fffbf0',
-                      '&::before': {
-                        content: '""',
-                        position: 'absolute',
-                        top: 0,
-                        left: 0,
-                        right: 0,
-                        height: 4,
-                        bgcolor: '#ff9800',
-                      },
-                    }),
-                    ...(tabValue === 2 && {
-                      bgcolor: '#f1f8f4',
-                      '&::before': {
-                        content: '""',
-                        position: 'absolute',
-                        top: 0,
-                        left: 0,
-                        right: 0,
-                        height: 4,
-                        bgcolor: '#4caf50',
-                      },
-                    }),
                   }}
                 >
                   <CardContent sx={{ p: 4 }}>
@@ -941,7 +845,7 @@ const TechnicianJobs: React.FC = () => {
                           )}
                           
                           {/* Completed section - Show review option */}
-                          {tabValue === 2 && booking.paymentStatus === 'PAID' && (
+                          {booking.paymentStatus === 'PAID' && booking.status === 'COMPLETED' && (
                             <Box sx={{ mt: 2, p: 2, bgcolor: '#e8f5e9', borderRadius: 2, border: '1px solid #4caf50' }}>
                               <Typography variant="body2" sx={{ fontWeight: 600, color: '#2e7d32', mb: 1 }}>
                                 ✓ Mission complétée et payée
