@@ -348,6 +348,7 @@ const TechnicianAvailabilityCalendar: React.FC<TechnicianAvailabilityCalendarPro
                         )}
                       </Box>
                     </Button>
+                    </Box>
                   );
                 })}
               </Box>
