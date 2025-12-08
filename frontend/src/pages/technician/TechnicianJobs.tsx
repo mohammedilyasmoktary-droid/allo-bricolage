@@ -684,6 +684,64 @@ const TechnicianJobs: React.FC = () => {
                             Actions
                           </Typography>
 
+                          {booking.status === 'PENDING' && (
+                            <>
+                              <Button
+                                fullWidth
+                                variant="contained"
+                                startIcon={<CheckCircleIcon />}
+                                onClick={async () => {
+                                  try {
+                                    await bookingsApi.accept(booking.id);
+                                    loadJobs();
+                                  } catch (error: any) {
+                                    setError(error.response?.data?.error || 'Erreur lors de l\'acceptation');
+                                  }
+                                }}
+                                sx={{
+                                  bgcolor: '#4caf50',
+                                  color: 'white',
+                                  '&:hover': { bgcolor: '#388e3c' },
+                                  textTransform: 'none',
+                                  borderRadius: 2,
+                                  py: 1.25,
+                                  fontWeight: 600,
+                                  mb: 1,
+                                  boxShadow: 2,
+                                }}
+                              >
+                                Accepter la mission
+                              </Button>
+                              <Button
+                                fullWidth
+                                variant="outlined"
+                                startIcon={<CloseIcon />}
+                                onClick={async () => {
+                                  try {
+                                    await bookingsApi.decline(booking.id);
+                                    loadJobs();
+                                  } catch (error: any) {
+                                    setError(error.response?.data?.error || 'Erreur lors du refus');
+                                  }
+                                }}
+                                sx={{
+                                  borderColor: '#dc3545',
+                                  color: '#dc3545',
+                                  '&:hover': { 
+                                    borderColor: '#c82333', 
+                                    bgcolor: 'rgba(220, 53, 69, 0.05)' 
+                                  },
+                                  textTransform: 'none',
+                                  borderRadius: 2,
+                                  py: 1.25,
+                                  fontWeight: 600,
+                                }}
+                              >
+                                Refuser
+                              </Button>
+                            </>
+                          )}
+
                           {booking.status === 'ACCEPTED' && (
                             <Button
                               fullWidth
@@ -748,24 +806,47 @@ const TechnicianJobs: React.FC = () => {
                           )}
 
                           {booking.status === 'IN_PROGRESS' && (
-                            <Button
-                              fullWidth
-                              variant="contained"
-                              startIcon={<CheckCircleIcon />}
-                              onClick={() => handleCompleteClick(booking)}
-                              sx={{
-                                bgcolor: '#4caf50',
-                                color: 'white',
-                                '&:hover': { bgcolor: '#388e3c' },
-                                textTransform: 'none',
-                                borderRadius: 2,
-                                py: 1.25,
-                                fontWeight: 600,
-                                boxShadow: 2,
-                              }}
-                            >
-                              Terminer le travail
-                            </Button>
+                            <>
+                              <Button
+                                fullWidth
+                                variant="contained"
+                                startIcon={<CheckCircleIcon />}
+                                onClick={() => handleCompleteClick(booking)}
+                                sx={{
+                                  bgcolor: '#4caf50',
+                                  color: 'white',
+                                  '&:hover': { bgcolor: '#388e3c' },
+                                  textTransform: 'none',
+                                  borderRadius: 2,
+                                  py: 1.25,
+                                  fontWeight: 600,
+                                  mb: 1,
+                                  boxShadow: 2,
+                                }}
+                              >
+                                Terminer le travail
+                              </Button>
+                              <Button
+                                fullWidth
+                                variant="outlined"
+                                startIcon={<ArrowBackIcon />}
+                                onClick={() => updateStatus(booking.id, 'ON_THE_WAY')}
+                                sx={{
+                                  borderColor: '#9e9e9e',
+                                  color: '#666',
+                                  '&:hover': { 
+                                    borderColor: '#757575', 
+                                    bgcolor: 'rgba(158, 158, 158, 0.05)' 
+                                  },
+                                  textTransform: 'none',
+                                  borderRadius: 2,
+                                  py: 1,
+                                  fontWeight: 600,
+                                }}
+                              >
+                                Retour à En route
+                              </Button>
+                            </>
                           )}
 
                           {booking.status === 'AWAITING_PAYMENT' && booking.paymentStatus === 'PENDING' && (
