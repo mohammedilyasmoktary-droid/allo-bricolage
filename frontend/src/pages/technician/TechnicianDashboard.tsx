@@ -171,6 +171,92 @@ const TechnicianDashboard: React.FC = () => {
 
   return (
     <Box sx={{ bgcolor: '#fafbfc', minHeight: '100vh', py: 3 }}>
+      <Box sx={{ display: 'flex', gap: 3, maxWidth: 1400, mx: 'auto', px: { xs: 2, md: 0 } }}>
+        {/* Left Panel - Jobs Management */}
+        <Drawer
+          variant="persistent"
+          anchor="left"
+          open={jobsPanelOpen}
+          sx={{
+            width: jobsPanelOpen ? 380 : 0,
+            flexShrink: 0,
+            '& .MuiDrawer-paper': {
+              width: 380,
+              boxSizing: 'border-box',
+              position: 'relative',
+              height: 'auto',
+              borderRight: '1px solid #e0e0e0',
+              bgcolor: '#fafbfc',
+            },
+          }}
+        >
+          <Box sx={{ p: 2, borderBottom: '1px solid #e0e0e0', bgcolor: '#032B5A', color: 'white' }}>
+            <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 1 }}>
+              <Typography variant="h6" sx={{ fontWeight: 700 }}>
+                Mes Missions
+              </Typography>
+              <IconButton
+                size="small"
+                onClick={() => setJobsPanelOpen(false)}
+                sx={{ color: 'white' }}
+              >
+                <CloseIcon />
+              </IconButton>
+            </Box>
+            <Typography variant="caption" sx={{ opacity: 0.9 }}>
+              {bookings.length} missions
+            </Typography>
+          </Box>
+          <Box sx={{ overflowY: 'auto', maxHeight: 'calc(100vh - 120px)' }}>
+            <List sx={{ p: 1 }}>
+              {bookings.map((booking) => (
+                <ListItem key={booking.id} disablePadding sx={{ mb: 1 }}>
+                  <Paper
+                    sx={{
+                      width: '100%',
+                      p: 2,
+                      borderRadius: 2,
+                      border: selectedJob?.id === booking.id ? '2px solid #F4C542' : '1px solid #e0e0e0',
+                      bgcolor: selectedJob?.id === booking.id ? '#fffbf0' : 'white',
+                      cursor: 'pointer',
+                      '&:hover': {
+                        borderColor: '#F4C542',
+                        bgcolor: '#fffbf0',
+                      },
+                    }}
+                    onClick={() => setSelectedJob(booking)}
+                  >
+                    <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 1 }}>
+                      <Typography variant="subtitle2" sx={{ fontWeight: 700, color: '#032B5A' }}>
+                        {booking.category?.name || 'Service'}
+                      </Typography>
+                      <Chip
+                        label={getStatusLabel(booking.status)}
+                        size="small"
+                        color={getStatusColor(booking.status)}
+                        sx={{ fontSize: '0.7rem', height: 20 }}
+                      />
+                    </Box>
+                    <Typography variant="caption" color="text.secondary" sx={{ display: 'block', mb: 1 }}>
+                      {booking.client?.name || 'Client'} • {booking.city}
+                    </Typography>
+                    {booking.scheduledDateTime && (
+                      <Typography variant="caption" color="text.secondary" sx={{ display: 'block', mb: 0.5 }}>
+                        {format(new Date(booking.scheduledDateTime), "d MMM yyyy 'à' HH:mm", { locale: fr })}
+                      </Typography>
+                    )}
+                    <Typography variant="caption" sx={{ fontWeight: 600, color: '#F4C542' }}>
+                      {booking.finalPrice || booking.estimatedPrice || 0} MAD
+                    </Typography>
+                  </Paper>
+                </ListItem>
+              ))}
+            </List>
+          </Box>
+        </Drawer>
+
+        {/* Main Content */}
+        <Box sx={{ flex: 1, minWidth: 0 }}>
       {/* Welcome Section */}
       <Box sx={{ mb: 4, display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 2 }}>
         <Box>
@@ -510,6 +596,9 @@ const TechnicianDashboard: React.FC = () => {
           </Card>
         </Grid>
       </Grid>
+
+        </Box>
+      </Box>
 
           {/* Job Actions Dialog */}
           {selectedJob && (
