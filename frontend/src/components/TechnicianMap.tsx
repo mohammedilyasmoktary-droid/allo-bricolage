@@ -1,6 +1,6 @@
 import React from 'react';
 import { GoogleMap, LoadScript, Marker, InfoWindow, useJsApiLoader } from '@react-google-maps/api';
-import { Box, Typography, Paper, Avatar, Rating, Chip } from '@mui/material';
+import { Box, Typography, Paper, Avatar, Rating, Chip, CircularProgress } from '@mui/material';
 import { Technician } from '../api/technicians';
 import { getCityCoordinates, getCenterCoordinates } from '../utils/cityCoordinates';
 import LocationOnIcon from '@mui/icons-material/LocationOn';
@@ -154,10 +154,9 @@ const TechnicianMap: React.FC<TechnicianMapProps> = ({ technicians, onTechnician
           mapContainerStyle={mapContainerStyle}
           center={center}
           zoom={cities.length === 1 ? 12 : 7}
-          onLoad={() => console.log('✅ Google Map loaded')}
-          onError={(error) => {
-            console.error('❌ Google Map Error:', error);
-            setLoadError('Erreur lors du chargement de la carte');
+          onLoad={() => {
+            console.log('✅ Google Map loaded');
+            setLoadError(null);
           }}
           options={{
             styles: [
