@@ -26,11 +26,8 @@ const TechnicianMap: React.FC<TechnicianMapProps> = ({ technicians, onTechnician
   
   // Try multiple ways to get the API key (for debugging)
   // TEMPORARY: Fallback to hardcoded key for testing (remove after fixing env var)
-  const googleMapsApiKey = 
-    import.meta.env.VITE_GOOGLE_MAPS_API_KEY || 
-    import.meta.env.GOOGLE_MAPS_API_KEY || 
-    (import.meta.env.PROD ? 'AIzaSyAjGf3qCd1j2PiQYZIP993o3sz7TtXyYrw' : '') || 
-    '';
+  const envKey = import.meta.env.VITE_GOOGLE_MAPS_API_KEY || import.meta.env.GOOGLE_MAPS_API_KEY;
+  const googleMapsApiKey = envKey || 'AIzaSyAjGf3qCd1j2PiQYZIP993o3sz7TtXyYrw'; // Fallback for testing
   
   // Debug: Log API key status (always log in console for debugging)
   React.useEffect(() => {
