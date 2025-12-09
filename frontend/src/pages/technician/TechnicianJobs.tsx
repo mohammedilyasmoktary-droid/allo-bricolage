@@ -93,6 +93,14 @@ const TechnicianJobs: React.FC = () => {
       const data = await bookingsApi.getMyBookings();
       console.log('Technician jobs loaded:', data?.length || 0, 'bookings');
       console.log('Jobs data:', data);
+      // Log quote information for debugging
+      data?.forEach((booking: Booking) => {
+        if (booking.quote) {
+          console.log(`Booking ${booking.id} has quote:`, booking.quote);
+        } else {
+          console.log(`Booking ${booking.id} has NO quote`);
+        }
+      });
       setBookings(data || []);
     } catch (error: any) {
       console.error('Failed to load jobs:', error);
