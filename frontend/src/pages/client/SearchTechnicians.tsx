@@ -427,25 +427,11 @@ const SearchTechnicians: React.FC = () => {
       )}
 
       {technicians.length > 0 && (
-        <Box sx={{ mb: 3, display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 2 }}>
+        <Box sx={{ mb: 3 }}>
           <Typography variant="h6" sx={{ fontWeight: 600, color: '#032B5A' }}>
             {filteredTechnicians.length} technicien(s) trouvé(s)
             {filteredTechnicians.length !== technicians.length && ` (sur ${technicians.length})`}
           </Typography>
-          <Tabs
-            value={viewMode}
-            onChange={(e, newValue) => setViewMode(newValue)}
-            sx={{
-              '& .MuiTab-root': {
-                textTransform: 'none',
-                fontWeight: 500,
-                minWidth: 100,
-              },
-            }}
-          >
-            <Tab label="Liste" value="list" />
-            <Tab label="Carte" value="map" />
-          </Tabs>
         </Box>
       )}
 
@@ -459,15 +445,11 @@ const SearchTechnicians: React.FC = () => {
         </Grid>
       )}
 
-      {viewMode === 'map' && technicians.length > 0 && !loading && (
-        <Paper sx={{ mb: 3, p: 2, boxShadow: 3, borderRadius: 3 }}>
-          <TechnicianMap
-            technicians={filteredTechnicians}
-            onTechnicianClick={(technician) => handleQuickView(technician)}
-          />
-        </Paper>
-      )}
-
+      {!loading && technicians.length > 0 && (
+        <Grid container spacing={3}>
+          {/* Left Side - Technician List */}
+          <Grid item xs={12} md={6}>
+            <Grid container spacing={3}>
               {paginatedTechnicians.map((technician) => (
               <Grid item xs={12} sm={6} key={technician.id}>
                 <Card
