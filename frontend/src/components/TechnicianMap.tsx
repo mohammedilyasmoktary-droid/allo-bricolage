@@ -23,16 +23,28 @@ const defaultCenter = {
 
 const TechnicianMap: React.FC<TechnicianMapProps> = ({ technicians, onTechnicianClick }) => {
   const [selectedTechnician, setSelectedTechnician] = React.useState<Technician | null>(null);
-  const googleMapsApiKey = import.meta.env.VITE_GOOGLE_MAPS_API_KEY || '';
+  
+  // Try multiple ways to get the API key (for debugging)
+  const googleMapsApiKey = 
+    import.meta.env.VITE_GOOGLE_MAPS_API_KEY || 
+    import.meta.env.GOOGLE_MAPS_API_KEY || 
+    '';
   
   // Debug: Log API key status (always log in console for debugging)
   React.useEffect(() => {
+    const envVars = Object.keys(import.meta.env).filter(k => k.includes('GOOGLE') || k.includes('MAPS'));
     console.log('🔍 Google Maps API Key Debug:', {
       exists: !!googleMapsApiKey,
       length: googleMapsApiKey?.length || 0,
       startsWith: googleMapsApiKey?.substring(0, 10) || 'N/A',
       preview: googleMapsApiKey ? `${googleMapsApiKey.substring(0, 10)}...` : 'MISSING',
+      VITE_GOOGLE_MAPS_API_KEY: import.meta.env.VITE_GOOGLE_MAPS_API_KEY ? 'EXISTS' : 'MISSING',
+      GOOGLE_MAPS_API_KEY: import.meta.env.GOOGLE_MAPS_API_KEY ? 'EXISTS' : 'MISSING',
       allViteEnvVars: Object.keys(import.meta.env).filter(k => k.startsWith('VITE_')),
+      googleRelatedVars: envVars,
+      mode: import.meta.env.MODE,
+      prod: import.meta.env.PROD,
+      dev: import.meta.env.DEV,
     });
   }, [googleMapsApiKey]);
 
