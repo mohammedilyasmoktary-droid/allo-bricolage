@@ -23,6 +23,15 @@ export interface Booking {
   technicianProfile?: any;
   category?: any;
   reviews?: any[];
+  quote?: {
+    id: string;
+    bookingId: string;
+    conditions: string;
+    equipment: string;
+    price: number;
+    createdAt: string;
+    updatedAt: string;
+  };
 }
 
 export interface CreateBookingData {
