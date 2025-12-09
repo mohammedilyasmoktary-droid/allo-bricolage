@@ -262,7 +262,32 @@ router.get('/my-bookings', authenticate, async (req, res) => {
 
     console.log('Getting bookings for user:', userId, 'role:', role);
 
-    const where: any = role === 'CLIENT' ? { clientId: userId } : { technicianId: userId };
+    // For technicians, include both accepted bookings (technicianId) and pending bookings assigned to their profile
+    let where: any;
+    if (role === 'CLIENT') {
+      where = { clientId: userId };
+    } else if (role === 'TECHNICIAN') {
+      // Get technician profile ID
+      const technicianProfile = await prisma.technicianProfile.findUnique({
+        where: { userId },
+        select: { id: true },
+      });
+      
+      if (technicianProfile) {
+        // Include bookings where technicianId matches OR technicianProfileId matches
+        where = {
+          OR: [
+            { technicianId: userId },
+            { technicianProfileId: technicianProfile.id },
+          ],
+        };
+      } else {
+        // Fallback to just technicianId if no profile exists
+        where = { technicianId: userId };
+      }
+    } else {
+      where = {};
+    }
 
     console.log('Query where clause:', where);
 
