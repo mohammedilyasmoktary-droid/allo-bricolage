@@ -32,17 +32,66 @@ const TechnicianAvailabilityCalendar: React.FC<TechnicianAvailabilityCalendarPro
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
   const [selectedTime, setSelectedTime] = useState<string>('');
 
-  // Generate next 30 days
-  const generateDays = () => {
-    const days = [];
+  // Generate days organized by month (30 days per month)
+  const generateDaysByMonth = () => {
+    const daysByMonth: { month: string; year: number; days: Date[] }[] = [];
     const today = startOfDay(new Date());
-    for (let i = 0; i < 30; i++) {
-      days.push(addDays(today, i));
+    let currentDate = today;
+    let currentMonth = format(currentDate, 'MMMM yyyy');
+    let currentYear = currentDate.getFullYear();
+    let daysInCurrentMonth: Date[] = [];
+    let daysGenerated = 0;
+    const totalDays = 60; // Generate 2 months worth (30 days each)
+
+    while (daysGenerated < totalDays) {
+      const monthKey = format(currentDate, 'MMMM yyyy');
+      const year = currentDate.getFullYear();
+
+      // If we've moved to a new month, save the previous month and start a new one
+      if (monthKey !== currentMonth) {
+        // Pad the previous month to 30 days if needed
+        while (daysInCurrentMonth.length < 30 && daysGenerated < totalDays) {
+          daysInCurrentMonth.push(addDays(daysInCurrentMonth[daysInCurrentMonth.length - 1] || currentDate, 1));
+          daysGenerated++;
+        }
+        
+        if (daysInCurrentMonth.length > 0) {
+          daysByMonth.push({
+            month: currentMonth,
+            year: currentYear,
+            days: daysInCurrentMonth.slice(0, 30), // Ensure exactly 30 days
+          });
+        }
+        
+        currentMonth = monthKey;
+        currentYear = year;
+        daysInCurrentMonth = [];
+      }
+
+      daysInCurrentMonth.push(currentDate);
+      daysGenerated++;
+      currentDate = addDays(currentDate, 1);
     }
-    return days;
+
+    // Add the last month
+    if (daysInCurrentMonth.length > 0) {
+      // Pad to 30 days if needed
+      while (daysInCurrentMonth.length < 30 && daysGenerated < totalDays) {
+        daysInCurrentMonth.push(addDays(daysInCurrentMonth[daysInCurrentMonth.length - 1], 1));
+        daysGenerated++;
+      }
+      daysByMonth.push({
+        month: currentMonth,
+        year: currentYear,
+        days: daysInCurrentMonth.slice(0, 30), // Ensure exactly 30 days
+      });
+    }
+
+    return daysByMonth;
   };
 
-  const days = generateDays();
+  const daysByMonth = generateDaysByMonth();
+  const days = daysByMonth.flatMap(monthData => monthData.days);
 
   // Generate time slots (8 AM to 8 PM, every hour)
   const timeSlots = Array.from({ length: 13 }, (_, i) => {
@@ -207,15 +256,8 @@ const TechnicianAvailabilityCalendar: React.FC<TechnicianAvailabilityCalendarPro
               </Typography>
               <Box
                 sx={{
-                  display: 'grid',
-                  gridTemplateColumns: 'repeat(7, 1fr)',
-                  gap: 1.5,
-                  maxHeight: 320,
+                  maxHeight: 500,
                   overflowY: 'auto',
-                  p: 2,
-                  bgcolor: '#fafbfc',
-                  borderRadius: 3,
-                  border: '1px solid #e8eaed',
                   '&::-webkit-scrollbar': {
                     width: '6px',
                   },
@@ -232,7 +274,32 @@ const TechnicianAvailabilityCalendar: React.FC<TechnicianAvailabilityCalendarPro
                   },
                 }}
               >
-                {days.map((day, index) => {
+                {daysByMonth.map((monthData, monthIndex) => (
+                  <Box key={monthIndex} sx={{ mb: monthIndex < daysByMonth.length - 1 ? 4 : 0 }}>
+                    <Typography 
+                      variant="subtitle1" 
+                      sx={{ 
+                        fontWeight: 700, 
+                        color: '#032B5A', 
+                        mb: 2,
+                        textTransform: 'capitalize',
+                        fontSize: '1rem',
+                      }}
+                    >
+                      {monthData.month}
+                    </Typography>
+                    <Box
+                      sx={{
+                        display: 'grid',
+                        gridTemplateColumns: 'repeat(7, 1fr)',
+                        gap: 1.5,
+                        p: 2,
+                        bgcolor: '#fafbfc',
+                        borderRadius: 3,
+                        border: '1px solid #e8eaed',
+                      }}
+                    >
+                      {monthData.days.map((day, index) => {
                   const isUnavailable = isDateUnavailable(day);
                   const isSelected = selectedDate && isSameDay(day, selectedDate);
                   const isPast = isBefore(day, startOfDay(new Date()));
@@ -349,8 +416,11 @@ const TechnicianAvailabilityCalendar: React.FC<TechnicianAvailabilityCalendarPro
                       </Box>
                     </Button>
                     </Box>
-                  );
-                })}
+                      );
+                    })}
+                    </Box>
+                  </Box>
+                ))}
               </Box>
             </Box>
 
