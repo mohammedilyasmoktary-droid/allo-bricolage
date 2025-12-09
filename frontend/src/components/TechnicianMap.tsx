@@ -29,13 +29,33 @@ const TechnicianMap: React.FC<TechnicianMapProps> = ({ technicians, onTechnician
   const cities = Array.from(new Set(technicians.map(t => t.user?.city).filter(Boolean) as string[]));
   const center = cities.length > 0 ? getCenterCoordinates(cities) : defaultCenter;
 
-  // Group technicians by city for clustering (optional - for now we show all)
-  const technicianMarkers = technicians
+  // Group technicians by city and add slight offset for multiple technicians in same city
+  const cityGroups = technicians
     .filter(t => t.user?.city)
-    .map(technician => ({
-      technician,
-      position: getCityCoordinates(technician.user!.city!),
-    }));
+    .reduce((acc, technician) => {
+      const city = technician.user!.city!;
+      if (!acc[city]) {
+        acc[city] = [];
+      }
+      acc[city].push(technician);
+      return acc;
+    }, {} as Record<string, Technician[]>);
+
+  const technicianMarkers = Object.entries(cityGroups).flatMap(([city, techs]) => {
+    const basePosition = getCityCoordinates(city);
+    // Add slight offset for multiple technicians in the same city
+    return techs.map((technician, index) => {
+      const offset = techs.length > 1 ? {
+        lat: basePosition.lat + (Math.random() - 0.5) * 0.01, // ~1km offset
+        lng: basePosition.lng + (Math.random() - 0.5) * 0.01,
+      } : basePosition;
+      return {
+        technician,
+        position: offset,
+        city,
+      };
+    });
+  });
 
   if (!googleMapsApiKey) {
     return (
