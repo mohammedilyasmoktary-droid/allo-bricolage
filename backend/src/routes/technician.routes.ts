@@ -182,20 +182,69 @@ router.post(
     { name: 'profilePicture', maxCount: 1 },
   ]),
   [
-    body('skills').isArray().withMessage('Skills must be an array'),
-    body('yearsOfExperience').isInt({ min: 0 }).withMessage('Years of experience must be a positive integer'),
-    body('hourlyRate').optional().isFloat({ min: 0 }),
-    body('basePrice').optional().isFloat({ min: 0 }),
+    body('skills').custom((value) => {
+      // Accept either array or JSON string
+      if (Array.isArray(value)) {
+        return true;
+      }
+      if (typeof value === 'string') {
+        try {
+          const parsed = JSON.parse(value);
+          if (Array.isArray(parsed)) {
+            return true;
+          }
+        } catch (e) {
+          throw new Error('Skills must be a valid JSON array string');
+        }
+      }
+      throw new Error('Skills must be an array or JSON array string');
+    }),
+    body('yearsOfExperience').custom((value) => {
+      const num = typeof value === 'string' ? parseInt(value) : value;
+      if (isNaN(num) || num < 0) {
+        throw new Error('Years of experience must be a positive integer');
+      }
+      return true;
+    }),
+    body('hourlyRate').optional().custom((value) => {
+      if (!value || value === '') return true;
+      const num = typeof value === 'string' ? parseFloat(value) : value;
+      if (isNaN(num) || num < 0) {
+        throw new Error('Hourly rate must be a positive number');
+      }
+      return true;
+    }),
+    body('basePrice').optional().custom((value) => {
+      if (!value || value === '') return true;
+      const num = typeof value === 'string' ? parseFloat(value) : value;
+      if (isNaN(num) || num < 0) {
+        throw new Error('Base price must be a positive number');
+      }
+      return true;
+    }),
     body('bio').optional().isString(),
   ],
   async (req: express.Request, res: express.Response) => {
     try {
       const errors = validationResult(req);
       if (!errors.isEmpty()) {
+        console.error('Validation errors:', errors.array());
         return res.status(400).json({ errors: errors.array() });
       }
 
-      const { skills, yearsOfExperience, hourlyRate, basePrice, bio } = req.body;
+      // Parse skills if it's a JSON string
+      let skills: string[];
+      if (typeof req.body.skills === 'string') {
+        try {
+          skills = JSON.parse(req.body.skills);
+        } catch (e) {
+          return res.status(400).json({ error: 'Invalid skills format. Must be a JSON array string.' });
+        }
+      } else {
+        skills = req.body.skills;
+      }
+
+      const { yearsOfExperience, hourlyRate, basePrice, bio } = req.body;
       const userId = req.user!.userId;
 
       // Check if profile exists
@@ -223,11 +272,11 @@ router.post(
         const profile = await prisma.technicianProfile.update({
           where: { userId },
           data: {
-            skills: JSON.parse(skills),
-            yearsOfExperience: parseInt(yearsOfExperience),
-            hourlyRate: hourlyRate ? parseFloat(hourlyRate) : null,
-            basePrice: basePrice ? parseFloat(basePrice) : null,
-            bio,
+            skills: skills, // Already parsed above
+            yearsOfExperience: typeof yearsOfExperience === 'string' ? parseInt(yearsOfExperience) : yearsOfExperience,
+            hourlyRate: hourlyRate && hourlyRate !== '' ? (typeof hourlyRate === 'string' ? parseFloat(hourlyRate) : hourlyRate) : null,
+            basePrice: basePrice && basePrice !== '' ? (typeof basePrice === 'string' ? parseFloat(basePrice) : basePrice) : null,
+            bio: bio || null,
             profilePictureUrl,
           },
           include: {
@@ -264,11 +313,11 @@ router.post(
         const profile = await prisma.technicianProfile.create({
           data: {
             userId,
-            skills: JSON.parse(skills),
-            yearsOfExperience: parseInt(yearsOfExperience),
-            hourlyRate: hourlyRate ? parseFloat(hourlyRate) : null,
-            basePrice: basePrice ? parseFloat(basePrice) : null,
-            bio,
+            skills: skills, // Already parsed above
+            yearsOfExperience: typeof yearsOfExperience === 'string' ? parseInt(yearsOfExperience) : yearsOfExperience,
+            hourlyRate: hourlyRate && hourlyRate !== '' ? (typeof hourlyRate === 'string' ? parseFloat(hourlyRate) : hourlyRate) : null,
+            basePrice: basePrice && basePrice !== '' ? (typeof basePrice === 'string' ? parseFloat(basePrice) : basePrice) : null,
+            bio: bio || null,
             profilePictureUrl,
             documents: {
               create: documentData.map(doc => ({
