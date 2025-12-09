@@ -469,7 +469,7 @@ const SearchTechnicians: React.FC = () => {
       )}
 
               {paginatedTechnicians.map((technician) => (
-              <Grid item xs={12} sm={6} md={4} lg={3} key={technician.id}>
+              <Grid item xs={12} sm={6} key={technician.id}>
                 <Card
                   sx={{
                     height: '100%',
