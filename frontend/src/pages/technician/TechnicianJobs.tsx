@@ -1393,10 +1393,23 @@ const TechnicianJobs: React.FC = () => {
                               variant="contained"
                               startIcon={<DownloadIcon />}
                               onClick={() => {
-                                const link = document.createElement('a');
-                                link.href = selectedBooking.receiptUrl!;
-                                link.download = `receipt-${selectedBooking.id}.pdf`;
-                                link.click();
+                                fetch(selectedBooking.receiptUrl!)
+                                  .then(res => res.blob())
+                                  .then(blob => {
+                                    const url = window.URL.createObjectURL(blob);
+                                    const link = document.createElement('a');
+                                    link.href = url;
+                                    link.download = `receipt-${selectedBooking.id}.pdf`;
+                                    document.body.appendChild(link);
+                                    link.click();
+                                    document.body.removeChild(link);
+                                    window.URL.revokeObjectURL(url);
+                                  })
+                                  .catch(err => {
+                                    console.error('Error downloading receipt:', err);
+                                    // Fallback: open in new tab
+                                    window.open(selectedBooking.receiptUrl, '_blank');
+                                  });
                               }}
                               sx={{
                                 bgcolor: '#032B5A',
@@ -1441,10 +1454,23 @@ const TechnicianJobs: React.FC = () => {
                               variant="contained"
                               startIcon={<DownloadIcon />}
                               onClick={() => {
-                                const link = document.createElement('a');
-                                link.href = selectedBooking.receiptUrl!;
-                                link.download = `receipt-${selectedBooking.id}.${selectedBooking.receiptUrl!.split('.').pop()}`;
-                                link.click();
+                                fetch(selectedBooking.receiptUrl!)
+                                  .then(res => res.blob())
+                                  .then(blob => {
+                                    const url = window.URL.createObjectURL(blob);
+                                    const link = document.createElement('a');
+                                    link.href = url;
+                                    link.download = `receipt-${selectedBooking.id}.${selectedBooking.receiptUrl!.split('.').pop()}`;
+                                    document.body.appendChild(link);
+                                    link.click();
+                                    document.body.removeChild(link);
+                                    window.URL.revokeObjectURL(url);
+                                  })
+                                  .catch(err => {
+                                    console.error('Error downloading receipt:', err);
+                                    // Fallback: open in new tab
+                                    window.open(selectedBooking.receiptUrl, '_blank');
+                                  });
                               }}
                               sx={{
                                 bgcolor: '#032B5A',
