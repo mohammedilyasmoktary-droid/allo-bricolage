@@ -148,23 +148,63 @@ const BookingRecapPage: React.FC = () => {
       </Box>
 
       {/* Info Alert */}
-      <Alert
-        severity="info"
-        icon={<InfoIcon />}
-        sx={{
-          mb: 4,
-          borderRadius: 2,
-          bgcolor: '#e3f2fd',
-          border: '1px solid #2196f3',
-          '& .MuiAlert-icon': {
-            color: '#2196f3',
-          },
-        }}
-      >
-        <Typography variant="body1" sx={{ fontWeight: 500, color: '#032B5A' }}>
-          Veuillez vérifier les détails de votre réservation avant de procéder au paiement.
-        </Typography>
-      </Alert>
+      {booking.status === 'PENDING' && (
+        <Alert
+          severity="info"
+          icon={<InfoIcon />}
+          sx={{
+            mb: 4,
+            borderRadius: 2,
+            bgcolor: '#fff3e0',
+            border: '1px solid #ff9800',
+            '& .MuiAlert-icon': {
+              color: '#ff9800',
+            },
+          }}
+        >
+          <Typography variant="body1" sx={{ fontWeight: 500, color: '#032B5A' }}>
+            Votre réservation est en attente d'acceptation par le technicien. Vous recevrez une notification une fois qu'elle sera acceptée.
+          </Typography>
+        </Alert>
+      )}
+      {booking.status === 'AWAITING_PAYMENT' && (
+        <Alert
+          severity="success"
+          icon={<InfoIcon />}
+          sx={{
+            mb: 4,
+            borderRadius: 2,
+            bgcolor: '#e8f5e9',
+            border: '1px solid #4caf50',
+            '& .MuiAlert-icon': {
+              color: '#4caf50',
+            },
+          }}
+        >
+          <Typography variant="body1" sx={{ fontWeight: 500, color: '#032B5A' }}>
+            Le service a été complété. Veuillez procéder au paiement.
+          </Typography>
+        </Alert>
+      )}
+      {booking.status === 'ACCEPTED' && (
+        <Alert
+          severity="success"
+          icon={<InfoIcon />}
+          sx={{
+            mb: 4,
+            borderRadius: 2,
+            bgcolor: '#e8f5e9',
+            border: '1px solid #4caf50',
+            '& .MuiAlert-icon': {
+              color: '#4caf50',
+            },
+          }}
+        >
+          <Typography variant="body1" sx={{ fontWeight: 500, color: '#032B5A' }}>
+            Votre réservation a été acceptée par le technicien. Le technicien vous contactera bientôt.
+          </Typography>
+        </Alert>
+      )}
 
       <Grid container spacing={4}>
         {/* Left Panel - Details */}
@@ -382,24 +422,33 @@ const BookingRecapPage: React.FC = () => {
 
               <Divider sx={{ my: 3, borderColor: '#e0e0e0' }} />
 
-              {/* Estimated Price */}
+              {/* Price */}
               <Box sx={{ mb: 3 }}>
                 <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1 }}>
                   <AttachMoneyIcon sx={{ color: '#F4C542', fontSize: 24 }} />
                   <Typography variant="body2" color="text.secondary" sx={{ fontWeight: 500 }}>
-                    Prix estimé
+                    {booking.status === 'AWAITING_PAYMENT' && booking.finalPrice ? 'Montant à payer' : 'Prix estimé'}
                   </Typography>
                 </Box>
                 <Typography
                   variant="h5"
                   sx={{
                     fontWeight: 700,
-                    color: booking.estimatedPrice ? '#F4C542' : '#9e9e9e',
+                    color: (booking.finalPrice || booking.estimatedPrice) ? '#F4C542' : '#9e9e9e',
                     ml: 4,
                   }}
                 >
-                  {booking.estimatedPrice ? `${booking.estimatedPrice} MAD` : 'À déterminer'}
+                  {booking.status === 'AWAITING_PAYMENT' && booking.finalPrice
+                    ? `${booking.finalPrice} MAD`
+                    : booking.estimatedPrice
+                    ? `${booking.estimatedPrice} MAD`
+                    : 'À déterminer'}
                 </Typography>
+                {booking.status === 'AWAITING_PAYMENT' && booking.finalPrice && booking.estimatedPrice && booking.finalPrice !== booking.estimatedPrice && (
+                  <Typography variant="caption" sx={{ color: '#666', ml: 4, display: 'block', mt: 0.5 }}>
+                    Prix estimé: {booking.estimatedPrice} MAD
+                  </Typography>
+                )}
               </Box>
 
               <Divider sx={{ my: 3, borderColor: '#e0e0e0' }} />
@@ -417,15 +466,27 @@ const BookingRecapPage: React.FC = () => {
                     </Typography>
                   </Box>
                   <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
-                    <CheckCircleIcon sx={{ color: '#4caf50', fontSize: 20 }} />
+                    {['ACCEPTED', 'ON_THE_WAY', 'IN_PROGRESS', 'AWAITING_PAYMENT', 'COMPLETED'].includes(booking.status) ? (
+                      <CheckCircleIcon sx={{ color: '#4caf50', fontSize: 20 }} />
+                    ) : (
+                      <CircularProgress size={20} sx={{ color: '#ff9800' }} />
+                    )}
                     <Typography variant="body2" sx={{ color: '#032B5A', fontWeight: 500 }}>
-                      En attente d'acceptation par le technicien
+                      {['ACCEPTED', 'ON_THE_WAY', 'IN_PROGRESS', 'AWAITING_PAYMENT', 'COMPLETED'].includes(booking.status)
+                        ? 'Acceptée par le technicien'
+                        : 'En attente d\'acceptation par le technicien'}
                     </Typography>
                   </Box>
                   <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
-                    <CheckCircleIcon sx={{ color: '#4caf50', fontSize: 20 }} />
+                    {booking.status === 'AWAITING_PAYMENT' || booking.status === 'COMPLETED' ? (
+                      <CheckCircleIcon sx={{ color: '#4caf50', fontSize: 20 }} />
+                    ) : booking.status === 'PENDING' || booking.status === 'ACCEPTED' || booking.status === 'ON_THE_WAY' || booking.status === 'IN_PROGRESS' ? (
+                      <CircularProgress size={20} sx={{ color: '#ff9800' }} />
+                    ) : null}
                     <Typography variant="body2" sx={{ color: '#032B5A', fontWeight: 500 }}>
-                      Paiement après complétion du travail
+                      {booking.status === 'AWAITING_PAYMENT' || booking.status === 'COMPLETED'
+                        ? 'Service complété - Paiement requis'
+                        : 'Service en cours'}
                     </Typography>
                   </Box>
                 </Box>
@@ -435,42 +496,69 @@ const BookingRecapPage: React.FC = () => {
 
               {/* Action Buttons */}
               <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-                <Button
-                  fullWidth
-                  variant="outlined"
-                  startIcon={<EditIcon />}
-                  onClick={handleEdit}
-                  sx={{
-                    borderColor: '#032B5A',
-                    color: '#032B5A',
-                    '&:hover': { borderColor: '#021d3f', bgcolor: 'rgba(3, 43, 90, 0.05)' },
-                    textTransform: 'none',
-                    borderRadius: 2,
-                    py: 1.25,
-                    fontWeight: 600,
-                  }}
-                >
-                  Modifier
-                </Button>
+                {/* Show payment button only when status is AWAITING_PAYMENT */}
+                {booking.status === 'AWAITING_PAYMENT' && (
+                  <Button
+                    fullWidth
+                    variant="contained"
+                    startIcon={<PaymentIcon />}
+                    onClick={handleConfirm}
+                    sx={{
+                      bgcolor: '#F4C542',
+                      color: '#032B5A',
+                      '&:hover': { bgcolor: '#e0b038' },
+                      textTransform: 'none',
+                      py: 1.5,
+                      borderRadius: 2,
+                      fontWeight: 700,
+                      boxShadow: 2,
+                    }}
+                  >
+                    Procéder au paiement
+                  </Button>
+                )}
 
-                <Button
-                  fullWidth
-                  variant="contained"
-                  startIcon={<PaymentIcon />}
-                  onClick={handleConfirm}
-                  sx={{
-                    bgcolor: '#F4C542',
-                    color: '#032B5A',
-                    '&:hover': { bgcolor: '#e0b038' },
-                    textTransform: 'none',
-                    py: 1.5,
-                    borderRadius: 2,
-                    fontWeight: 700,
-                    boxShadow: 2,
-                  }}
-                >
-                  Confirmer et continuer
-                </Button>
+                {/* Show edit button only for PENDING status */}
+                {booking.status === 'PENDING' && (
+                  <Button
+                    fullWidth
+                    variant="outlined"
+                    startIcon={<EditIcon />}
+                    onClick={handleEdit}
+                    sx={{
+                      borderColor: '#032B5A',
+                      color: '#032B5A',
+                      '&:hover': { borderColor: '#021d3f', bgcolor: 'rgba(3, 43, 90, 0.05)' },
+                      textTransform: 'none',
+                      borderRadius: 2,
+                      py: 1.25,
+                      fontWeight: 600,
+                    }}
+                  >
+                    Modifier la réservation
+                  </Button>
+                )}
+
+                {/* Show message button when technician is assigned */}
+                {booking.status !== 'PENDING' && booking.technicianId && (
+                  <Button
+                    fullWidth
+                    variant="outlined"
+                    startIcon={<MessageIcon />}
+                    onClick={() => navigate(`/messages?bookingId=${booking.id}`)}
+                    sx={{
+                      borderColor: '#032B5A',
+                      color: '#032B5A',
+                      '&:hover': { borderColor: '#021d3f', bgcolor: 'rgba(3, 43, 90, 0.05)' },
+                      textTransform: 'none',
+                      borderRadius: 2,
+                      py: 1.25,
+                      fontWeight: 600,
+                    }}
+                  >
+                    Contacter le technicien
+                  </Button>
+                )}
               </Box>
             </CardContent>
           </Card>
