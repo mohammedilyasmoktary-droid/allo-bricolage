@@ -30,6 +30,7 @@ import PersonIcon from '@mui/icons-material/Person';
 import PhotoLibraryIcon from '@mui/icons-material/PhotoLibrary';
 import InfoIcon from '@mui/icons-material/Info';
 import AttachMoneyIcon from '@mui/icons-material/AttachMoney';
+import MessageIcon from '@mui/icons-material/Message';
 
 const getStatusColor = (status: string) => {
   switch (status) {
