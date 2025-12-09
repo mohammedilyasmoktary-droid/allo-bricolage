@@ -88,30 +88,64 @@ const TechnicianJobs: React.FC = () => {
 
   const loadJobs = async () => {
     setLoading(true);
+    setError(''); // Clear any previous errors
     try {
-      console.log('Loading technician jobs...');
+      console.log('🔄 Loading technician jobs...');
+      console.log('Current user:', user?.id, user?.role);
       const data = await bookingsApi.getMyBookings();
-      console.log('Technician jobs loaded:', data?.length || 0, 'bookings');
-      console.log('Jobs data:', data);
+      console.log('✅ Technician jobs loaded:', data?.length || 0, 'bookings');
+      console.log('📦 Jobs data type:', typeof data, 'Is array:', Array.isArray(data));
+      console.log('📦 Jobs data:', data);
+      
+      // Ensure data is an array
+      if (!data) {
+        console.warn('⚠️ No data returned from API');
+        setBookings([]);
+        return;
+      }
+      
+      if (!Array.isArray(data)) {
+        console.error('❌ Data is not an array:', typeof data, data);
+        setError('Format de données invalide reçu du serveur');
+        setBookings([]);
+        return;
+      }
+      
+      // Log detailed booking information
+      if (data.length > 0) {
+        console.log('📋 First booking details:', {
+          id: data[0].id,
+          status: data[0].status,
+          technicianId: data[0].technicianId,
+          technicianProfileId: data[0].technicianProfileId,
+          hasQuote: !!data[0].quote,
+        });
+      }
+      
       // Log quote information for debugging
-      data?.forEach((booking: Booking) => {
+      data.forEach((booking: Booking) => {
         if (booking.quote) {
-          console.log(`Booking ${booking.id} has quote:`, booking.quote);
+          console.log(`✅ Booking ${booking.id} has quote:`, booking.quote);
         } else {
-          console.log(`Booking ${booking.id} has NO quote`);
+          console.log(`❌ Booking ${booking.id} has NO quote`);
         }
       });
-      setBookings(data || []);
+      
+      setBookings(data);
+      console.log('✅ Bookings state updated with', data.length, 'items');
     } catch (error: any) {
-      console.error('Failed to load jobs:', error);
-      console.error('Error details:', {
+      console.error('❌ Failed to load jobs:', error);
+      console.error('❌ Error details:', {
         message: error.message,
         response: error.response?.data,
         status: error.response?.status,
+        url: error.config?.url,
       });
+      setError('Erreur lors du chargement des missions. Veuillez réessayer.');
       setBookings([]);
     } finally {
       setLoading(false);
+      console.log('🏁 Loading finished');
     }
   };
 

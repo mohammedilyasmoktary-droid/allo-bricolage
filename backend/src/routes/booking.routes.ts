@@ -273,8 +273,11 @@ router.get('/my-bookings', authenticate, async (req, res) => {
         select: { id: true },
       });
       
+      console.log('Technician profile found:', technicianProfile);
+      
       if (technicianProfile) {
         // Include bookings where technicianId matches OR technicianProfileId matches
+        // This ensures we get both accepted bookings and pending bookings assigned to the profile
         where = {
           OR: [
             { technicianId: userId },
@@ -283,13 +286,14 @@ router.get('/my-bookings', authenticate, async (req, res) => {
         };
       } else {
         // Fallback to just technicianId if no profile exists
+        console.warn('No technician profile found for user:', userId);
         where = { technicianId: userId };
       }
     } else {
       where = {};
     }
 
-    console.log('Query where clause:', where);
+    console.log('Query where clause:', JSON.stringify(where, null, 2));
 
     const bookings = await prisma.serviceRequest.findMany({
       where,
