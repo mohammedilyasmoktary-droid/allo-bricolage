@@ -177,14 +177,12 @@ const TechnicianMap: React.FC<TechnicianMapProps> = ({ technicians, onTechnician
             </svg>
           `)}`;
           
-          // Create icon config safely - only use google.maps if available
-          let iconConfig: any = { url: svgIcon };
-          if (typeof window !== 'undefined' && (window as any).google && (window as any).google.maps) {
-            iconConfig.scaledSize = new (window as any).google.maps.Size(40, 40);
-          } else {
-            // Fallback: use width/height instead of scaledSize
-            iconConfig.scaledSize = { width: 40, height: 40 };
-          }
+          // Create icon config - use simple object format that works without Size constructor
+          const iconConfig = {
+            url: svgIcon,
+            scaledSize: { width: 40, height: 40 },
+            anchor: { x: 20, y: 20 },
+          };
           
           return (
             <Marker
