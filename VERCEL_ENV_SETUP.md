@@ -1,58 +1,66 @@
-# Configuration des Variables d'Environnement Vercel
+# Vercel Environment Variable Setup - Step by Step
 
-## Problème Actuel
-L'application frontend ne peut pas se connecter au backend. L'erreur indique que l'URL du backend n'est pas correctement configurée.
+## Issue: Google Maps API Key Not Loading
 
-## Solution : Configurer VITE_API_URL sur Vercel
+If you see "Google Maps API key not configured" even after adding the variable, follow these steps:
 
-### Étape 1 : Obtenir l'URL du Backend
-1. Allez sur [Render Dashboard](https://dashboard.render.com/)
-2. Sélectionnez votre service backend
-3. Copiez l'URL du service (ex: `https://allo-bricolage-backend.onrender.com`)
-4. Ajoutez `/api` à la fin : `https://allo-bricolage-backend.onrender.com/api`
+### Step 1: Verify the Variable in Vercel
 
-### Étape 2 : Configurer sur Vercel
-1. Allez sur [Vercel Dashboard](https://vercel.com/dashboard)
-2. Sélectionnez votre projet `allo-bricolage`
-3. Allez dans **Settings** → **Environment Variables**
-4. Ajoutez la variable suivante :
-   - **Name**: `VITE_API_URL`
-   - **Value**: `https://allo-bricolage-backend.onrender.com/api`
-   - **Environment**: Sélectionnez **Production**, **Preview**, et **Development**
-5. Cliquez sur **Save**
-6. **Important** : Redéployez l'application après avoir ajouté la variable
+1. Go to your Vercel dashboard: https://vercel.com/dashboard
+2. Select your project: **allo-bricolage**
+3. Go to **Settings** → **Environment Variables**
+4. Look for `VITE_GOOGLE_MAPS_API_KEY`
+5. **Verify:**
+   - ✅ Name is exactly: `VITE_GOOGLE_MAPS_API_KEY` (case-sensitive, no spaces)
+   - ✅ Value is: `AIzaSyAjGf3qCd1j2PiQYZIP993o3sz7TtXyYrw`
+   - ✅ Environment checkboxes: At minimum, **Production** must be checked
 
-### Étape 3 : Vérifier le Backend
-Assurez-vous que le backend est bien démarré sur Render :
-1. Vérifiez les logs sur Render
-2. Testez l'URL directement : `https://allo-bricolage-backend.onrender.com/api/health` (ou une route similaire)
-3. Vérifiez que CORS est configuré pour accepter les requêtes depuis `https://allo-bricolage.vercel.app`
+### Step 2: If Variable Doesn't Exist - Add It
 
-### Étape 4 : Redéployer
-Après avoir configuré la variable d'environnement :
-1. Sur Vercel, allez dans **Deployments**
-2. Cliquez sur les trois points (⋯) du dernier déploiement
-3. Sélectionnez **Redeploy**
-4. Attendez que le déploiement se termine
+1. Click **"Add New"** button
+2. **Name:** `VITE_GOOGLE_MAPS_API_KEY` (copy exactly, no spaces)
+3. **Value:** `AIzaSyAjGf3qCd1j2PiQYZIP993o3sz7TtXyYrw`
+4. **Environment:** Check **ALL THREE**:
+   - ✅ Production
+   - ✅ Preview  
+   - ✅ Development
+5. Click **"Save"**
 
-## Variables d'Environnement Requises
+### Step 3: Redeploy (CRITICAL)
 
-### Frontend (Vercel)
-- `VITE_API_URL`: URL complète du backend avec `/api` (ex: `https://allo-bricolage-backend.onrender.com/api`)
+**Important:** After adding/updating environment variables, you MUST redeploy:
 
-### Backend (Render)
-- `DATABASE_URL`: URL de connexion MySQL
-- `JWT_ACCESS_SECRET`: Secret pour les tokens JWT
-- `JWT_REFRESH_SECRET`: Secret pour les refresh tokens
-- `FRONTEND_URL`: URL du frontend (ex: `https://allo-bricolage.vercel.app`)
-- `BACKEND_URL`: URL du backend (ex: `https://allo-bricolage-backend.onrender.com`)
+1. Go to **Deployments** tab
+2. Find the latest deployment
+3. Click the **three dots (...)** menu on the right
+4. Click **"Redeploy"**
+5. Make sure **"Use existing Build Cache"** is **UNCHECKED** (to ensure new env vars are loaded)
+6. Click **"Redeploy"**
 
-## Test de Connexion
-Après configuration, testez la connexion :
-1. Ouvrez la console du navigateur (F12)
-2. Regardez les logs qui affichent l'URL API utilisée
-3. Essayez de vous connecter
-4. Si l'erreur persiste, vérifiez :
-   - Que le backend est démarré sur Render
-   - Que l'URL est correcte (avec `/api` à la fin)
-   - Que CORS est configuré correctement
+### Step 4: Wait for Deployment
+
+- Wait 1-2 minutes for the deployment to complete
+- Check that the deployment status shows "Ready" (green checkmark)
+
+### Step 5: Test
+
+1. Go to your live site: `https://allo-bricolage.vercel.app`
+2. Navigate to the search page
+3. Click the **"Carte"** tab
+4. The map should now load with technician markers
+
+## Troubleshooting
+
+### If still not working:
+
+1. **Clear browser cache** (Ctrl+Shift+R or Cmd+Shift+R)
+2. **Check browser console** (F12) for any errors
+3. **Verify variable name** - Must be exactly `VITE_GOOGLE_MAPS_API_KEY` (VITE_ prefix is required for Vite)
+4. **Check deployment logs** in Vercel to see if variable is being read
+
+### Common Mistakes:
+
+- ❌ Variable name with spaces: `VITE_GOOGLE_MAPS_API_KEY ` (has trailing space)
+- ❌ Wrong prefix: `GOOGLE_MAPS_API_KEY` (missing VITE_)
+- ❌ Only added to Development, not Production
+- ❌ Forgot to redeploy after adding variable
