@@ -25,16 +25,15 @@ const TechnicianMap: React.FC<TechnicianMapProps> = ({ technicians, onTechnician
   const [selectedTechnician, setSelectedTechnician] = React.useState<Technician | null>(null);
   const googleMapsApiKey = import.meta.env.VITE_GOOGLE_MAPS_API_KEY || '';
   
-  // Debug: Log API key status (only in development)
+  // Debug: Log API key status (always log in console for debugging)
   React.useEffect(() => {
-    if (import.meta.env.DEV) {
-      console.log('Google Maps API Key Status:', {
-        exists: !!googleMapsApiKey,
-        length: googleMapsApiKey?.length || 0,
-        startsWith: googleMapsApiKey?.substring(0, 10) || 'N/A',
-        allEnvVars: Object.keys(import.meta.env).filter(k => k.startsWith('VITE_')),
-      });
-    }
+    console.log('🔍 Google Maps API Key Debug:', {
+      exists: !!googleMapsApiKey,
+      length: googleMapsApiKey?.length || 0,
+      startsWith: googleMapsApiKey?.substring(0, 10) || 'N/A',
+      preview: googleMapsApiKey ? `${googleMapsApiKey.substring(0, 10)}...` : 'MISSING',
+      allViteEnvVars: Object.keys(import.meta.env).filter(k => k.startsWith('VITE_')),
+    });
   }, [googleMapsApiKey]);
 
   // Get unique cities from technicians
