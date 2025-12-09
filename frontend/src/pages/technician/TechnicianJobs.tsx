@@ -195,7 +195,13 @@ const TechnicianJobs: React.FC = () => {
       setQuoteConditions('');
       setQuoteEquipment('');
       setQuotePrice('');
-      loadJobs();
+      // Reload jobs to get updated quote data
+      await loadJobs();
+      // If detail dialog is open, reload the booking details
+      if (selectedBooking && detailDialogOpen) {
+        const updatedBooking = await bookingsApi.getById(selectedBooking.id);
+        setSelectedBooking(updatedBooking);
+      }
     } catch (err: any) {
       console.error('Failed to create quote:', err);
       setError(err.response?.data?.error || 'Erreur lors de la création du devis');
