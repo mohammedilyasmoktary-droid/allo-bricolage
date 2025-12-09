@@ -263,58 +263,12 @@ router.get('/my-bookings', authenticate, async (req, res) => {
     console.log('Getting bookings for user:', userId, 'role:', role);
 
     // For technicians, include both accepted bookings (technicianId) and pending bookings assigned to their profile
-    let where: any;
+    let bookings: any[];
+    
     if (role === 'CLIENT') {
-      where = { clientId: userId };
-    } else if (role === 'TECHNICIAN') {
-      // Get technician profile ID
-      const technicianProfile = await prisma.technicianProfile.findUnique({
-        where: { userId },
-        select: { id: true },
-      });
-      
-      console.log('🔍 Technician profile lookup:', {
-        userId,
-        profileFound: !!technicianProfile,
-        profileId: technicianProfile?.id,
-      });
-      
-      if (technicianProfile) {
-        // Try to get bookings with both conditions separately first to debug
-        const bookingsByUserId = await prisma.serviceRequest.findMany({
-          where: { technicianId: userId },
-          select: { id: true },
-        });
-        const bookingsByProfileId = await prisma.serviceRequest.findMany({
-          where: { technicianProfileId: technicianProfile.id },
-          select: { id: true },
-        });
-        
-        console.log('📊 Bookings by technicianId:', bookingsByUserId.length);
-        console.log('📊 Bookings by technicianProfileId:', bookingsByProfileId.length);
-        
-        // Include bookings where technicianId matches OR technicianProfileId matches
-        // This ensures we get both accepted bookings and pending bookings assigned to the profile
-        where = {
-          OR: [
-            { technicianId: userId },
-            { technicianProfileId: technicianProfile.id },
-          ],
-        };
-      } else {
-        // Fallback to just technicianId if no profile exists
-        console.warn('⚠️ No technician profile found for user:', userId);
-        where = { technicianId: userId };
-      }
-    } else {
-      where = {};
-    }
-
-    console.log('📋 Query where clause:', JSON.stringify(where, null, 2));
-
-    const bookings = await prisma.serviceRequest.findMany({
-      where,
-      include: {
+      bookings = await prisma.serviceRequest.findMany({
+        where: { clientId: userId },
+        include: {
         client: {
           select: {
             id: true,
