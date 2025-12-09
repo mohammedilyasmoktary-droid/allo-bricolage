@@ -117,22 +117,58 @@ const TechnicianMap: React.FC<TechnicianMapProps> = ({ technicians, onTechnician
     );
   }
 
+  const [loadError, setLoadError] = React.useState<string | null>(null);
+
+  const handleLoadError = (error: Error) => {
+    console.error('❌ Google Maps Load Error:', error);
+    setLoadError(error.message || 'Failed to load Google Maps');
+  };
+
   return (
-    <LoadScript googleMapsApiKey={googleMapsApiKey}>
-      <GoogleMap
-        mapContainerStyle={mapContainerStyle}
-        center={center}
-        zoom={cities.length === 1 ? 12 : 7}
-        options={{
-          styles: [
-            {
-              featureType: 'poi',
-              elementType: 'labels',
-              stylers: [{ visibility: 'off' }],
-            },
-          ],
-        }}
-      >
+    <LoadScript 
+      googleMapsApiKey={googleMapsApiKey}
+      onLoad={() => {
+        console.log('✅ Google Maps API loaded successfully');
+        setLoadError(null);
+      }}
+      onError={handleLoadError}
+      loadingElement={<Box sx={{ height: '500px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}><CircularProgress /></Box>}
+    >
+      {loadError ? (
+        <Paper sx={{ p: 3, textAlign: 'center', bgcolor: '#fff3cd', border: '1px solid #ffc107' }}>
+          <Typography variant="h6" color="error" sx={{ mb: 2 }}>
+            Erreur de chargement de Google Maps
+          </Typography>
+          <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
+            {loadError}
+          </Typography>
+          <Typography variant="caption" color="text.secondary" sx={{ display: 'block', mb: 2 }}>
+            Vérifiez que l'API key est valide et que "Maps JavaScript API" est activée dans Google Cloud Console.
+          </Typography>
+          <Typography variant="body2" color="text.secondary">
+            API Key utilisée: {googleMapsApiKey.substring(0, 10)}...
+          </Typography>
+        </Paper>
+      ) : (
+        <GoogleMap
+          mapContainerStyle={mapContainerStyle}
+          center={center}
+          zoom={cities.length === 1 ? 12 : 7}
+          onLoad={() => console.log('✅ Google Map loaded')}
+          onError={(error) => {
+            console.error('❌ Google Map Error:', error);
+            setLoadError('Erreur lors du chargement de la carte');
+          }}
+          options={{
+            styles: [
+              {
+                featureType: 'poi',
+                elementType: 'labels',
+                stylers: [{ visibility: 'off' }],
+              },
+            ],
+          }}
+        >
         {technicianMarkers.map((marker, index) => {
           const initial = marker.technician.user?.name?.charAt(0).toUpperCase() || 'T';
           const svgIcon = `data:image/svg+xml;charset=UTF-8,${encodeURIComponent(`
