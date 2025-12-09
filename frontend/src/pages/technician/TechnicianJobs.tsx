@@ -1307,7 +1307,7 @@ const TechnicianJobs: React.FC = () => {
                       <AttachMoneyIcon sx={{ mr: 2, color: '#4caf50', fontSize: 24 }} />
                       <ListItemText
                         primary={
-                          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, flexWrap: 'wrap' }}>
                             <Typography variant="subtitle1" sx={{ fontWeight: 700, color: '#032B5A' }}>
                               Prix final
                             </Typography>
@@ -1325,9 +1325,18 @@ const TechnicianJobs: React.FC = () => {
                           </Box>
                         }
                         secondary={
-                          <Typography variant="h6" sx={{ fontWeight: 700, color: '#4caf50', mt: 0.5 }}>
-                            {selectedBooking.finalPrice} MAD
-                          </Typography>
+                          <Box sx={{ mt: 0.5 }}>
+                            <Typography variant="h6" sx={{ fontWeight: 700, color: '#4caf50' }}>
+                              {selectedBooking.finalPrice} MAD
+                            </Typography>
+                            {selectedBooking.estimatedPrice && selectedBooking.finalPrice !== selectedBooking.estimatedPrice && (
+                              <Typography variant="caption" sx={{ color: '#666', display: 'block', mt: 0.5 }}>
+                                Différence: {selectedBooking.finalPrice > selectedBooking.estimatedPrice ? '+' : ''}
+                                {selectedBooking.finalPrice - selectedBooking.estimatedPrice} MAD
+                                {selectedBooking.finalPrice > selectedBooking.estimatedPrice ? ' (augmentation)' : ' (réduction)'}
+                              </Typography>
+                            )}
+                          </Box>
                         }
                       />
                     </ListItem>
