@@ -24,6 +24,18 @@ const defaultCenter = {
 const TechnicianMap: React.FC<TechnicianMapProps> = ({ technicians, onTechnicianClick }) => {
   const [selectedTechnician, setSelectedTechnician] = React.useState<Technician | null>(null);
   const googleMapsApiKey = import.meta.env.VITE_GOOGLE_MAPS_API_KEY || '';
+  
+  // Debug: Log API key status (only in development)
+  React.useEffect(() => {
+    if (import.meta.env.DEV) {
+      console.log('Google Maps API Key Status:', {
+        exists: !!googleMapsApiKey,
+        length: googleMapsApiKey?.length || 0,
+        startsWith: googleMapsApiKey?.substring(0, 10) || 'N/A',
+        allEnvVars: Object.keys(import.meta.env).filter(k => k.startsWith('VITE_')),
+      });
+    }
+  }, [googleMapsApiKey]);
 
   // Get unique cities from technicians
   const cities = Array.from(new Set(technicians.map(t => t.user?.city).filter(Boolean) as string[]));
