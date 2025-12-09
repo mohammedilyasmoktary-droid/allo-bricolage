@@ -14,8 +14,6 @@ import {
   InputLabel,
   CircularProgress,
   Avatar,
-  Tabs,
-  Tab,
   Paper,
   Alert,
   Slider,
@@ -82,7 +80,7 @@ const SearchTechnicians: React.FC = () => {
   const [filteredTechnicians, setFilteredTechnicians] = useState<Technician[]>([]);
   const [categories, setCategories] = useState<Category[]>([]);
   const [loading, setLoading] = useState(false);
-  const [viewMode, setViewMode] = useState<'list' | 'map'>('list');
+  // Removed viewMode - now showing both list and map side by side
   const [isUrgent, setIsUrgent] = useState(false);
   const [quickViewOpen, setQuickViewOpen] = useState(false);
   const [selectedTechnician, setSelectedTechnician] = useState<Technician | null>(null);
@@ -470,10 +468,7 @@ const SearchTechnicians: React.FC = () => {
         </Paper>
       )}
 
-      {viewMode === 'list' && !loading && (
-        <>
-          <Grid container spacing={3}>
-            {paginatedTechnicians.map((technician) => (
+              {paginatedTechnicians.map((technician) => (
               <Grid item xs={12} sm={6} md={4} lg={3} key={technician.id}>
                 <Card
                   sx={{
