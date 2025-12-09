@@ -672,30 +672,57 @@ const SearchTechnicians: React.FC = () => {
                 </Card>
               </Grid>
             ))}
+            </Grid>
+
+            {/* Pagination */}
+            {totalPages > 1 && (
+              <Box sx={{ display: 'flex', justifyContent: 'center', mt: 4, mb: 2 }}>
+                <Pagination
+                  count={totalPages}
+                  page={currentPage}
+                  onChange={(_, page) => setCurrentPage(page)}
+                  color="primary"
+                  sx={{
+                    '& .MuiPaginationItem-root': {
+                      color: '#032B5A',
+                      '&.Mui-selected': {
+                        bgcolor: '#F4C542',
+                        color: '#032B5A',
+                        fontWeight: 700,
+                      },
+                    },
+                  }}
+                />
+              </Box>
+            )}
           </Grid>
 
-          {/* Pagination */}
-          {totalPages > 1 && (
-            <Box sx={{ display: 'flex', justifyContent: 'center', mt: 4, mb: 2 }}>
-              <Pagination
-                count={totalPages}
-                page={currentPage}
-                onChange={(_, page) => setCurrentPage(page)}
-                color="primary"
-                sx={{
-                  '& .MuiPaginationItem-root': {
-                    color: '#032B5A',
-                    '&.Mui-selected': {
-                      bgcolor: '#F4C542',
-                      color: '#032B5A',
-                      fontWeight: 700,
-                    },
-                  },
-                }}
-              />
-            </Box>
-          )}
-        </>
+          {/* Right Side - Map */}
+          <Grid item xs={12} md={6}>
+            <Paper 
+              sx={{ 
+                p: 2, 
+                boxShadow: 3, 
+                borderRadius: 3,
+                position: { md: 'sticky' },
+                top: { md: 20 },
+                height: { md: 'fit-content' },
+                maxHeight: { md: 'calc(100vh - 40px)' },
+                overflow: 'hidden',
+              }}
+            >
+              <Typography variant="h6" sx={{ fontWeight: 600, color: '#032B5A', mb: 2 }}>
+                Carte des techniciens
+              </Typography>
+              <Box sx={{ borderRadius: 2, overflow: 'hidden' }}>
+                <TechnicianMap
+                  technicians={filteredTechnicians}
+                  onTechnicianClick={(technician) => handleQuickView(technician)}
+                />
+              </Box>
+            </Paper>
+          </Grid>
+        </Grid>
       )}
 
       {technicians.length === 0 && !loading && (
