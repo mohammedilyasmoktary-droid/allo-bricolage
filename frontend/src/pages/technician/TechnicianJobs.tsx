@@ -1001,9 +1001,16 @@ const TechnicianJobs: React.FC = () => {
                             </Box>
                           )}
 
-                          {booking.status === 'AWAITING_PAYMENT' && booking.paymentStatus !== 'PENDING' && (
-                            <Alert severity="info" sx={{ borderRadius: 2 }}>
-                              En attente du paiement du client
+                          {booking.status === 'AWAITING_PAYMENT' && booking.paymentStatus === 'UNPAID' && (
+                            <Alert severity="info" sx={{ borderRadius: 2, bgcolor: '#e3f2fd', border: '1px solid #2196f3' }}>
+                              <Typography variant="body2" sx={{ fontWeight: 600, color: '#032B5A' }}>
+                                En attente du paiement du client
+                              </Typography>
+                              {booking.finalPrice && (
+                                <Typography variant="body2" sx={{ color: '#032B5A', mt: 0.5 }}>
+                                  Montant à recevoir: <strong>{booking.finalPrice} MAD</strong>
+                                </Typography>
+                              )}
                             </Alert>
                           )}
 
