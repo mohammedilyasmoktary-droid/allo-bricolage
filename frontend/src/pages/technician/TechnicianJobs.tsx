@@ -996,6 +996,17 @@ const TechnicianJobs: React.FC = () => {
                                 onClick={async () => {
                                   try {
                                     setError(''); // Clear previous errors
+                                    console.log('Attempting to update booking to IN_PROGRESS:', booking.id);
+                                    console.log('Booking quote status:', booking.quote ? 'Has quote' : 'No quote');
+                                    
+                                    // Double-check quote exists before attempting update
+                                    if (!booking.quote) {
+                                      setError('Un devis doit être créé avant de commencer le travail. Veuillez créer un devis d\'abord.');
+                                      setSelectedBooking(booking);
+                                      handleCreateQuote(booking);
+                                      return;
+                                    }
+                                    
                                     await updateStatus(booking.id, 'IN_PROGRESS');
                                   } catch (err: any) {
                                     console.error('Failed to update to IN_PROGRESS:', err);
