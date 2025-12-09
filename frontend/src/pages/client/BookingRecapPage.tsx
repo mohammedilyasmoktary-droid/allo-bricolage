@@ -17,6 +17,7 @@ import {
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
 import { bookingsApi, Booking } from '../../api/bookings';
+import { generateQuotePDF, QuotePDFData } from '../../utils/pdfGenerator';
 import { format } from 'date-fns';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import EditIcon from '@mui/icons-material/Edit';
@@ -31,6 +32,9 @@ import PhotoLibraryIcon from '@mui/icons-material/PhotoLibrary';
 import InfoIcon from '@mui/icons-material/Info';
 import AttachMoneyIcon from '@mui/icons-material/AttachMoney';
 import MessageIcon from '@mui/icons-material/Message';
+import DescriptionIcon from '@mui/icons-material/Description';
+import PictureAsPdfIcon from '@mui/icons-material/PictureAsPdf';
+import BuildIcon from '@mui/icons-material/Build';
 
 const getStatusColor = (status: string) => {
   switch (status) {
@@ -336,6 +340,93 @@ const BookingRecapPage: React.FC = () => {
                 </>
               )}
 
+              {/* Quote Section */}
+              {booking.quote && (
+                <>
+                  <Divider sx={{ my: 3, borderColor: '#f0f0f0' }} />
+                  <Paper
+                    sx={{
+                      p: 3,
+                      bgcolor: '#fff9e6',
+                      borderRadius: 3,
+                      border: '2px solid #F4C542',
+                      boxShadow: '0 4px 12px rgba(244, 197, 66, 0.15)',
+                    }}
+                  >
+                    <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 2 }}>
+                      <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                        <DescriptionIcon sx={{ color: '#F4C542', fontSize: 24 }} />
+                        <Typography variant="h6" sx={{ fontWeight: 700, color: '#032B5A' }}>
+                          Devis
+                        </Typography>
+                      </Box>
+                      <Button
+                        variant="contained"
+                        size="small"
+                        startIcon={<PictureAsPdfIcon />}
+                        onClick={async () => {
+                          try {
+                            const pdfData: QuotePDFData = {
+                              quoteId: booking.quote!.id,
+                              bookingId: booking.id,
+                              clientName: user?.name || 'Client',
+                              clientEmail: user?.email || '',
+                              clientPhone: user?.phone || '',
+                              technicianName: booking.technician?.name || 'Technicien',
+                              technicianPhone: booking.technician?.phone || '',
+                              serviceCategory: booking.category?.name || '',
+                              description: booking.description || '',
+                              address: booking.address || '',
+                              city: booking.city || '',
+                              conditions: booking.quote!.conditions,
+                              equipment: booking.quote!.equipment,
+                              price: booking.quote!.price,
+                              createdAt: booking.quote!.createdAt,
+                            };
+                            await generateQuotePDF(pdfData);
+                          } catch (error) {
+                            console.error('Failed to generate quote PDF:', error);
+                          }
+                        }}
+                        sx={{
+                          bgcolor: '#032B5A',
+                          color: 'white',
+                          textTransform: 'none',
+                          '&:hover': { bgcolor: '#021d3f' },
+                        }}
+                      >
+                        Télécharger PDF
+                      </Button>
+                    </Box>
+                    <Divider sx={{ mb: 2 }} />
+                    <Box sx={{ mb: 2 }}>
+                      <Typography variant="subtitle2" sx={{ fontWeight: 600, color: '#032B5A', mb: 1 }}>
+                        Prix du devis:
+                      </Typography>
+                      <Typography variant="h5" sx={{ fontWeight: 700, color: '#F4C542' }}>
+                        {booking.quote.price} MAD
+                      </Typography>
+                    </Box>
+                    <Box sx={{ mb: 2 }}>
+                      <Typography variant="subtitle2" sx={{ fontWeight: 600, color: '#032B5A', mb: 1 }}>
+                        Conditions:
+                      </Typography>
+                      <Typography variant="body2" sx={{ color: '#032B5A', lineHeight: 1.8, whiteSpace: 'pre-wrap' }}>
+                        {booking.quote.conditions}
+                      </Typography>
+                    </Box>
+                    <Box>
+                      <Typography variant="subtitle2" sx={{ fontWeight: 600, color: '#032B5A', mb: 1 }}>
+                        Équipement nécessaire:
+                      </Typography>
+                      <Typography variant="body2" sx={{ color: '#032B5A', lineHeight: 1.8, whiteSpace: 'pre-wrap' }}>
+                        {booking.quote.equipment}
+                      </Typography>
+                    </Box>
+                  </Paper>
+                </>
+              )}
+
               {/* Photos */}
               {booking.photos && booking.photos.length > 0 && (
                 <>
@@ -428,29 +519,92 @@ const BookingRecapPage: React.FC = () => {
                 <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1 }}>
                   <AttachMoneyIcon sx={{ color: '#F4C542', fontSize: 24 }} />
                   <Typography variant="body2" color="text.secondary" sx={{ fontWeight: 500 }}>
-                    {booking.status === 'AWAITING_PAYMENT' && booking.finalPrice ? 'Montant à payer' : 'Prix estimé'}
+                    {booking.status === 'AWAITING_PAYMENT' && booking.finalPrice ? 'Montant à payer' : booking.quote ? 'Prix du devis' : 'Prix estimé'}
                   </Typography>
                 </Box>
                 <Typography
                   variant="h5"
                   sx={{
                     fontWeight: 700,
-                    color: (booking.finalPrice || booking.estimatedPrice) ? '#F4C542' : '#9e9e9e',
+                    color: (booking.finalPrice || booking.quote?.price || booking.estimatedPrice) ? '#F4C542' : '#9e9e9e',
                     ml: 4,
                   }}
                 >
                   {booking.status === 'AWAITING_PAYMENT' && booking.finalPrice
                     ? `${booking.finalPrice} MAD`
+                    : booking.quote?.price
+                    ? `${booking.quote.price} MAD`
                     : booking.estimatedPrice
                     ? `${booking.estimatedPrice} MAD`
                     : 'À déterminer'}
                 </Typography>
+                {booking.quote && booking.estimatedPrice && booking.quote.price !== booking.estimatedPrice && (
+                  <Typography variant="caption" sx={{ color: '#666', ml: 4, display: 'block', mt: 0.5 }}>
+                    Prix estimé initial: {booking.estimatedPrice} MAD
+                  </Typography>
+                )}
                 {booking.status === 'AWAITING_PAYMENT' && booking.finalPrice && booking.estimatedPrice && booking.finalPrice !== booking.estimatedPrice && (
                   <Typography variant="caption" sx={{ color: '#666', ml: 4, display: 'block', mt: 0.5 }}>
                     Prix estimé: {booking.estimatedPrice} MAD
                   </Typography>
                 )}
               </Box>
+
+              {/* Quote Info */}
+              {booking.quote && (
+                <>
+                  <Divider sx={{ my: 3, borderColor: '#e0e0e0' }} />
+                  <Box sx={{ mb: 3 }}>
+                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1 }}>
+                      <DescriptionIcon sx={{ color: '#F4C542', fontSize: 20 }} />
+                      <Typography variant="body2" color="text.secondary" sx={{ fontWeight: 600 }}>
+                        Devis disponible
+                      </Typography>
+                    </Box>
+                    <Typography variant="body2" sx={{ color: '#032B5A', ml: 4, mb: 1 }}>
+                      Un devis détaillé a été créé par le technicien. Vous pouvez le consulter dans les détails ci-contre.
+                    </Typography>
+                    <Button
+                      variant="outlined"
+                      size="small"
+                      startIcon={<PictureAsPdfIcon />}
+                      onClick={async () => {
+                        try {
+                          const pdfData: QuotePDFData = {
+                            quoteId: booking.quote!.id,
+                            bookingId: booking.id,
+                            clientName: user?.name || 'Client',
+                            clientEmail: user?.email || '',
+                            clientPhone: user?.phone || '',
+                            technicianName: booking.technician?.name || 'Technicien',
+                            technicianPhone: booking.technician?.phone || '',
+                            serviceCategory: booking.category?.name || '',
+                            description: booking.description || '',
+                            address: booking.address || '',
+                            city: booking.city || '',
+                            conditions: booking.quote!.conditions,
+                            equipment: booking.quote!.equipment,
+                            price: booking.quote!.price,
+                            createdAt: booking.quote!.createdAt,
+                          };
+                          await generateQuotePDF(pdfData);
+                        } catch (error) {
+                          console.error('Failed to generate quote PDF:', error);
+                        }
+                      }}
+                      sx={{
+                        ml: 4,
+                        borderColor: '#032B5A',
+                        color: '#032B5A',
+                        textTransform: 'none',
+                        '&:hover': { borderColor: '#021d3f', bgcolor: 'rgba(3, 43, 90, 0.05)' },
+                      }}
+                    >
+                      Télécharger le devis (PDF)
+                    </Button>
+                  </Box>
+                </>
+              )}
 
               <Divider sx={{ my: 3, borderColor: '#e0e0e0' }} />
 
