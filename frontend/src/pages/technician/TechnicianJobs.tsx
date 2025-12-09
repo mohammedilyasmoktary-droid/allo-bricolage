@@ -987,14 +987,21 @@ const TechnicianJobs: React.FC = () => {
                                 startIcon={<BuildIcon />}
                                 onClick={async () => {
                                   try {
+                                    setError(''); // Clear previous errors
                                     await updateStatus(booking.id, 'IN_PROGRESS');
                                   } catch (err: any) {
-                                    if (err.response?.data?.error?.includes('devis')) {
-                                      setError('Un devis doit être créé avant de commencer le travail');
-                                      setSelectedBooking(booking);
-                                      handleCreateQuote(booking);
+                                    console.error('Failed to update to IN_PROGRESS:', err);
+                                    const errorMessage = err.response?.data?.error || err.message || 'Erreur lors de la mise à jour du statut';
+                                    
+                                    if (errorMessage.includes('devis') || errorMessage.includes('Devis')) {
+                                      setError('Un devis doit être créé avant de commencer le travail. Veuillez créer un devis d\'abord.');
+                                      // Open quote dialog if no quote exists
+                                      if (!booking.quote) {
+                                        setSelectedBooking(booking);
+                                        handleCreateQuote(booking);
+                                      }
                                     } else {
-                                      setError(err.response?.data?.error || 'Erreur lors de la mise à jour du statut');
+                                      setError(errorMessage);
                                     }
                                   }
                                 }}
