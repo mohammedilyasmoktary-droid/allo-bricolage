@@ -1,11 +1,9 @@
 import express, { Request, Response } from 'express';
 import { body, validationResult } from 'express-validator';
-import { PrismaClient } from '@prisma/client';
-import { authenticate } from '../middleware/auth.middleware';
-import { authorize } from '../middleware/auth.middleware';
+import prisma from '../config/database';
+import { authenticate, authorize } from '../middleware/auth.middleware';
 
 const router = express.Router();
-const prisma = new PrismaClient();
 
 // Create or update a quote for a booking (TECHNICIAN only)
 router.post(
