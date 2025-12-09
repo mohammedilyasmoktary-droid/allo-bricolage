@@ -1292,13 +1292,43 @@ const TechnicianJobs: React.FC = () => {
                       />
                     </ListItem>
                   )}
-                  {(selectedBooking.estimatedPrice || selectedBooking.finalPrice) && (
+                  {selectedBooking.estimatedPrice && (
                     <ListItem disableGutters>
                       <AttachMoneyIcon sx={{ mr: 2, color: '#F4C542' }} />
                       <ListItemText
-                        primary="Prix"
-                        secondary={`${selectedBooking.finalPrice || selectedBooking.estimatedPrice} MAD`}
+                        primary="Prix estimé"
+                        secondary={`${selectedBooking.estimatedPrice} MAD`}
                         primaryTypographyProps={{ fontWeight: 600, color: '#032B5A' }}
+                      />
+                    </ListItem>
+                  )}
+                  {selectedBooking.finalPrice && (
+                    <ListItem disableGutters>
+                      <AttachMoneyIcon sx={{ mr: 2, color: '#4caf50', fontSize: 24 }} />
+                      <ListItemText
+                        primary={
+                          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                            <Typography variant="subtitle1" sx={{ fontWeight: 700, color: '#032B5A' }}>
+                              Prix final
+                            </Typography>
+                            <Chip 
+                              label="Défini par vous" 
+                              size="small" 
+                              sx={{ 
+                                bgcolor: '#4caf50', 
+                                color: 'white', 
+                                fontSize: '0.7rem',
+                                height: 20,
+                                fontWeight: 600,
+                              }} 
+                            />
+                          </Box>
+                        }
+                        secondary={
+                          <Typography variant="h6" sx={{ fontWeight: 700, color: '#4caf50', mt: 0.5 }}>
+                            {selectedBooking.finalPrice} MAD
+                          </Typography>
+                        }
                       />
                     </ListItem>
                   )}
@@ -1338,51 +1368,99 @@ const TechnicianJobs: React.FC = () => {
                           Reçu de paiement confirmé.
                         </Typography>
                       )}
-                      {selectedBooking.receiptUrl.endsWith('.pdf') ? (
-                        <Button
-                          variant="outlined"
-                          href={selectedBooking.receiptUrl}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          startIcon={<PictureAsPdfIcon />}
-                          sx={{
-                            borderColor: selectedBooking.paymentStatus === 'PENDING' ? '#ff9800' : '#032B5A',
-                            color: selectedBooking.paymentStatus === 'PENDING' ? '#f57c00' : '#032B5A',
-                            textTransform: 'none',
-                            '&:hover': {
-                              borderColor: selectedBooking.paymentStatus === 'PENDING' ? '#f57c00' : '#021d3f',
-                              bgcolor: selectedBooking.paymentStatus === 'PENDING' ? 'rgba(255, 152, 0, 0.1)' : 'rgba(3, 43, 90, 0.05)',
-                            },
-                          }}
-                        >
-                          Voir le reçu PDF
-                        </Button>
-                      ) : (
-                        <Box
-                          sx={{
-                            border: '1px solid #e0e0e0',
-                            borderRadius: 2,
-                            overflow: 'hidden',
-                            mt: 1,
-                            cursor: 'pointer',
-                            '&:hover': {
-                              borderColor: '#F4C542',
-                            },
-                          }}
-                          onClick={() => window.open(selectedBooking.receiptUrl, '_blank')}
-                        >
-                          <img
-                            src={selectedBooking.receiptUrl}
-                            alt="Payment Receipt"
-                            style={{
-                              width: '100%',
-                              maxHeight: '300px',
-                              objectFit: 'contain',
-                              display: 'block',
-                            }}
-                          />
-                        </Box>
-                      )}
+                      <Box sx={{ display: 'flex', gap: 1, mb: 2, flexWrap: 'wrap' }}>
+                        {selectedBooking.receiptUrl.endsWith('.pdf') ? (
+                          <>
+                            <Button
+                              variant="outlined"
+                              href={selectedBooking.receiptUrl}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              startIcon={<PictureAsPdfIcon />}
+                              sx={{
+                                borderColor: selectedBooking.paymentStatus === 'PENDING' ? '#ff9800' : '#032B5A',
+                                color: selectedBooking.paymentStatus === 'PENDING' ? '#f57c00' : '#032B5A',
+                                textTransform: 'none',
+                                '&:hover': {
+                                  borderColor: selectedBooking.paymentStatus === 'PENDING' ? '#f57c00' : '#021d3f',
+                                  bgcolor: selectedBooking.paymentStatus === 'PENDING' ? 'rgba(255, 152, 0, 0.1)' : 'rgba(3, 43, 90, 0.05)',
+                                },
+                              }}
+                            >
+                              Voir le reçu PDF
+                            </Button>
+                            <Button
+                              variant="contained"
+                              startIcon={<DownloadIcon />}
+                              onClick={() => {
+                                const link = document.createElement('a');
+                                link.href = selectedBooking.receiptUrl!;
+                                link.download = `receipt-${selectedBooking.id}.pdf`;
+                                link.click();
+                              }}
+                              sx={{
+                                bgcolor: '#032B5A',
+                                color: 'white',
+                                textTransform: 'none',
+                                '&:hover': {
+                                  bgcolor: '#021d3f',
+                                },
+                              }}
+                            >
+                              Télécharger
+                            </Button>
+                          </>
+                        ) : (
+                          <>
+                            <Box
+                              sx={{
+                                border: '1px solid #e0e0e0',
+                                borderRadius: 2,
+                                overflow: 'hidden',
+                                flex: 1,
+                                minWidth: 200,
+                                cursor: 'pointer',
+                                '&:hover': {
+                                  borderColor: '#F4C542',
+                                },
+                              }}
+                              onClick={() => window.open(selectedBooking.receiptUrl, '_blank')}
+                            >
+                              <img
+                                src={selectedBooking.receiptUrl}
+                                alt="Payment Receipt"
+                                style={{
+                                  width: '100%',
+                                  maxHeight: '300px',
+                                  objectFit: 'contain',
+                                  display: 'block',
+                                }}
+                              />
+                            </Box>
+                            <Button
+                              variant="contained"
+                              startIcon={<DownloadIcon />}
+                              onClick={() => {
+                                const link = document.createElement('a');
+                                link.href = selectedBooking.receiptUrl!;
+                                link.download = `receipt-${selectedBooking.id}.${selectedBooking.receiptUrl!.split('.').pop()}`;
+                                link.click();
+                              }}
+                              sx={{
+                                bgcolor: '#032B5A',
+                                color: 'white',
+                                textTransform: 'none',
+                                alignSelf: 'flex-start',
+                                '&:hover': {
+                                  bgcolor: '#021d3f',
+                                },
+                              }}
+                            >
+                              Télécharger
+                            </Button>
+                          </>
+                        )}
+                      </Box>
                       {selectedBooking.transactionId && (
                         <Typography variant="caption" sx={{ color: '#666', mt: 1, display: 'block' }}>
                           ID de transaction: {selectedBooking.transactionId}
