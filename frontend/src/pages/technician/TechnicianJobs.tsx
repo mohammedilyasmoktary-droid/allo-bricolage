@@ -109,6 +109,7 @@ const TechnicianJobs: React.FC = () => {
 
   const updateStatus = async (bookingId: string, status: string, finalPrice?: number) => {
     try {
+      setError(''); // Clear any previous errors
       await bookingsApi.updateStatus(bookingId, { status, finalPrice });
       loadJobs();
       if (status === 'COMPLETED') {
@@ -116,9 +117,11 @@ const TechnicianJobs: React.FC = () => {
         setSelectedBooking(null);
         setFinalPrice('');
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error('Failed to update status:', error);
-      setError('Erreur lors de la mise à jour du statut');
+      const errorMessage = error.response?.data?.error || error.message || 'Erreur lors de la mise à jour du statut';
+      setError(errorMessage);
+      throw error; // Re-throw to allow caller to handle it
     }
   };
 
@@ -229,25 +232,35 @@ const TechnicianJobs: React.FC = () => {
   };
 
   const handleViewDetails = async (booking: Booking) => {
-    setSelectedBooking(booking);
-    setDetailDialogOpen(true);
-    
-    // Load existing review if payment is paid
-    if (booking.paymentStatus === 'PAID' && booking.reviews && booking.reviews.length > 0) {
-      const technicianReview = booking.reviews.find((r: any) => r.reviewerId === user?.id);
-      if (technicianReview) {
-        setExistingReview(technicianReview);
-        setReviewRating(technicianReview.rating);
-        setReviewComment(technicianReview.comment || '');
+    try {
+      // Reload booking details to get the latest quote and other data
+      const fullBooking = await bookingsApi.getById(booking.id);
+      setSelectedBooking(fullBooking);
+      setDetailDialogOpen(true);
+      
+      // Load existing review if payment is paid
+      if (fullBooking.paymentStatus === 'PAID' && fullBooking.reviews && fullBooking.reviews.length > 0) {
+        const technicianReview = fullBooking.reviews.find((r: any) => r.reviewerId === user?.id);
+        if (technicianReview) {
+          setExistingReview(technicianReview);
+          setReviewRating(technicianReview.rating);
+          setReviewComment(technicianReview.comment || '');
+        } else {
+          setExistingReview(null);
+          setReviewRating(5);
+          setReviewComment('');
+        }
       } else {
         setExistingReview(null);
         setReviewRating(5);
         setReviewComment('');
       }
-    } else {
-      setExistingReview(null);
-      setReviewRating(5);
-      setReviewComment('');
+    } catch (error: any) {
+      console.error('Failed to load booking details:', error);
+      setError('Erreur lors du chargement des détails');
+      // Fallback to using the booking passed as parameter
+      setSelectedBooking(booking);
+      setDetailDialogOpen(true);
     }
   };
 
@@ -926,7 +939,14 @@ const TechnicianJobs: React.FC = () => {
                                 fullWidth
                                 variant="contained"
                                 startIcon={<DirectionsCarIcon />}
-                                onClick={() => updateStatus(booking.id, 'ON_THE_WAY')}
+                                onClick={async () => {
+                                  try {
+                                    await updateStatus(booking.id, 'ON_THE_WAY');
+                                  } catch (err: any) {
+                                    // Error is already set by updateStatus
+                                    console.error('Failed to update to ON_THE_WAY:', err);
+                                  }
+                                }}
                                 sx={{
                                   bgcolor: '#2196f3',
                                   color: 'white',

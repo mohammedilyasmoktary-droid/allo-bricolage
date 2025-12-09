@@ -297,6 +297,7 @@ router.get('/my-bookings', authenticate, async (req, res) => {
           },
         },
         category: true,
+        quote: true,
         reviews: {
           select: {
             id: true,
