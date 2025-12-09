@@ -80,7 +80,6 @@ const SearchTechnicians: React.FC = () => {
   const [filteredTechnicians, setFilteredTechnicians] = useState<Technician[]>([]);
   const [categories, setCategories] = useState<Category[]>([]);
   const [loading, setLoading] = useState(false);
-  // Removed viewMode - now showing both list and map side by side
   const [isUrgent, setIsUrgent] = useState(false);
   const [quickViewOpen, setQuickViewOpen] = useState(false);
   const [selectedTechnician, setSelectedTechnician] = useState<Technician | null>(null);
