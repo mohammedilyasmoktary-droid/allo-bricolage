@@ -390,7 +390,14 @@ const TechnicianJobs: React.FC = () => {
 
   // Filter and categorize bookings
   const filteredBookings = useMemo(() => {
+    // Ensure bookings is an array
+    if (!bookings || !Array.isArray(bookings)) {
+      console.warn('Bookings is not an array:', bookings);
+      return [];
+    }
+
     let filtered = [...bookings];
+    console.log('Filtering bookings. Total:', bookings.length, 'Status filter:', statusFilter, 'Search:', searchQuery);
 
     // Search filter
     if (searchQuery) {
@@ -402,16 +409,19 @@ const TechnicianJobs: React.FC = () => {
           b.address?.toLowerCase().includes(query) ||
           b.description?.toLowerCase().includes(query)
       );
+      console.log('After search filter:', filtered.length);
     }
 
     // Status filter - show all if 'all' is selected, otherwise filter by status
     if (statusFilter !== 'all') {
       filtered = filtered.filter((b) => b.status === statusFilter);
+      console.log('After status filter:', filtered.length);
     }
 
     // Sort by date (newest first)
     filtered.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
 
+    console.log('Final filtered bookings:', filtered.length);
     return filtered;
   }, [bookings, statusFilter, searchQuery]);
 
