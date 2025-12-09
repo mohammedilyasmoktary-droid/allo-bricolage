@@ -262,56 +262,117 @@ router.get('/my-bookings', authenticate, async (req, res) => {
 
     console.log('Getting bookings for user:', userId, 'role:', role);
 
-    // For technicians, include both accepted bookings (technicianId) and pending bookings assigned to their profile
+    const includeClause = {
+      client: {
+        select: {
+          id: true,
+          name: true,
+          email: true,
+          phone: true,
+          city: true,
+        },
+      },
+      technician: {
+        select: {
+          id: true,
+          name: true,
+          email: true,
+          phone: true,
+          city: true,
+        },
+      },
+      technicianProfile: {
+        select: {
+          id: true,
+          skills: true,
+          yearsOfExperience: true,
+          averageRating: true,
+          profilePictureUrl: true,
+        },
+      },
+      category: true,
+      quote: true,
+      reviews: {
+        select: {
+          id: true,
+          reviewerId: true,
+          rating: true,
+          comment: true,
+        },
+      },
+    };
+
     let bookings: any[];
-    
+
     if (role === 'CLIENT') {
       bookings = await prisma.serviceRequest.findMany({
         where: { clientId: userId },
-        include: {
-        client: {
-          select: {
-            id: true,
-            name: true,
-            email: true,
-            phone: true,
-            city: true,
-          },
-        },
-        technician: {
-          select: {
-            id: true,
-            name: true,
-            email: true,
-            phone: true,
-            city: true,
-          },
-        },
-        technicianProfile: {
-          select: {
-            id: true,
-            skills: true,
-            yearsOfExperience: true,
-            averageRating: true,
-            profilePictureUrl: true,
-          },
-        },
-        category: true,
-        quote: true,
-        reviews: {
-          select: {
-            id: true,
-            reviewerId: true,
-            rating: true,
-            comment: true,
-          },
-        },
-      },
-      orderBy: { createdAt: 'desc' },
-    });
+        include: includeClause,
+        orderBy: { createdAt: 'desc' },
+      });
+    } else if (role === 'TECHNICIAN') {
+      // Get technician profile ID
+      const technicianProfile = await prisma.technicianProfile.findUnique({
+        where: { userId },
+        select: { id: true },
+      });
+      
+      console.log('🔍 Technician profile lookup:', {
+        userId,
+        profileFound: !!technicianProfile,
+        profileId: technicianProfile?.id,
+      });
+      
+      if (technicianProfile) {
+        // Get bookings by technicianId and technicianProfileId separately, then merge
+        const [bookingsByUserId, bookingsByProfileId] = await Promise.all([
+          prisma.serviceRequest.findMany({
+            where: { technicianId: userId },
+            include: includeClause,
+            orderBy: { createdAt: 'desc' },
+          }),
+          prisma.serviceRequest.findMany({
+            where: { technicianProfileId: technicianProfile.id },
+            include: includeClause,
+            orderBy: { createdAt: 'desc' },
+          }),
+        ]);
+        
+        console.log('📊 Bookings by technicianId:', bookingsByUserId.length);
+        console.log('📊 Bookings by technicianProfileId:', bookingsByProfileId.length);
+        
+        // Merge and deduplicate by booking ID
+        const bookingMap = new Map();
+        [...bookingsByUserId, ...bookingsByProfileId].forEach(booking => {
+          bookingMap.set(booking.id, booking);
+        });
+        
+        bookings = Array.from(bookingMap.values());
+        bookings.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+      } else {
+        console.warn('⚠️ No technician profile found for user:', userId);
+        bookings = await prisma.serviceRequest.findMany({
+          where: { technicianId: userId },
+          include: includeClause,
+          orderBy: { createdAt: 'desc' },
+        });
+      }
+    } else {
+      bookings = [];
+    }
 
-    console.log('Found bookings:', bookings.length);
-    console.log('Bookings IDs:', bookings.map(b => b.id));
+    console.log('✅ Found bookings:', bookings.length);
+    console.log('📋 Bookings IDs:', bookings.map(b => b.id));
+    
+    // Log first booking details for debugging
+    if (bookings.length > 0) {
+      console.log('📋 First booking sample:', {
+        id: bookings[0].id,
+        technicianId: bookings[0].technicianId,
+        technicianProfileId: bookings[0].technicianProfileId,
+        status: bookings[0].status,
+      });
+    }
 
     res.json(bookings);
   } catch (error: any) {
