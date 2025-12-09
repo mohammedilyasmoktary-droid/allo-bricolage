@@ -55,6 +55,7 @@ import StarIcon from '@mui/icons-material/Star';
 import ReceiptIcon from '@mui/icons-material/Receipt';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import MessageIcon from '@mui/icons-material/Message';
+import DownloadIcon from '@mui/icons-material/Download';
 import { useNavigate } from 'react-router-dom';
 
 const TechnicianJobs: React.FC = () => {
