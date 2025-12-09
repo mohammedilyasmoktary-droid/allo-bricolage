@@ -74,21 +74,45 @@ const LoginPage: React.FC = () => {
       // Handle different error formats
       let errorMessage = 'Erreur de connexion. Vérifiez vos identifiants.';
       
-      if (err.code === 'ECONNREFUSED' || err.message?.includes('Network Error') || err.message?.includes('ERR_NETWORK')) {
-        errorMessage = 'Impossible de se connecter au serveur. Vérifiez que le serveur backend est démarré sur le port 5000.';
+      // Check if API URL is misconfigured
+      const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:5001/api';
+      const isProduction = import.meta.env.PROD;
+      const isLocalhost = apiUrl.includes('localhost');
+      
+      if (err.code === 'ECONNREFUSED' || err.message?.includes('Network Error') || err.message?.includes('ERR_NETWORK') || err.message?.includes('Failed to fetch')) {
+        if (isProduction && isLocalhost) {
+          errorMessage = 'Configuration manquante: La variable VITE_API_URL n\'est pas configurée sur Vercel. Veuillez contacter l\'administrateur.';
+        } else {
+          errorMessage = 'Impossible de se connecter au serveur backend. Vérifiez votre connexion internet et réessayez.';
+        }
       } else if (err.code === 'ETIMEDOUT' || err.message?.includes('timeout')) {
-        errorMessage = 'La connexion a expiré. Veuillez réessayer.';
+        errorMessage = 'La connexion a expiré. Le serveur met trop de temps à répondre. Veuillez réessayer.';
       } else if (err.response?.status === 401) {
         errorMessage = 'Email ou mot de passe incorrect.';
+      } else if (err.response?.status === 404) {
+        errorMessage = 'Endpoint introuvable. Le serveur backend pourrait être en cours de déploiement.';
+      } else if (err.response?.status >= 500) {
+        errorMessage = 'Erreur serveur. Veuillez réessayer dans quelques instants.';
       } else if (err.response?.data?.error) {
         errorMessage = err.response.data.error;
       } else if (err.response?.data?.message) {
         errorMessage = err.response.data.message;
-      } else if (err.message) {
+      } else if (err.message && !err.message.includes('Network Error') && !err.message.includes('Failed to fetch')) {
         errorMessage = err.message;
       } else if (err.response?.data?.errors && Array.isArray(err.response.data.errors)) {
         errorMessage = err.response.data.errors.map((e: any) => e.msg || e.message).join(', ');
       }
+      
+      // Log detailed error for debugging
+      console.error('Login error details:', {
+        message: err.message,
+        code: err.code,
+        status: err.response?.status,
+        apiUrl,
+        isProduction,
+        isLocalhost,
+        responseData: err.response?.data,
+      });
       
       setError(errorMessage);
     } finally {

@@ -31,8 +31,9 @@ import {
 } from '@mui/material';
 import { bookingsApi, Booking } from '../../api/bookings';
 import { reviewsApi, CreateReviewData } from '../../api/reviews';
+import { quotesApi, Quote, CreateQuoteData } from '../../api/quotes';
 import { useAuth } from '../../contexts/AuthContext';
-import { generateBookingPDF, BookingPDFData } from '../../utils/pdfGenerator';
+import { generateBookingPDF, BookingPDFData, generateQuotePDF, QuotePDFData } from '../../utils/pdfGenerator';
 import { format } from 'date-fns';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import DirectionsCarIcon from '@mui/icons-material/DirectionsCar';
@@ -74,6 +75,11 @@ const TechnicianJobs: React.FC = () => {
   const [submittingReview, setSubmittingReview] = useState(false);
   const [reviewSuccess, setReviewSuccess] = useState(false);
   const [existingReview, setExistingReview] = useState<any>(null);
+  const [quoteDialogOpen, setQuoteDialogOpen] = useState(false);
+  const [quoteConditions, setQuoteConditions] = useState('');
+  const [quoteEquipment, setQuoteEquipment] = useState('');
+  const [quotePrice, setQuotePrice] = useState<string>('');
+  const [submittingQuote, setSubmittingQuote] = useState(false);
   const { user } = useAuth();
 
   useEffect(() => {
@@ -142,6 +148,84 @@ const TechnicianJobs: React.FC = () => {
       return;
     }
     updateStatus(selectedBooking.id, 'COMPLETED', price);
+  };
+
+  const handleCreateQuote = (booking: Booking) => {
+    setSelectedBooking(booking);
+    setQuoteConditions(booking.quote?.conditions || '');
+    setQuoteEquipment(booking.quote?.equipment || '');
+    setQuotePrice(booking.quote?.price?.toString() || booking.estimatedPrice?.toString() || '');
+    setQuoteDialogOpen(true);
+    setError('');
+  };
+
+  const handleSubmitQuote = async () => {
+    if (!selectedBooking) return;
+    
+    if (!quoteConditions.trim()) {
+      setError('Veuillez remplir les conditions');
+      return;
+    }
+    if (!quoteEquipment.trim()) {
+      setError('Veuillez remplir la liste d\'équipement');
+      return;
+    }
+    const price = parseFloat(quotePrice);
+    if (isNaN(price) || price <= 0) {
+      setError('Veuillez entrer un prix valide');
+      return;
+    }
+
+    setSubmittingQuote(true);
+    setError('');
+    
+    try {
+      const quoteData: CreateQuoteData = {
+        bookingId: selectedBooking.id,
+        conditions: quoteConditions.trim(),
+        equipment: quoteEquipment.trim(),
+        price,
+      };
+      
+      await quotesApi.create(quoteData);
+      setQuoteDialogOpen(false);
+      setQuoteConditions('');
+      setQuoteEquipment('');
+      setQuotePrice('');
+      loadJobs();
+    } catch (err: any) {
+      console.error('Failed to create quote:', err);
+      setError(err.response?.data?.error || 'Erreur lors de la création du devis');
+    } finally {
+      setSubmittingQuote(false);
+    }
+  };
+
+  const handleDownloadQuotePDF = async (quote: Quote, booking: Booking) => {
+    try {
+      const pdfData: QuotePDFData = {
+        quoteId: quote.id,
+        bookingId: booking.id,
+        clientName: booking.client?.name || 'Client',
+        clientEmail: booking.client?.email || '',
+        clientPhone: booking.client?.phone || '',
+        technicianName: booking.technician?.name || 'Technicien',
+        technicianPhone: booking.technician?.phone || '',
+        serviceCategory: booking.category?.name || '',
+        description: booking.description || '',
+        address: booking.address || '',
+        city: booking.city || '',
+        conditions: quote.conditions,
+        equipment: quote.equipment,
+        price: quote.price,
+        createdAt: quote.createdAt,
+      };
+      
+      await generateQuotePDF(pdfData);
+    } catch (error) {
+      console.error('Failed to generate quote PDF:', error);
+      setError('Erreur lors de la génération du PDF');
+    }
   };
 
   const handleViewDetails = async (booking: Booking) => {
@@ -818,6 +902,26 @@ const TechnicianJobs: React.FC = () => {
                               >
                                 Message
                               </Button>
+                              {!booking.quote && (
+                                <Button
+                                  fullWidth
+                                  variant="contained"
+                                  startIcon={<DescriptionIcon />}
+                                  onClick={() => handleCreateQuote(booking)}
+                                  sx={{
+                                    bgcolor: '#032B5A',
+                                    color: 'white',
+                                    '&:hover': { bgcolor: '#021d3f' },
+                                    textTransform: 'none',
+                                    borderRadius: 2,
+                                    py: 1.25,
+                                    fontWeight: 600,
+                                    mb: 1,
+                                  }}
+                                >
+                                  Créer un devis
+                                </Button>
+                              )}
                               <Button
                                 fullWidth
                                 variant="contained"
@@ -844,11 +948,25 @@ const TechnicianJobs: React.FC = () => {
                                 fullWidth
                                 variant="contained"
                                 startIcon={<BuildIcon />}
-                                onClick={() => updateStatus(booking.id, 'IN_PROGRESS')}
+                                onClick={async () => {
+                                  try {
+                                    await updateStatus(booking.id, 'IN_PROGRESS');
+                                  } catch (err: any) {
+                                    if (err.response?.data?.error?.includes('devis')) {
+                                      setError('Un devis doit être créé avant de commencer le travail');
+                                      setSelectedBooking(booking);
+                                      handleCreateQuote(booking);
+                                    } else {
+                                      setError(err.response?.data?.error || 'Erreur lors de la mise à jour du statut');
+                                    }
+                                  }
+                                }}
+                                disabled={!booking.quote}
                                 sx={{
                                   bgcolor: '#03a9f4',
                                   color: 'white',
                                   '&:hover': { bgcolor: '#0288d1' },
+                                  '&:disabled': { bgcolor: '#e0e0e0', color: '#9e9e9e' },
                                   textTransform: 'none',
                                   borderRadius: 2,
                                   py: 1.25,
@@ -856,8 +974,31 @@ const TechnicianJobs: React.FC = () => {
                                   mb: 1,
                                 }}
                               >
-                                Arrivé - Commencer
+                                {booking.quote ? 'Arrivé - Commencer' : 'Créer un devis d\'abord'}
                               </Button>
+                              {!booking.quote && (
+                                <Button
+                                  fullWidth
+                                  variant="outlined"
+                                  startIcon={<DescriptionIcon />}
+                                  onClick={() => handleCreateQuote(booking)}
+                                  sx={{
+                                    borderColor: '#F4C542',
+                                    color: '#032B5A',
+                                    '&:hover': { 
+                                      borderColor: '#e0b038', 
+                                      bgcolor: 'rgba(244, 197, 66, 0.1)' 
+                                    },
+                                    textTransform: 'none',
+                                    borderRadius: 2,
+                                    py: 1,
+                                    fontWeight: 600,
+                                    mb: 1,
+                                  }}
+                                >
+                                  Créer un devis
+                                </Button>
+                              )}
                               <Button
                                 fullWidth
                                 variant="outlined"
@@ -1206,6 +1347,135 @@ const TechnicianJobs: React.FC = () => {
         </DialogActions>
       </Dialog>
 
+      {/* Quote Dialog */}
+      <Dialog
+        open={quoteDialogOpen}
+        onClose={() => {
+          setQuoteDialogOpen(false);
+          setError('');
+        }}
+        maxWidth="md"
+        fullWidth
+        PaperProps={{
+          sx: {
+            borderRadius: 3,
+            boxShadow: '0 8px 32px rgba(0,0,0,0.12)',
+          },
+        }}
+      >
+        <DialogTitle
+          sx={{
+            bgcolor: '#032B5A',
+            color: 'white',
+            fontWeight: 700,
+          }}
+        >
+          {selectedBooking?.quote ? 'Modifier le devis' : 'Créer un devis'}
+        </DialogTitle>
+        <DialogContent sx={{ p: 4 }}>
+          {error && (
+            <Alert severity="error" sx={{ mb: 3, borderRadius: 2 }} onClose={() => setError('')}>
+              {error}
+            </Alert>
+          )}
+          <Alert severity="info" sx={{ mb: 3, borderRadius: 2 }}>
+            <Typography variant="body2" sx={{ fontWeight: 600, mb: 1 }}>
+              📋 Informations requises pour le devis
+            </Typography>
+            <Typography variant="body2">
+              Remplissez les conditions, la liste d'équipement nécessaire et le prix. Le client recevra ce devis et pourra le télécharger en PDF.
+            </Typography>
+          </Alert>
+          
+          <TextField
+            fullWidth
+            label="Conditions et termes"
+            multiline
+            rows={4}
+            value={quoteConditions}
+            onChange={(e) => setQuoteConditions(e.target.value)}
+            required
+            placeholder="Ex: Intervention garantie 6 mois, paiement à la réception, etc."
+            sx={{ mb: 3 }}
+            InputProps={{
+              startAdornment: (
+                <InputAdornment position="start" sx={{ alignSelf: 'flex-start', mt: 1 }}>
+                  <DescriptionIcon sx={{ color: '#F4C542' }} />
+                </InputAdornment>
+              ),
+            }}
+          />
+          
+          <TextField
+            fullWidth
+            label="Équipement nécessaire"
+            multiline
+            rows={4}
+            value={quoteEquipment}
+            onChange={(e) => setQuoteEquipment(e.target.value)}
+            required
+            placeholder="Ex: Multimètre, tournevis, câbles électriques, etc."
+            sx={{ mb: 3 }}
+            InputProps={{
+              startAdornment: (
+                <InputAdornment position="start" sx={{ alignSelf: 'flex-start', mt: 1 }}>
+                  <BuildIcon sx={{ color: '#F4C542' }} />
+                </InputAdornment>
+              ),
+            }}
+          />
+          
+          <TextField
+            fullWidth
+            label="Prix (MAD)"
+            type="number"
+            value={quotePrice}
+            onChange={(e) => setQuotePrice(e.target.value)}
+            required
+            InputProps={{
+              startAdornment: (
+                <InputAdornment position="start">
+                  <AttachMoneyIcon sx={{ color: '#F4C542' }} />
+                </InputAdornment>
+              ),
+            }}
+            sx={{ mb: 2 }}
+          />
+        </DialogContent>
+        <DialogActions sx={{ p: 3, bgcolor: '#f8f9fa' }}>
+          <Button
+            onClick={() => {
+              setQuoteDialogOpen(false);
+              setError('');
+            }}
+            disabled={submittingQuote}
+            sx={{
+              color: '#666',
+              textTransform: 'none',
+              fontWeight: 600,
+            }}
+          >
+            Annuler
+          </Button>
+          <Button
+            onClick={handleSubmitQuote}
+            variant="contained"
+            disabled={submittingQuote || !quoteConditions.trim() || !quoteEquipment.trim() || !quotePrice}
+            startIcon={submittingQuote ? <CircularProgress size={20} /> : <DescriptionIcon />}
+            sx={{
+              bgcolor: '#032B5A',
+              color: 'white',
+              '&:hover': { bgcolor: '#021d3f' },
+              textTransform: 'none',
+              fontWeight: 600,
+              px: 3,
+            }}
+          >
+            {submittingQuote ? 'Création...' : selectedBooking?.quote ? 'Modifier' : 'Créer le devis'}
+          </Button>
+        </DialogActions>
+      </Dialog>
+
       {/* Details Dialog */}
       <Dialog
         open={detailDialogOpen}
@@ -1345,7 +1615,7 @@ const TechnicianJobs: React.FC = () => {
                 </List>
               </Grid>
               <Grid item xs={12} md={6}>
-                <Paper sx={{ p: 2, bgcolor: '#f8f9fa', borderRadius: 2 }}>
+                <Paper sx={{ p: 2, bgcolor: '#f8f9fa', borderRadius: 2, mb: 2 }}>
                   <Typography variant="subtitle2" sx={{ fontWeight: 600, color: '#032B5A', mb: 1 }}>
                     Description
                   </Typography>
@@ -1353,6 +1623,53 @@ const TechnicianJobs: React.FC = () => {
                     {selectedBooking.description}
                   </Typography>
                 </Paper>
+                
+                {/* Quote Display */}
+                {selectedBooking.quote && (
+                  <Paper sx={{ p: 3, bgcolor: '#fff9e6', borderRadius: 2, border: '2px solid #F4C542', mb: 2 }}>
+                    <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 2 }}>
+                      <Typography variant="h6" sx={{ fontWeight: 700, color: '#032B5A' }}>
+                        📋 Devis
+                      </Typography>
+                      <Button
+                        variant="contained"
+                        size="small"
+                        startIcon={<PictureAsPdfIcon />}
+                        onClick={() => handleDownloadQuotePDF(selectedBooking.quote, selectedBooking)}
+                        sx={{
+                          bgcolor: '#032B5A',
+                          color: 'white',
+                          textTransform: 'none',
+                          '&:hover': { bgcolor: '#021d3f' },
+                        }}
+                      >
+                        Télécharger PDF
+                      </Button>
+                    </Box>
+                    <Divider sx={{ mb: 2 }} />
+                    <Box sx={{ mb: 2 }}>
+                      <Typography variant="subtitle2" sx={{ fontWeight: 600, color: '#032B5A', mb: 1 }}>
+                        Prix: <span style={{ color: '#F4C542', fontSize: '1.2em', fontWeight: 700 }}>{selectedBooking.quote.price} MAD</span>
+                      </Typography>
+                    </Box>
+                    <Box sx={{ mb: 2 }}>
+                      <Typography variant="subtitle2" sx={{ fontWeight: 600, color: '#032B5A', mb: 1 }}>
+                        Conditions:
+                      </Typography>
+                      <Typography variant="body2" sx={{ lineHeight: 1.8, color: '#032B5A', whiteSpace: 'pre-wrap' }}>
+                        {selectedBooking.quote.conditions}
+                      </Typography>
+                    </Box>
+                    <Box>
+                      <Typography variant="subtitle2" sx={{ fontWeight: 600, color: '#032B5A', mb: 1 }}>
+                        Équipement nécessaire:
+                      </Typography>
+                      <Typography variant="body2" sx={{ lineHeight: 1.8, color: '#032B5A', whiteSpace: 'pre-wrap' }}>
+                        {selectedBooking.quote.equipment}
+                      </Typography>
+                    </Box>
+                  </Paper>
+                )}
                 {/* Payment Receipt Display - Show for all payment statuses if receipt exists */}
                 {selectedBooking.receiptUrl && (
                   <Box sx={{ mt: 3 }}>

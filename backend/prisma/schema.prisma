@@ -193,6 +193,7 @@ model ServiceRequest {
   reviews       Review[]
   chatMessages  ChatMessage[]
   galleryImages GalleryImage[]
+  quote         Quote?
 
   @@index([clientId])
   @@index([technicianId])
@@ -200,6 +201,19 @@ model ServiceRequest {
   @@index([status])
   @@index([city])
   @@index([createdAt])
+}
+
+model Quote {
+  id            String         @id @default(uuid())
+  bookingId     String         @unique
+  booking       ServiceRequest @relation(fields: [bookingId], references: [id], onDelete: Cascade)
+  conditions    String         @db.Text // Terms and conditions
+  equipment     String         @db.Text // Required equipment list
+  price         Float          // Quote price
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
+
+  @@index([bookingId])
 }
 
 model Review {

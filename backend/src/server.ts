@@ -14,6 +14,7 @@ import { adminRouter } from './routes/admin.routes';
 import { notificationRouter } from './routes/notification.routes';
 import { subscriptionRouter } from './routes/subscription.routes';
 import messageRouter from './routes/message.routes';
+import quoteRouter from './routes/quote.routes';
 import { applyReceiptColumnsMigration } from './utils/migration';
 
 dotenv.config();
@@ -116,6 +117,7 @@ app.use('/api/admin', adminRouter);
 app.use('/api/notifications', notificationRouter);
 app.use('/api/subscriptions', subscriptionRouter);
 app.use('/api/messages', messageRouter);
+app.use('/api/quotes', quoteRouter);
 app.use('/api/files', fileRouter);
 
 // Error handling middleware

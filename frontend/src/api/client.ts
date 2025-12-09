@@ -6,10 +6,20 @@ const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5001/api'
 // Log the API URL (always, for debugging)
 console.log('🔗 API Base URL:', API_BASE_URL);
 console.log('🔗 VITE_API_URL env:', import.meta.env.VITE_API_URL || 'NOT SET');
+console.log('🔗 Environment:', import.meta.env.MODE, import.meta.env.PROD ? '(PRODUCTION)' : '(DEVELOPMENT)');
 
 // Warn if using default localhost in production
 if (import.meta.env.PROD && API_BASE_URL.includes('localhost')) {
-  console.warn('⚠️ WARNING: Using localhost API URL in production! Set VITE_API_URL environment variable.');
+  console.error('❌ CRITICAL ERROR: Using localhost API URL in production!');
+  console.error('❌ VITE_API_URL environment variable is not set on Vercel!');
+  console.error('❌ Please add VITE_API_URL=https://allo-bricolage-backend.onrender.com/api to Vercel environment variables.');
+  
+  // Show alert to user in production
+  if (typeof window !== 'undefined') {
+    setTimeout(() => {
+      alert('Configuration Error: Backend URL not configured. Please contact administrator.');
+    }, 1000);
+  }
 }
 
 export const apiClient = axios.create({

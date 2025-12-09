@@ -348,6 +348,7 @@ router.get('/:id', authenticate, async (req, res) => {
             city: true,
           },
         },
+        quote: true,
         reviews: {
           include: {
             reviewer: {
@@ -600,6 +601,18 @@ router.patch(
       const allowedFromStatuses = ['PENDING', 'ACCEPTED', 'ON_THE_WAY', 'IN_PROGRESS', 'AWAITING_PAYMENT'];
       if (!allowedFromStatuses.includes(booking.status)) {
         return res.status(400).json({ error: 'Cannot update status from current status' });
+      }
+
+      // Require quote before allowing IN_PROGRESS status
+      if (status === 'IN_PROGRESS') {
+        const quote = await prisma.quote.findUnique({
+          where: { bookingId: booking.id },
+        });
+        if (!quote) {
+          return res.status(400).json({ 
+            error: 'Un devis doit être créé avant de commencer le travail. Veuillez créer un devis d\'abord.' 
+          });
+        }
       }
 
       const updateData: any = { status };

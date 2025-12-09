@@ -28,6 +28,24 @@ export interface BookingPDFData {
   };
 }
 
+export interface QuotePDFData {
+  quoteId: string;
+  bookingId: string;
+  clientName: string;
+  clientEmail: string;
+  clientPhone: string;
+  technicianName: string;
+  technicianPhone: string;
+  serviceCategory: string;
+  description: string;
+  address: string;
+  city: string;
+  conditions: string;
+  equipment: string;
+  price: number;
+  createdAt: string;
+}
+
 export const generateBookingPDF = async (data: BookingPDFData): Promise<void> => {
   const doc = new jsPDF('p', 'mm', 'a4');
   const pageWidth = doc.internal.pageSize.getWidth();
