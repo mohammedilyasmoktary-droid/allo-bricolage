@@ -83,11 +83,17 @@ const TechnicianMap: React.FC<TechnicianMapProps> = ({ technicians, onTechnician
   if (!googleMapsApiKey) {
     return (
       <Paper sx={{ p: 3, textAlign: 'center', bgcolor: '#f5f5f5' }}>
-        <Typography variant="body1" color="text.secondary">
-          Google Maps API key not configured. Please add VITE_GOOGLE_MAPS_API_KEY to your .env file.
+        <Typography variant="body1" color="text.secondary" sx={{ mb: 2 }}>
+          Google Maps API key not configured.
         </Typography>
-        <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>
-          Get your API key from: https://console.cloud.google.com/google/maps-apis
+        <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
+          Please add <strong>VITE_GOOGLE_MAPS_API_KEY</strong> to your Vercel environment variables.
+        </Typography>
+        <Typography variant="caption" color="text.secondary" sx={{ display: 'block', mb: 2 }}>
+          Check the browser console (F12) for detailed debug information.
+        </Typography>
+        <Typography variant="body2" color="text.secondary">
+          Get your API key from: <a href="https://console.cloud.google.com/google/maps-apis" target="_blank" rel="noopener noreferrer">Google Cloud Console</a>
         </Typography>
       </Paper>
     );
