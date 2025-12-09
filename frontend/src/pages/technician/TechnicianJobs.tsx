@@ -428,6 +428,17 @@ const TechnicianJobs: React.FC = () => {
         </Typography>
       </Box>
 
+      {/* Global Error Alert */}
+      {error && (
+        <Alert 
+          severity="error" 
+          sx={{ mb: 3, borderRadius: 2 }} 
+          onClose={() => setError('')}
+        >
+          {error}
+        </Alert>
+      )}
+
       {/* Search and Tabs */}
       <Card sx={{ mb: 4, boxShadow: 3, borderRadius: 3, border: '1px solid #e0e0e0' }}>
         <CardContent sx={{ p: 3 }}>
