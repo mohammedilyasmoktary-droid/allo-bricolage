@@ -25,9 +25,11 @@ const TechnicianMap: React.FC<TechnicianMapProps> = ({ technicians, onTechnician
   const [selectedTechnician, setSelectedTechnician] = React.useState<Technician | null>(null);
   
   // Try multiple ways to get the API key (for debugging)
+  // TEMPORARY: Fallback to hardcoded key for testing (remove after fixing env var)
   const googleMapsApiKey = 
     import.meta.env.VITE_GOOGLE_MAPS_API_KEY || 
     import.meta.env.GOOGLE_MAPS_API_KEY || 
+    (import.meta.env.PROD ? 'AIzaSyAjGf3qCd1j2PiQYZIP993o3sz7TtXyYrw' : '') || 
     '';
   
   // Debug: Log API key status (always log in console for debugging)
