@@ -1,5 +1,5 @@
 import React from 'react';
-import { GoogleMap, LoadScript, Marker, InfoWindow } from '@react-google-maps/api';
+import { GoogleMap, LoadScript, Marker, InfoWindow, useJsApiLoader } from '@react-google-maps/api';
 import { Box, Typography, Paper, Avatar, Rating, Chip } from '@mui/material';
 import { Technician } from '../api/technicians';
 import { getCityCoordinates, getCenterCoordinates } from '../utils/cityCoordinates';
