@@ -289,7 +289,8 @@ const TechnicianMap: React.FC<TechnicianMapProps> = ({ technicians, onTechnician
             </Box>
           </InfoWindow>
         )}
-      </GoogleMap>
+        </GoogleMap>
+      )}
     </LoadScript>
   );
 };
