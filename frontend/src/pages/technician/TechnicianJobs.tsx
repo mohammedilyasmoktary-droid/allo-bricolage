@@ -951,10 +951,62 @@ const TechnicianJobs: React.FC = () => {
                                 </Typography>
                                 {booking.finalPrice && (
                                   <Typography variant="h6" sx={{ fontWeight: 700, color: '#f57c00', mt: 1 }}>
-                                    Montant: {booking.finalPrice} MAD
+                                    Montant à recevoir: {booking.finalPrice} MAD
                                   </Typography>
                                 )}
                               </Alert>
+                              
+                              {/* Show receipt if uploaded */}
+                              {booking.receiptUrl && (
+                                <Box sx={{ mb: 2, p: 2, bgcolor: '#f8f9fa', borderRadius: 2, border: '2px solid #ff9800' }}>
+                                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1.5 }}>
+                                    <ReceiptIcon sx={{ color: '#ff9800', fontSize: 20 }} />
+                                    <Typography variant="subtitle2" sx={{ fontWeight: 600, color: '#032B5A' }}>
+                                      Reçu de paiement uploadé
+                                    </Typography>
+                                  </Box>
+                                  {booking.receiptUrl.endsWith('.pdf') ? (
+                                    <Button
+                                      variant="outlined"
+                                      size="small"
+                                      href={booking.receiptUrl}
+                                      target="_blank"
+                                      startIcon={<ReceiptIcon />}
+                                      sx={{
+                                        borderColor: '#ff9800',
+                                        color: '#f57c00',
+                                        '&:hover': { borderColor: '#f57c00', bgcolor: 'rgba(255, 152, 0, 0.1)' },
+                                        textTransform: 'none',
+                                      }}
+                                    >
+                                      Voir le reçu PDF
+                                    </Button>
+                                  ) : (
+                                    <Box
+                                      component="img"
+                                      src={booking.receiptUrl}
+                                      alt="Payment Receipt"
+                                      onClick={() => window.open(booking.receiptUrl, '_blank')}
+                                      sx={{
+                                        width: '100%',
+                                        maxHeight: 200,
+                                        objectFit: 'contain',
+                                        borderRadius: 2,
+                                        border: '1px solid #e0e0e0',
+                                        cursor: 'pointer',
+                                        '&:hover': {
+                                          borderColor: '#ff9800',
+                                          boxShadow: '0 4px 12px rgba(255, 152, 0, 0.3)',
+                                        },
+                                      }}
+                                    />
+                                  )}
+                                  <Typography variant="caption" sx={{ color: '#666', display: 'block', mt: 1 }}>
+                                    Cliquez pour agrandir et vérifier
+                                  </Typography>
+                                </Box>
+                              )}
+                              
                               <Button
                                 fullWidth
                                 variant="contained"
@@ -977,7 +1029,7 @@ const TechnicianJobs: React.FC = () => {
                                   transition: 'all 0.3s ease',
                                 }}
                               >
-                                ✓ Confirmer le paiement
+                                {booking.receiptUrl ? '✓ Vérifier et confirmer le paiement' : '✓ Confirmer le paiement'}
                               </Button>
                             </>
                           )}
