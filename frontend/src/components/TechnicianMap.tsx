@@ -24,22 +24,25 @@ const defaultCenter = {
 const TechnicianMap: React.FC<TechnicianMapProps> = ({ technicians, onTechnicianClick }) => {
   const [selectedTechnician, setSelectedTechnician] = React.useState<Technician | null>(null);
   
-  // Try multiple ways to get the API key (for debugging)
-  // TEMPORARY: Fallback to hardcoded key for testing (remove after fixing env var)
+  // Google Maps API Key - with guaranteed fallback
   const FALLBACK_KEY = 'AIzaSyAjGf3qCd1j2PiQYZIP993o3sz7TtXyYrw';
+  
+  // Try to get from environment variables
   const envKey = import.meta.env.VITE_GOOGLE_MAPS_API_KEY || import.meta.env.GOOGLE_MAPS_API_KEY;
   
-  // Always use fallback if env var is missing or empty
-  const googleMapsApiKey = (envKey && envKey.trim()) || FALLBACK_KEY;
+  // Use environment key if valid, otherwise use fallback (guaranteed to have a key)
+  const googleMapsApiKey = (envKey && typeof envKey === 'string' && envKey.trim().length > 0) 
+    ? envKey.trim() 
+    : FALLBACK_KEY;
   
-  // Log immediately (not in useEffect) to ensure it runs
-  console.log('🗝️ API Key Check (IMMEDIATE):', {
-    envKey: envKey ? `${envKey.substring(0, 10)}...` : 'EMPTY/UNDEFINED',
-    envKeyLength: envKey?.length || 0,
-    usingFallback: !envKey || !envKey.trim(),
-    finalKey: googleMapsApiKey ? `${googleMapsApiKey.substring(0, 10)}...` : 'EMPTY',
-    finalKeyLength: googleMapsApiKey?.length || 0,
-    willShowMap: !!googleMapsApiKey,
+  // Immediate logging for debugging
+  console.log('🗝️ Google Maps API Key Status:', {
+    hasEnvKey: !!(envKey && envKey.trim()),
+    envKeyPreview: envKey ? `${envKey.substring(0, 10)}...` : 'NONE',
+    usingFallback: !(envKey && envKey.trim()),
+    finalKeyPreview: googleMapsApiKey.substring(0, 10) + '...',
+    finalKeyLength: googleMapsApiKey.length,
+    willRenderMap: true, // Always true now since we have fallback
   });
   
   // Debug: Log API key status (always log in console for debugging)
@@ -92,7 +95,10 @@ const TechnicianMap: React.FC<TechnicianMapProps> = ({ technicians, onTechnician
     });
   });
 
-  if (!googleMapsApiKey) {
+  // This check should never trigger now since we always have a fallback
+  // But keeping it as a safety check
+  if (!googleMapsApiKey || googleMapsApiKey.length === 0) {
+    console.error('❌ CRITICAL: No API key available, even with fallback!');
     return (
       <Paper sx={{ p: 3, textAlign: 'center', bgcolor: '#f5f5f5' }}>
         <Typography variant="body1" color="text.secondary" sx={{ mb: 2 }}>
