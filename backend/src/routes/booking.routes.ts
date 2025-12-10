@@ -6,6 +6,7 @@ import { checkSubscription } from '../middleware/subscription.middleware';
 import { upload, getFileUrl } from '../utils/fileUpload';
 
 const router = express.Router();
+const FRONTEND_URL = (process.env.FRONTEND_URL || 'https://allo-bricolage.vercel.app').replace(/\/+$/, '');
 
 // Get all bookings (for public completed jobs display and availability checking)
 router.get('/', async (req, res) => {
@@ -1037,6 +1038,18 @@ router.patch(
           message: notificationMessage,
         },
       });
+
+      // Notify client with receipt download link when available (Wafacash / Virement)
+      if (receiptUrl && booking.clientId) {
+        const paymentPageUrl = `${FRONTEND_URL}/payment/${booking.id}`;
+        await prisma.notification.create({
+          data: {
+            userId: booking.clientId,
+            type: 'PAYMENT_RECEIPT_AVAILABLE',
+            message: `Votre reçu de paiement est disponible. Téléchargez-le ici: ${receiptUrl} ou consultez vos paiements: ${paymentPageUrl}`,
+          },
+        });
+      }
 
       // Create automatic chat message for payment
       if (booking.technicianId && booking.clientId) {

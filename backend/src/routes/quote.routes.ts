@@ -4,6 +4,7 @@ import prisma from '../config/database';
 import { authenticate, authorize } from '../middleware/auth.middleware';
 
 const router = express.Router();
+const FRONTEND_URL = (process.env.FRONTEND_URL || 'https://allo-bricolage.vercel.app').replace(/\/+$/, '');
 
 // Create or update a quote for a booking (TECHNICIAN only)
 router.post(
@@ -80,12 +81,13 @@ router.post(
         });
       }
 
-      // Notify client about the quote
+      // Notify client about the quote with download link
+      const recapUrl = `${FRONTEND_URL}/client/bookings/recap?bookingId=${bookingId}`;
       await prisma.notification.create({
         data: {
           userId: booking.clientId,
-          type: 'BOOKING_ACCEPTED',
-          message: `Un devis a été créé pour votre réservation. Prix: ${price} MAD.`,
+          type: 'QUOTE_AVAILABLE',
+          message: `Un devis est disponible pour votre réservation. Prix: ${price} MAD. Téléchargez le PDF ici: ${recapUrl}`,
         },
       });
 
