@@ -1012,101 +1012,98 @@ const CreateBooking: React.FC = () => {
               </Card>
             )}
 
+              {/* Action Buttons */}
+              <Box sx={{ display: 'flex', gap: 2, mt: 5, pt: 4, borderTop: '1px solid #e8eaed', flexWrap: 'wrap' }}>
+                <Button
+                  type="submit"
+                  variant="contained"
+                  disabled={loading}
+                  startIcon={showSummary ? <CheckCircleIcon /> : undefined}
+                  sx={{
+                    bgcolor: showSummary ? '#4caf50' : '#F4C542',
+                    color: '#032B5A',
+                    '&:hover': {
+                      bgcolor: showSummary ? '#45a049' : '#e0b038',
+                      transform: 'translateY(-2px)',
+                      boxShadow: '0 6px 20px rgba(244, 197, 66, 0.3)',
+                    },
+                    '&:disabled': {
+                      bgcolor: '#e0e0e0',
+                      color: '#9e9e9e',
+                    },
+                    textTransform: 'none',
+                    minWidth: 220,
+                    py: 1.75,
+                    px: 4,
+                    borderRadius: 3,
+                    fontWeight: 700,
+                    fontSize: '1rem',
+                    boxShadow: '0 4px 12px rgba(244, 197, 66, 0.25)',
+                    transition: 'all 0.2s ease',
+                  }}
+                >
+                  {loading ? (
+                    <>
+                      <CircularProgress size={20} sx={{ mr: 1.5, color: '#032B5A' }} />
+                      Création...
+                    </>
+                  ) : showSummary ? (
+                    'Confirmer la réservation'
+                  ) : (
+                    'Vérifier et continuer'
+                  )}
+                </Button>
+                {showSummary && (
+                  <Button
+                    variant="outlined"
+                    onClick={() => setShowSummary(false)}
+                    sx={{
+                      textTransform: 'none',
+                      borderColor: '#032B5A',
+                      borderWidth: 2,
+                      color: '#032B5A',
+                      '&:hover': { 
+                        borderColor: '#021d3f', 
+                        bgcolor: 'rgba(3, 43, 90, 0.05)',
+                        transform: 'translateY(-1px)',
+                      },
+                      borderRadius: 3,
+                      py: 1.75,
+                      px: 3,
+                      minWidth: 140,
+                      fontWeight: 600,
+                      transition: 'all 0.2s ease',
+                    }}
+                  >
+                    Modifier
+                  </Button>
+                )}
+                <Button
+                  variant="outlined"
+                  onClick={() => navigate('/client/bookings')}
+                  sx={{
+                    textTransform: 'none',
+                    borderColor: '#d1d5db',
+                    color: '#666',
+                    '&:hover': { 
+                      borderColor: '#9e9e9e', 
+                      bgcolor: 'rgba(158, 158, 158, 0.05)',
+                      color: '#424242',
+                    },
+                    borderRadius: 3,
+                    py: 1.75,
+                    px: 3,
+                    minWidth: 140,
+                    fontWeight: 600,
+                    transition: 'all 0.2s ease',
+                  }}
+                >
+                  Annuler
+                </Button>
+              </Box>
             </form>
             </CardContent>
           </Card>
-        </Grid>
-
-        {/* Action Buttons - full width under date/time */}
-        <Grid item xs={12}>
-          <Box sx={{ display: 'flex', gap: 2, mt: 5, pt: 4, borderTop: '1px solid #e8eaed', flexWrap: 'wrap' }}>
-            <Button
-              type="submit"
-              variant="contained"
-              disabled={loading}
-              startIcon={showSummary ? <CheckCircleIcon /> : undefined}
-              sx={{
-                bgcolor: showSummary ? '#4caf50' : '#F4C542',
-                color: '#032B5A',
-                '&:hover': {
-                  bgcolor: showSummary ? '#45a049' : '#e0b038',
-                  transform: 'translateY(-2px)',
-                  boxShadow: '0 6px 20px rgba(244, 197, 66, 0.3)',
-                },
-                '&:disabled': {
-                  bgcolor: '#e0e0e0',
-                  color: '#9e9e9e',
-                },
-                textTransform: 'none',
-                minWidth: 220,
-                py: 1.75,
-                px: 4,
-                borderRadius: 3,
-                fontWeight: 700,
-                fontSize: '1rem',
-                boxShadow: '0 4px 12px rgba(244, 197, 66, 0.25)',
-                transition: 'all 0.2s ease',
-              }}
-            >
-              {loading ? (
-                <>
-                  <CircularProgress size={20} sx={{ mr: 1.5, color: '#032B5A' }} />
-                  Création...
-                </>
-              ) : showSummary ? (
-                'Confirmer la réservation'
-              ) : (
-                'Vérifier et continuer'
-              )}
-            </Button>
-            {showSummary && (
-              <Button
-                variant="outlined"
-                onClick={() => setShowSummary(false)}
-                sx={{
-                  textTransform: 'none',
-                  borderColor: '#032B5A',
-                  borderWidth: 2,
-                  color: '#032B5A',
-                  '&:hover': { 
-                    borderColor: '#021d3f', 
-                    bgcolor: 'rgba(3, 43, 90, 0.05)',
-                    transform: 'translateY(-1px)',
-                  },
-                  borderRadius: 3,
-                  py: 1.75,
-                  px: 3,
-                  minWidth: 140,
-                  fontWeight: 600,
-                  transition: 'all 0.2s ease',
-                }}
-              >
-                Modifier
-              </Button>
-            )}
-            <Button
-              variant="outlined"
-              onClick={() => navigate('/client/bookings')}
-              sx={{
-                textTransform: 'none',
-                borderColor: '#d1d5db',
-                color: '#666',
-                '&:hover': { 
-                  borderColor: '#9e9e9e', 
-                  bgcolor: 'rgba(158, 158, 158, 0.05)',
-                  color: '#424242',
-                },
-                borderRadius: 3,
-                py: 1.75,
-                px: 3,
-                minWidth: 140,
-                fontWeight: 600,
-                transition: 'all 0.2s ease',
-              }}
-            >
-              Annuler
-            </Button>
-          </Box>
         </Grid>
 
         {/* Calendar Card - Right Side */}
