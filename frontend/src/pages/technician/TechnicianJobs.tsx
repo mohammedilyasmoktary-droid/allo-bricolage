@@ -83,8 +83,23 @@ const TechnicianJobs: React.FC = () => {
   const { user } = useAuth();
 
   useEffect(() => {
+    // Check if user is authenticated before loading
+    if (!user) {
+      console.warn('⚠️ No user found, cannot load jobs');
+      setError('Vous devez être connecté pour voir vos missions.');
+      setLoading(false);
+      return;
+    }
+    
+    if (user.role !== 'TECHNICIAN') {
+      console.warn('⚠️ User is not a technician:', user.role);
+      setError('Cette page est réservée aux techniciens.');
+      setLoading(false);
+      return;
+    }
+    
     loadJobs();
-  }, []);
+  }, [user]);
 
   const loadJobs = async () => {
     setLoading(true);
