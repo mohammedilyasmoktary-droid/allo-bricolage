@@ -36,6 +36,7 @@ logs/
 # Uploads (backend)
 backend/uploads/
 backend/prisma/migrations/
+!backend/prisma/migrations/20251210094500_add_quote_model/**
 
 # Temporary files
 *.tmp
@@ -53,7 +54,6 @@ out/
 # Backend specific
 backend/dist/
 backend/.env
-
 # Database
 *.db
 *.sqlite
@@ -61,5 +61,6 @@ backend/.env
 
 # Prisma
 backend/prisma/migrations/
+!backend/prisma/migrations/20251210094500_add_quote_model/**
 
 .github/workflows/
