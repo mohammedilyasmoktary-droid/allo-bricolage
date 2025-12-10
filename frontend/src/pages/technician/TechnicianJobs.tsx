@@ -503,6 +503,19 @@ const TechnicianJobs: React.FC = () => {
           severity="error" 
           sx={{ mb: 3, borderRadius: 2 }} 
           onClose={() => setError('')}
+          action={
+            <Button
+              color="inherit"
+              size="small"
+              onClick={() => {
+                setError('');
+                loadJobs();
+              }}
+              sx={{ textTransform: 'none' }}
+            >
+              Réessayer
+            </Button>
+          }
         >
           {error}
         </Alert>
