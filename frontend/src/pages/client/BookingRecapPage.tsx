@@ -338,8 +338,8 @@ const BookingRecapPage: React.FC = () => {
                 </>
               )}
 
-              {/* Quote Section */}
-              {booking.quote && (
+              {/* Quote Section - Only show after technician arrives (ON_THE_WAY or later) */}
+              {booking.quote && (booking.status === 'ON_THE_WAY' || booking.status === 'IN_PROGRESS' || booking.status === 'COMPLETED' || booking.status === 'AWAITING_PAYMENT') && (
                 <>
                   <Divider sx={{ my: 3, borderColor: '#f0f0f0' }} />
                   <Paper
@@ -517,7 +517,7 @@ const BookingRecapPage: React.FC = () => {
                 <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1 }}>
                   <AttachMoneyIcon sx={{ color: '#F4C542', fontSize: 24 }} />
                   <Typography variant="body2" color="text.secondary" sx={{ fontWeight: 500 }}>
-                    {booking.status === 'AWAITING_PAYMENT' && booking.finalPrice ? 'Montant à payer' : booking.quote ? 'Prix du devis' : 'Prix estimé'}
+                    {booking.status === 'AWAITING_PAYMENT' && booking.finalPrice ? 'Montant à payer' : (booking.quote && (booking.status === 'ON_THE_WAY' || booking.status === 'IN_PROGRESS' || booking.status === 'COMPLETED' || booking.status === 'AWAITING_PAYMENT')) ? 'Prix du devis' : 'Prix estimé'}
                   </Typography>
                 </Box>
                 <Typography
@@ -530,13 +530,13 @@ const BookingRecapPage: React.FC = () => {
                 >
                   {booking.status === 'AWAITING_PAYMENT' && booking.finalPrice
                     ? `${booking.finalPrice} MAD`
-                    : booking.quote?.price
+                    : (booking.quote && (booking.status === 'ON_THE_WAY' || booking.status === 'IN_PROGRESS' || booking.status === 'COMPLETED' || booking.status === 'AWAITING_PAYMENT')) && booking.quote.price
                     ? `${booking.quote.price} MAD`
                     : booking.estimatedPrice
                     ? `${booking.estimatedPrice} MAD`
                     : 'À déterminer'}
                 </Typography>
-                {booking.quote && booking.estimatedPrice && booking.quote.price !== booking.estimatedPrice && (
+                {booking.quote && (booking.status === 'ON_THE_WAY' || booking.status === 'IN_PROGRESS' || booking.status === 'COMPLETED' || booking.status === 'AWAITING_PAYMENT') && booking.estimatedPrice && booking.quote.price !== booking.estimatedPrice && (
                   <Typography variant="caption" sx={{ color: '#666', ml: 4, display: 'block', mt: 0.5 }}>
                     Prix estimé initial: {booking.estimatedPrice} MAD
                   </Typography>
@@ -548,8 +548,8 @@ const BookingRecapPage: React.FC = () => {
                 )}
               </Box>
 
-              {/* Quote Info */}
-              {booking.quote && (
+              {/* Quote Info - Only show after technician arrives */}
+              {booking.quote && (booking.status === 'ON_THE_WAY' || booking.status === 'IN_PROGRESS' || booking.status === 'COMPLETED' || booking.status === 'AWAITING_PAYMENT') && (
                 <>
                   <Divider sx={{ my: 3, borderColor: '#e0e0e0' }} />
                   <Box sx={{ mb: 3 }}>
