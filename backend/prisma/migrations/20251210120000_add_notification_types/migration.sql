@@ -1,0 +1,20 @@
+-- AlterTable: Add new notification types to NotificationType enum
+-- Note: MySQL doesn't support direct enum modification, so we need to alter the column
+
+ALTER TABLE `Notification` MODIFY COLUMN `type` ENUM(
+  'BOOKING_CREATED',
+  'BOOKING_ACCEPTED',
+  'BOOKING_DECLINED',
+  'BOOKING_ON_THE_WAY',
+  'BOOKING_IN_PROGRESS',
+  'BOOKING_COMPLETED',
+  'BOOKING_CANCELLED',
+  'PAYMENT_CONFIRMED',
+  'VERIFICATION_APPROVED',
+  'VERIFICATION_REJECTED',
+  'SUBSCRIPTION_EXPIRED',
+  'SUBSCRIPTION_RENEWED',
+  'QUOTE_AVAILABLE',
+  'PAYMENT_RECEIPT_AVAILABLE'
+) NOT NULL;
+
