@@ -189,9 +189,11 @@ const TechnicianAvailabilityCalendar: React.FC<TechnicianAvailabilityCalendarPro
         position: 'sticky',
         top: 20,
         bgcolor: 'white',
+        overflow: 'hidden',
+        maxWidth: '100%',
       }}
     >
-      <CardContent sx={{ p: { xs: 3, md: 4 } }}>
+      <CardContent sx={{ p: { xs: 2, md: 3 }, overflow: 'hidden', maxWidth: '100%', boxSizing: 'border-box' }}>
         <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, mb: 4 }}>
           <Box
             sx={{
