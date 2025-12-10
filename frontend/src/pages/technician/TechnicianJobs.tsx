@@ -1029,27 +1029,7 @@ const TechnicianJobs: React.FC = () => {
                               >
                                 Message
                               </Button>
-                              {/* Quote creation only available after technician starts work (IN_PROGRESS) */}
-                              {!booking.quote && booking.status === 'IN_PROGRESS' && (
-                                <Button
-                                  fullWidth
-                                  variant="contained"
-                                  startIcon={<DescriptionIcon />}
-                                  onClick={() => handleCreateQuote(booking)}
-                                  sx={{
-                                    bgcolor: '#032B5A',
-                                    color: 'white',
-                                    '&:hover': { bgcolor: '#021d3f' },
-                                    textTransform: 'none',
-                                    borderRadius: 2,
-                                    py: 1.25,
-                                    fontWeight: 600,
-                                    mb: 1,
-                                  }}
-                                >
-                                  Créer un devis
-                                </Button>
-                              )}
+                              {/* Quote creation only available after technician starts work (IN_PROGRESS) - removed from ACCEPTED */}
                               <Button
                                 fullWidth
                                 variant="contained"
