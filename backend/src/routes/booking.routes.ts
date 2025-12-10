@@ -324,31 +324,54 @@ router.get('/my-bookings', authenticate, async (req, res) => {
       });
       
       if (technicianProfile) {
-        // Get bookings by technicianId and technicianProfileId separately, then merge
-        const [bookingsByUserId, bookingsByProfileId] = await Promise.all([
-          prisma.serviceRequest.findMany({
-            where: { technicianId: userId },
+        // Use OR query to get all bookings for this technician
+        // This includes both accepted bookings (technicianId) and pending bookings (technicianProfileId)
+        try {
+          bookings = await prisma.serviceRequest.findMany({
+            where: {
+              OR: [
+                { technicianId: userId },
+                { technicianProfileId: technicianProfile.id },
+              ],
+            },
             include: includeClause,
             orderBy: { createdAt: 'desc' },
-          }),
-          prisma.serviceRequest.findMany({
-            where: { technicianProfileId: technicianProfile.id },
-            include: includeClause,
-            orderBy: { createdAt: 'desc' },
-          }),
-        ]);
-        
-        console.log('📊 Bookings by technicianId:', bookingsByUserId.length);
-        console.log('📊 Bookings by technicianProfileId:', bookingsByProfileId.length);
-        
-        // Merge and deduplicate by booking ID
-        const bookingMap = new Map();
-        [...bookingsByUserId, ...bookingsByProfileId].forEach(booking => {
-          bookingMap.set(booking.id, booking);
-        });
-        
-        bookings = Array.from(bookingMap.values());
-        bookings.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+          });
+          
+          console.log('📊 Total bookings found:', bookings.length);
+        } catch (orError: any) {
+          console.error('❌ OR query failed, trying separate queries:', orError);
+          // Fallback: Get bookings separately and merge
+          try {
+            const [bookingsByUserId, bookingsByProfileId] = await Promise.all([
+              prisma.serviceRequest.findMany({
+                where: { technicianId: userId },
+                include: includeClause,
+                orderBy: { createdAt: 'desc' },
+              }),
+              prisma.serviceRequest.findMany({
+                where: { technicianProfileId: technicianProfile.id },
+                include: includeClause,
+                orderBy: { createdAt: 'desc' },
+              }),
+            ]);
+            
+            console.log('📊 Bookings by technicianId:', bookingsByUserId.length);
+            console.log('📊 Bookings by technicianProfileId:', bookingsByProfileId.length);
+            
+            // Merge and deduplicate by booking ID
+            const bookingMap = new Map();
+            [...bookingsByUserId, ...bookingsByProfileId].forEach(booking => {
+              bookingMap.set(booking.id, booking);
+            });
+            
+            bookings = Array.from(bookingMap.values());
+            bookings.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+          } catch (fallbackError: any) {
+            console.error('❌ Fallback query also failed:', fallbackError);
+            throw fallbackError;
+          }
+        }
       } else {
         console.warn('⚠️ No technician profile found for user:', userId);
         bookings = await prisma.serviceRequest.findMany({
