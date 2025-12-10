@@ -19,6 +19,7 @@ import { useAuth } from '../../contexts/AuthContext';
 import { bookingsApi, Booking } from '../../api/bookings';
 import { generateQuotePDF, QuotePDFData } from '../../utils/pdfGenerator';
 import { format } from 'date-fns';
+import { fr } from 'date-fns/locale';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import EditIcon from '@mui/icons-material/Edit';
 import PaymentIcon from '@mui/icons-material/Payment';
@@ -506,6 +507,18 @@ const BookingRecapPage: React.FC = () => {
                   </Typography>
                   <Typography variant="body1" sx={{ fontWeight: 600, color: '#032B5A' }}>
                     {booking.technician.name}
+                  </Typography>
+                </Box>
+              )}
+
+              {/* Date and Time Summary */}
+              {booking.scheduledDateTime && (
+                <Box sx={{ mb: 2.5 }}>
+                  <Typography variant="body2" color="text.secondary" sx={{ mb: 0.5, fontWeight: 500 }}>
+                    Date et heure
+                  </Typography>
+                  <Typography variant="body1" sx={{ fontWeight: 600, color: '#032B5A' }}>
+                    {format(new Date(booking.scheduledDateTime), "EEEE d MMMM yyyy 'à' HH:mm", { locale: fr })}
                   </Typography>
                 </Box>
               )}

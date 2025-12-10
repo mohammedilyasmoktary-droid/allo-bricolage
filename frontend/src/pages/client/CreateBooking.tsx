@@ -990,6 +990,23 @@ const CreateBooking: React.FC = () => {
                         {formData.address}, {formData.city}
                       </Typography>
                     </Grid>
+                    {formData.scheduledDateTime && (
+                      <Grid item xs={12} md={6}>
+                        <Typography variant="caption" sx={{ color: '#666', mb: 1, display: 'block', fontWeight: 600, textTransform: 'uppercase', letterSpacing: 0.5, fontSize: '0.75rem' }}>
+                          Date et heure
+                        </Typography>
+                        <Typography variant="body1" sx={{ fontWeight: 600, color: '#032B5A', fontSize: '1rem' }}>
+                          {(() => {
+                            try {
+                              const date = new Date(formData.scheduledDateTime);
+                              return format(date, "EEEE d MMMM yyyy 'à' HH:mm", { locale: fr });
+                            } catch (error) {
+                              return formData.scheduledDateTime;
+                            }
+                          })()}
+                        </Typography>
+                      </Grid>
+                    )}
                     {isUrgent && (
                       <Grid item xs={12}>
                         <Alert 
