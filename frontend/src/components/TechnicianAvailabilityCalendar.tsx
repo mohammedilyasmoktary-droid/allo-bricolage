@@ -9,12 +9,16 @@ import {
   Chip,
   Alert,
   CircularProgress,
+  IconButton,
 } from '@mui/material';
 import { bookingsApi, Booking } from '../api/bookings';
 import CalendarTodayIcon from '@mui/icons-material/CalendarToday';
 import AccessTimeIcon from '@mui/icons-material/AccessTime';
 import EventBusyIcon from '@mui/icons-material/EventBusy';
-import { format, addDays, isSameDay, isBefore, startOfDay, parseISO } from 'date-fns';
+import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
+import ChevronRightIcon from '@mui/icons-material/ChevronRight';
+import { format, addDays, isSameDay, isBefore, startOfDay, parseISO, startOfMonth, endOfMonth, eachDayOfInterval, startOfWeek, endOfWeek, addMonths, subMonths } from 'date-fns';
+import { fr } from 'date-fns/locale';
 
 interface TechnicianAvailabilityCalendarProps {
   technicianId: string;
@@ -31,67 +35,34 @@ const TechnicianAvailabilityCalendar: React.FC<TechnicianAvailabilityCalendarPro
   const [loading, setLoading] = useState(false);
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
   const [selectedTime, setSelectedTime] = useState<string>('');
+  const [currentMonth, setCurrentMonth] = useState<Date>(startOfMonth(new Date()));
 
-  // Generate days organized by month (30 days per month)
-  const generateDaysByMonth = () => {
-    const daysByMonth: { month: string; year: number; days: Date[] }[] = [];
-    const today = startOfDay(new Date());
-    let currentDate = today;
-    let currentMonth = format(currentDate, 'MMMM yyyy');
-    let currentYear = currentDate.getFullYear();
-    let daysInCurrentMonth: Date[] = [];
-    let daysGenerated = 0;
-    const totalDays = 60; // Generate 2 months worth (30 days each)
-
-    while (daysGenerated < totalDays) {
-      const monthKey = format(currentDate, 'MMMM yyyy');
-      const year = currentDate.getFullYear();
-
-      // If we've moved to a new month, save the previous month and start a new one
-      if (monthKey !== currentMonth) {
-        // Pad the previous month to 30 days if needed
-        while (daysInCurrentMonth.length < 30 && daysGenerated < totalDays) {
-          daysInCurrentMonth.push(addDays(daysInCurrentMonth[daysInCurrentMonth.length - 1] || currentDate, 1));
-          daysGenerated++;
-        }
-        
-        if (daysInCurrentMonth.length > 0) {
-          daysByMonth.push({
-            month: currentMonth,
-            year: currentYear,
-            days: daysInCurrentMonth.slice(0, 30), // Ensure exactly 30 days
-          });
-        }
-        
-        currentMonth = monthKey;
-        currentYear = year;
-        daysInCurrentMonth = [];
-      }
-
-      daysInCurrentMonth.push(currentDate);
-      daysGenerated++;
-      currentDate = addDays(currentDate, 1);
-    }
-
-    // Add the last month
-    if (daysInCurrentMonth.length > 0) {
-      // Pad to 30 days if needed
-      while (daysInCurrentMonth.length < 30 && daysGenerated < totalDays) {
-        daysInCurrentMonth.push(addDays(daysInCurrentMonth[daysInCurrentMonth.length - 1], 1));
-        daysGenerated++;
-      }
-      daysByMonth.push({
-        month: currentMonth,
-        year: currentYear,
-        days: daysInCurrentMonth.slice(0, 30), // Ensure exactly 30 days
-      });
-    }
-
-    return daysByMonth;
+  // Get all days for the current month view (including padding days from previous/next month)
+  const getCalendarDays = () => {
+    const monthStart = startOfMonth(currentMonth);
+    const monthEnd = endOfMonth(currentMonth);
+    const calendarStart = startOfWeek(monthStart, { weekStartsOn: 1 }); // Monday = 1
+    const calendarEnd = endOfWeek(monthEnd, { weekStartsOn: 1 });
+    
+    return eachDayOfInterval({ start: calendarStart, end: calendarEnd });
   };
 
-  const daysByMonth = generateDaysByMonth();
-  const days = daysByMonth.flatMap(monthData => monthData.days);
+  const calendarDays = getCalendarDays();
+  
+  // Check if a day belongs to the current month
+  const isCurrentMonth = (date: Date): boolean => {
+    return format(date, 'yyyy-MM') === format(currentMonth, 'yyyy-MM');
+  };
+
+  // Navigate to previous month
+  const handlePreviousMonth = () => {
+    setCurrentMonth(subMonths(currentMonth, 1));
+  };
+
+  // Navigate to next month
+  const handleNextMonth = () => {
+    setCurrentMonth(addMonths(currentMonth, 1));
+  };
 
   // Generate time slots (8 AM to 8 PM, every hour)
   const timeSlots = Array.from({ length: 13 }, (_, i) => {
@@ -254,159 +225,168 @@ const TechnicianAvailabilityCalendar: React.FC<TechnicianAvailabilityCalendarPro
               <Typography variant="subtitle2" sx={{ fontWeight: 600, mb: 2.5, color: '#032B5A', fontSize: '0.95rem' }}>
                 Sélectionnez une date
               </Typography>
+              
+              {/* Month Navigation */}
+              <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 2 }}>
+                <IconButton
+                  onClick={handlePreviousMonth}
+                  sx={{
+                    color: '#032B5A',
+                    bgcolor: '#f5f5f5',
+                    '&:hover': {
+                      bgcolor: '#e0e0e0',
+                    },
+                  }}
+                >
+                  <ChevronLeftIcon />
+                </IconButton>
+                <Typography 
+                  variant="h6" 
+                  sx={{ 
+                    fontWeight: 700, 
+                    color: '#032B5A',
+                    textTransform: 'capitalize',
+                    fontSize: '1.1rem',
+                  }}
+                >
+                  {format(currentMonth, 'MMMM yyyy', { locale: fr })}
+                </Typography>
+                <IconButton
+                  onClick={handleNextMonth}
+                  sx={{
+                    color: '#032B5A',
+                    bgcolor: '#f5f5f5',
+                    '&:hover': {
+                      bgcolor: '#e0e0e0',
+                    },
+                  }}
+                >
+                  <ChevronRightIcon />
+                </IconButton>
+              </Box>
+
+              {/* Weekday Headers */}
               <Box
                 sx={{
-                  maxHeight: 500,
-                  overflowY: 'auto',
-                  '&::-webkit-scrollbar': {
-                    width: '6px',
-                  },
-                  '&::-webkit-scrollbar-track': {
-                    bgcolor: '#f5f5f5',
-                    borderRadius: 3,
-                  },
-                  '&::-webkit-scrollbar-thumb': {
-                    bgcolor: '#d1d5db',
-                    borderRadius: 3,
-                    '&:hover': {
-                      bgcolor: '#9e9e9e',
-                    },
-                  },
+                  display: 'grid',
+                  gridTemplateColumns: 'repeat(7, 1fr)',
+                  gap: 1,
+                  mb: 1,
                 }}
               >
-                {daysByMonth.map((monthData, monthIndex) => (
-                  <Box key={monthIndex} sx={{ mb: monthIndex < daysByMonth.length - 1 ? 4 : 0 }}>
-                    <Typography 
-                      variant="subtitle1" 
-                      sx={{ 
-                        fontWeight: 700, 
-                        color: '#032B5A', 
-                        mb: 2,
-                        textTransform: 'capitalize',
-                        fontSize: '1rem',
-                      }}
-                    >
-                      {monthData.month}
-                    </Typography>
-                    <Box
-                      sx={{
-                        display: 'grid',
-                        gridTemplateColumns: 'repeat(7, 1fr)',
-                        gap: 1.5,
-                        p: 2,
-                        bgcolor: '#fafbfc',
-                        borderRadius: 3,
-                        border: '1px solid #e8eaed',
-                      }}
-                    >
-                      {monthData.days.map((day, index) => {
+                {['Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam', 'Dim'].map((day) => (
+                  <Typography
+                    key={day}
+                    variant="caption"
+                    sx={{
+                      textAlign: 'center',
+                      fontWeight: 700,
+                      color: '#666',
+                      fontSize: '0.75rem',
+                      textTransform: 'uppercase',
+                      letterSpacing: 0.5,
+                    }}
+                  >
+                    {day}
+                  </Typography>
+                ))}
+              </Box>
+
+              {/* Calendar Grid */}
+              <Box
+                sx={{
+                  display: 'grid',
+                  gridTemplateColumns: 'repeat(7, 1fr)',
+                  gap: 1,
+                  p: 2,
+                  bgcolor: '#fafbfc',
+                  borderRadius: 3,
+                  border: '1px solid #e8eaed',
+                }}
+              >
+                {calendarDays.map((day, index) => {
                   const isUnavailable = isDateUnavailable(day);
                   const isSelected = selectedDate && isSameDay(day, selectedDate);
                   const isPast = isBefore(day, startOfDay(new Date()));
                   const isToday = isSameDay(day, new Date());
+                  const isInCurrentMonth = isCurrentMonth(day);
 
                   return (
-                    <Box
+                    <Button
                       key={index}
+                      onClick={() => handleDateSelect(day)}
+                      disabled={isUnavailable || isPast || !isInCurrentMonth}
                       sx={{
+                        minWidth: 40,
+                        height: 48,
+                        p: 0,
+                        borderRadius: 2,
                         position: 'relative',
-                      }}
-                    >
-                      <Button
-                        onClick={() => handleDateSelect(day)}
-                        disabled={isUnavailable || isPast}
-                        sx={{
-                          minWidth: 44,
-                          height: 64,
-                          p: 0,
-                          borderRadius: 3,
-                          position: 'relative',
                         bgcolor: isSelected
                           ? '#F4C542'
                           : isUnavailable
                           ? '#ffebee'
-                          : isPast
-                          ? '#f5f5f5'
+                          : isPast || !isInCurrentMonth
+                          ? 'transparent'
+                          : isToday
+                          ? 'rgba(244, 197, 66, 0.1)'
                           : 'white',
                         color: isSelected
                           ? '#032B5A'
                           : isUnavailable
                           ? '#d32f2f'
-                          : isPast
-                          ? '#9e9e9e'
+                          : isPast || !isInCurrentMonth
+                          ? '#d1d5db'
                           : '#032B5A',
                         border: isSelected
                           ? '2px solid #F4C542'
+                          : isToday && !isSelected
+                          ? '2px solid #F4C542'
                           : isUnavailable
                           ? '2px solid #d32f2f'
-                          : '1px solid #e8eaed',
+                          : '1px solid transparent',
                         boxShadow: isSelected ? '0 2px 8px rgba(244, 197, 66, 0.2)' : 'none',
                         '&:hover': {
-                          bgcolor: isUnavailable || isPast
+                          bgcolor: isUnavailable || isPast || !isInCurrentMonth
                             ? undefined
                             : isSelected
                             ? '#e0b038'
                             : 'rgba(244, 197, 66, 0.08)',
-                          borderColor: isUnavailable || isPast
+                          borderColor: isUnavailable || isPast || !isInCurrentMonth
                             ? undefined
                             : isSelected
                             ? '#F4C542'
                             : '#F4C542',
-                          transform: isUnavailable || isPast ? undefined : 'translateY(-2px)',
-                          boxShadow: isUnavailable || isPast ? 'none' : '0 4px 12px rgba(244, 197, 66, 0.15)',
+                          transform: isUnavailable || isPast || !isInCurrentMonth ? undefined : 'translateY(-2px)',
+                          boxShadow: isUnavailable || isPast || !isInCurrentMonth ? 'none' : '0 4px 12px rgba(244, 197, 66, 0.15)',
                         },
                         '&:disabled': {
-                          color: isUnavailable ? '#d32f2f' : '#9e9e9e',
-                          bgcolor: isUnavailable ? '#ffebee' : '#f5f5f5',
+                          color: isUnavailable ? '#d32f2f' : '#d1d5db',
+                          bgcolor: isUnavailable ? '#ffebee' : 'transparent',
+                          opacity: isInCurrentMonth ? 1 : 0.3,
                         },
                         transition: 'all 0.2s ease',
                       }}
                     >
                       <Box sx={{ textAlign: 'center', width: '100%', position: 'relative' }}>
                         <Typography 
-                          variant="caption" 
+                          variant="body2" 
                           sx={{ 
-                            display: 'block', 
-                            fontSize: '0.65rem',
-                            fontWeight: 600,
-                            mb: 0.5,
-                            textTransform: 'uppercase',
-                            letterSpacing: 0.5,
-                            opacity: isUnavailable || isPast ? 0.6 : 1,
-                          }}
-                        >
-                          {format(day, 'EEE')}
-                        </Typography>
-                        <Typography 
-                          variant="body1" 
-                          sx={{ 
-                            fontSize: '1.3rem',
+                            fontSize: '0.95rem',
                             fontWeight: isSelected || isToday ? 700 : 600,
-                            opacity: isUnavailable || isPast ? 0.6 : 1,
+                            opacity: isUnavailable || isPast || !isInCurrentMonth ? 0.6 : 1,
                           }}
                         >
                           {format(day, 'd')}
                         </Typography>
-                        <Typography 
-                          variant="caption" 
-                          sx={{ 
-                            fontSize: '0.65rem',
-                            color: isToday ? '#F4C542' : 'inherit',
-                            fontWeight: isToday ? 700 : 500,
-                            mt: 0.5,
-                            opacity: isUnavailable || isPast ? 0.6 : 1,
-                          }}
-                        >
-                          {format(day, 'MMM')}
-                        </Typography>
-                        {isUnavailable && (
+                        {isUnavailable && isInCurrentMonth && (
                           <Box
                             sx={{
                               position: 'absolute',
                               top: 4,
                               right: 4,
-                              width: 8,
-                              height: 8,
+                              width: 6,
+                              height: 6,
                               borderRadius: '50%',
                               bgcolor: '#d32f2f',
                               border: '1px solid white',
@@ -415,12 +395,8 @@ const TechnicianAvailabilityCalendar: React.FC<TechnicianAvailabilityCalendarPro
                         )}
                       </Box>
                     </Button>
-                    </Box>
-                      );
-                    })}
-                    </Box>
-                  </Box>
-                ))}
+                  );
+                })}
               </Box>
             </Box>
 
