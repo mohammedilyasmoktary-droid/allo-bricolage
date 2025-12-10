@@ -1,7 +1,10 @@
 import axios from 'axios';
 import { connectionManager } from '../utils/connectionManager';
 
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5001/api';
+// Prefer env var; in production fallback to Render backend instead of localhost
+const API_BASE_URL =
+  import.meta.env.VITE_API_URL ||
+  (import.meta.env.PROD ? 'https://allo-bricolage-backend.onrender.com/api' : 'http://localhost:5001/api');
 
 // Log the API URL (always, for debugging)
 console.log('🔗 API Base URL:', API_BASE_URL);
