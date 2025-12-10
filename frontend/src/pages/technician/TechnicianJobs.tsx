@@ -1029,8 +1029,8 @@ const TechnicianJobs: React.FC = () => {
                               >
                                 Message
                               </Button>
-                              {/* Quote creation only available after technician arrives (ON_THE_WAY or later) */}
-                              {!booking.quote && (booking.status === 'ON_THE_WAY' || booking.status === 'IN_PROGRESS') && (
+                              {/* Quote creation only available after technician starts work (IN_PROGRESS) */}
+                              {!booking.quote && booking.status === 'IN_PROGRESS' && (
                                 <Button
                                   fullWidth
                                   variant="contained"
@@ -1087,34 +1087,14 @@ const TechnicianJobs: React.FC = () => {
                                   try {
                                     setError(''); // Clear previous errors
                                     console.log('Attempting to update booking to IN_PROGRESS:', booking.id);
-                                    console.log('Booking quote status:', booking.quote ? 'Has quote' : 'No quote');
-                                    
-                                    // Double-check quote exists before attempting update
-                                    if (!booking.quote) {
-                                      setError('Un devis doit être créé avant de commencer le travail. Veuillez créer un devis d\'abord.');
-                                      setSelectedBooking(booking);
-                                      handleCreateQuote(booking);
-                                      return;
-                                    }
-                                    
+                                    // Quote can be created after starting work, not required before
                                     await updateStatus(booking.id, 'IN_PROGRESS');
                                   } catch (err: any) {
                                     console.error('Failed to update to IN_PROGRESS:', err);
                                     const errorMessage = err.response?.data?.error || err.message || 'Erreur lors de la mise à jour du statut';
-                                    
-                                    if (errorMessage.includes('devis') || errorMessage.includes('Devis')) {
-                                      setError('Un devis doit être créé avant de commencer le travail. Veuillez créer un devis d\'abord.');
-                                      // Open quote dialog if no quote exists
-                                      if (!booking.quote) {
-                                        setSelectedBooking(booking);
-                                        handleCreateQuote(booking);
-                                      }
-                                    } else {
-                                      setError(errorMessage);
-                                    }
+                                    setError(errorMessage);
                                   }
                                 }}
-                                disabled={!booking.quote}
                                 sx={{
                                   bgcolor: '#03a9f4',
                                   color: 'white',
@@ -1127,31 +1107,8 @@ const TechnicianJobs: React.FC = () => {
                                   mb: 1,
                                 }}
                               >
-                                {booking.quote ? 'Arrivé - Commencer' : 'Créer un devis d\'abord'}
+                                Arrivé - Commencer
                               </Button>
-                              {!booking.quote && (
-                                <Button
-                                  fullWidth
-                                  variant="outlined"
-                                  startIcon={<DescriptionIcon />}
-                                  onClick={() => handleCreateQuote(booking)}
-                                  sx={{
-                                    borderColor: '#F4C542',
-                                    color: '#032B5A',
-                                    '&:hover': { 
-                                      borderColor: '#e0b038', 
-                                      bgcolor: 'rgba(244, 197, 66, 0.1)' 
-                                    },
-                                    textTransform: 'none',
-                                    borderRadius: 2,
-                                    py: 1,
-                                    fontWeight: 600,
-                                    mb: 1,
-                                  }}
-                                >
-                                  Créer un devis
-                                </Button>
-                              )}
                               <Button
                                 fullWidth
                                 variant="outlined"
@@ -1177,6 +1134,28 @@ const TechnicianJobs: React.FC = () => {
 
                           {booking.status === 'IN_PROGRESS' && (
                             <>
+                              {/* Quote creation available after starting work */}
+                              {!booking.quote && (
+                                <Button
+                                  fullWidth
+                                  variant="contained"
+                                  startIcon={<DescriptionIcon />}
+                                  onClick={() => handleCreateQuote(booking)}
+                                  sx={{
+                                    bgcolor: '#032B5A',
+                                    color: 'white',
+                                    '&:hover': { bgcolor: '#021d3f' },
+                                    textTransform: 'none',
+                                    borderRadius: 2,
+                                    py: 1.25,
+                                    fontWeight: 600,
+                                    mb: 1,
+                                    boxShadow: 2,
+                                  }}
+                                >
+                                  Créer un devis
+                                </Button>
+                              )}
                               <Button
                                 fullWidth
                                 variant="contained"
