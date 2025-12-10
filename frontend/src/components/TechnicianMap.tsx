@@ -81,12 +81,25 @@ const TechnicianMap: React.FC<TechnicianMapProps> = ({ technicians, onTechnician
 
   const technicianMarkers = Object.entries(cityGroups).flatMap(([city, techs]) => {
     const basePosition = getCityCoordinates(city);
-    // Add slight offset for multiple technicians in the same city
+    // Spread technicians in a circle or grid pattern around the city center
     return techs.map((technician, index) => {
-      const offset = techs.length > 1 ? {
-        lat: basePosition.lat + (Math.random() - 0.5) * 0.01, // ~1km offset
-        lng: basePosition.lng + (Math.random() - 0.5) * 0.01,
-      } : basePosition;
+      let offset = basePosition;
+      
+      if (techs.length > 1) {
+        // Calculate angle for circular distribution
+        const angle = (index * 2 * Math.PI) / techs.length;
+        // Use radius based on number of technicians (more techs = larger radius)
+        const radius = Math.max(0.015, Math.min(0.03, techs.length * 0.005)); // 0.015 to 0.03 degrees (~1.5-3km)
+        
+        // Add some randomness to avoid perfect circles
+        const randomOffset = (Math.random() - 0.5) * 0.005; // Small random variation
+        
+        offset = {
+          lat: basePosition.lat + (Math.sin(angle) * radius) + randomOffset,
+          lng: basePosition.lng + (Math.cos(angle) * radius) + randomOffset,
+        };
+      }
+      
       return {
         technician,
         position: offset,
