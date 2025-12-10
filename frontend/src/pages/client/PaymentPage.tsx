@@ -56,6 +56,7 @@ const PaymentPage: React.FC = () => {
   const [submittingReview, setSubmittingReview] = useState(false);
   const [reviewSuccess, setReviewSuccess] = useState(false);
   const [existingReview, setExistingReview] = useState<any>(null);
+  const [codeCopied, setCodeCopied] = useState(false);
 
   useEffect(() => {
     const loadBooking = async () => {
@@ -509,7 +510,174 @@ const PaymentPage: React.FC = () => {
                 </Box>
               )}
 
-              {(paymentMethod === 'WAFACASH' || paymentMethod === 'BANK_TRANSFER') && (
+              {paymentMethod === 'WAFACASH' && (
+                <Box sx={{ mt: 3 }}>
+                  {/* Wafacash Payment Code */}
+                  <Card
+                    sx={{
+                      mb: 3,
+                      bgcolor: '#fffbf0',
+                      border: '2px solid #F4C542',
+                      borderRadius: 3,
+                      boxShadow: '0 4px 12px rgba(244, 197, 66, 0.2)',
+                    }}
+                  >
+                    <CardContent sx={{ p: 3 }}>
+                      <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 2 }}>
+                        <AccountBalanceWalletIcon sx={{ color: '#F4C542', fontSize: 32 }} />
+                        <Typography variant="h6" sx={{ fontWeight: 700, color: '#032B5A' }}>
+                          Code de Paiement Wafacash
+                        </Typography>
+                      </Box>
+                      <Alert
+                        severity="info"
+                        icon={<InfoIcon />}
+                        sx={{
+                          mb: 2,
+                          borderRadius: 2,
+                          bgcolor: '#e3f2fd',
+                          border: '1px solid #2196f3',
+                          '& .MuiAlert-icon': {
+                            color: '#2196f3',
+                          },
+                        }}
+                      >
+                        <Typography variant="body2" sx={{ fontWeight: 500, color: '#032B5A' }}>
+                          Utilisez ce code pour effectuer votre paiement via Wafacash (application mobile, site web, ou point de vente).
+                        </Typography>
+                      </Alert>
+                      <Box
+                        sx={{
+                          bgcolor: 'white',
+                          border: '2px dashed #F4C542',
+                          borderRadius: 2,
+                          p: 3,
+                          textAlign: 'center',
+                          position: 'relative',
+                        }}
+                      >
+                        <Typography variant="body2" sx={{ mb: 1, fontWeight: 600, color: '#032B5A', textTransform: 'uppercase', letterSpacing: 1 }}>
+                          Code de Paiement
+                        </Typography>
+                        <Typography
+                          variant="h4"
+                          sx={{
+                            fontWeight: 700,
+                            color: '#032B5A',
+                            fontFamily: 'monospace',
+                            letterSpacing: 2,
+                            mb: 2,
+                            wordBreak: 'break-all',
+                          }}
+                        >
+                          *126*1*{bookingId?.substring(0, 8).toUpperCase()}*{finalPrice.toFixed(0)}#
+                        </Typography>
+                        <Button
+                          variant="outlined"
+                          size="small"
+                          onClick={() => {
+                            const code = `*126*1*${bookingId?.substring(0, 8).toUpperCase()}*${finalPrice.toFixed(0)}#`;
+                            navigator.clipboard.writeText(code).then(() => {
+                              setCodeCopied(true);
+                              setTimeout(() => setCodeCopied(false), 3000);
+                            });
+                          }}
+                          sx={{
+                            borderColor: '#F4C542',
+                            color: '#032B5A',
+                            textTransform: 'none',
+                            '&:hover': {
+                              borderColor: '#e0b038',
+                              bgcolor: '#fffbf0',
+                            },
+                          }}
+                        >
+                          {codeCopied ? '✓ Code copié!' : 'Copier le code'}
+                        </Button>
+                      </Box>
+                      <Box sx={{ mt: 2 }}>
+                        <Typography variant="body2" sx={{ fontWeight: 600, color: '#032B5A', mb: 1 }}>
+                          Instructions :
+                        </Typography>
+                        <Box component="ol" sx={{ pl: 2, m: 0 }}>
+                          <Typography component="li" variant="body2" color="text.secondary" sx={{ mb: 0.5 }}>
+                            Composez le code ci-dessus sur votre téléphone
+                          </Typography>
+                          <Typography component="li" variant="body2" color="text.secondary" sx={{ mb: 0.5 }}>
+                            Ou utilisez l'application Wafacash et entrez le code
+                          </Typography>
+                          <Typography component="li" variant="body2" color="text.secondary" sx={{ mb: 0.5 }}>
+                            Confirmez le montant : <strong>{finalPrice.toFixed(2)} MAD</strong>
+                          </Typography>
+                          <Typography component="li" variant="body2" color="text.secondary">
+                            Après le paiement, téléchargez le reçu ci-dessous
+                          </Typography>
+                        </Box>
+                      </Box>
+                    </CardContent>
+                  </Card>
+
+                  {/* Receipt Upload */}
+                  <Box
+                    sx={{
+                      border: '2px dashed #e0e0e0',
+                      borderRadius: 2,
+                      p: 3,
+                      textAlign: 'center',
+                      bgcolor: receipt ? '#f5f5f5' : 'white',
+                      cursor: 'pointer',
+                      transition: 'all 0.3s',
+                      '&:hover': {
+                        borderColor: '#F4C542',
+                        bgcolor: '#fffbf0',
+                      },
+                    }}
+                  >
+                    <input
+                      type="file"
+                      accept="image/*,.pdf"
+                      style={{ display: 'none' }}
+                      id="receipt-upload"
+                      onChange={(e) => {
+                        const file = e.target.files?.[0];
+                        if (file) {
+                          setReceipt(file);
+                        }
+                      }}
+                    />
+                    <label htmlFor="receipt-upload">
+                      <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 1 }}>
+                        <CloudUploadIcon sx={{ fontSize: 48, color: receipt ? '#4caf50' : '#9e9e9e' }} />
+                        <Typography variant="body1" sx={{ fontWeight: 600, color: '#032B5A' }}>
+                          {receipt ? receipt.name : 'Upload Payment Receipt'}
+                        </Typography>
+                        <Typography variant="body2" color="text.secondary">
+                          {receipt ? 'Receipt uploaded successfully' : 'Click to upload receipt (Image or PDF)'}
+                        </Typography>
+                      </Box>
+                    </label>
+                  </Box>
+                  <Alert
+                    severity="info"
+                    icon={<InfoIcon />}
+                    sx={{
+                      mt: 2,
+                      borderRadius: 2,
+                      bgcolor: '#e3f2fd',
+                      border: '1px solid #2196f3',
+                      '& .MuiAlert-icon': {
+                        color: '#2196f3',
+                      },
+                    }}
+                  >
+                    <Typography variant="body2" sx={{ fontWeight: 500, color: '#032B5A' }}>
+                      Upload your Wafacash payment receipt. The technician will verify and confirm the payment.
+                    </Typography>
+                  </Alert>
+                </Box>
+              )}
+
+              {paymentMethod === 'BANK_TRANSFER' && (
                 <Box sx={{ mt: 3 }}>
                   <Box
                     sx={{
@@ -564,9 +732,7 @@ const PaymentPage: React.FC = () => {
                     }}
                   >
                     <Typography variant="body2" sx={{ fontWeight: 500, color: '#032B5A' }}>
-                      {paymentMethod === 'WAFACASH'
-                        ? 'Upload your Wafacash payment receipt. The technician will verify and confirm the payment.'
-                        : 'Upload your bank transfer receipt. The technician will verify and confirm the payment.'}
+                      Upload your bank transfer receipt. The technician will verify and confirm the payment.
                     </Typography>
                   </Alert>
                 </Box>
