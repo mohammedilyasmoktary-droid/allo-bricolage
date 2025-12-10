@@ -140,8 +140,25 @@ const TechnicianJobs: React.FC = () => {
         response: error.response?.data,
         status: error.response?.status,
         url: error.config?.url,
+        code: error.code,
       });
-      setError('Erreur lors du chargement des missions. Veuillez réessayer.');
+      
+      // Provide more specific error messages
+      let errorMessage = 'Erreur lors du chargement des missions. Veuillez réessayer.';
+      
+      if (error.code === 'ECONNREFUSED' || error.code === 'ETIMEDOUT' || error.message?.includes('Network Error')) {
+        errorMessage = 'Impossible de se connecter au serveur. Vérifiez votre connexion internet.';
+      } else if (error.response?.status === 401) {
+        errorMessage = 'Session expirée. Veuillez vous reconnecter.';
+      } else if (error.response?.status === 403) {
+        errorMessage = 'Accès refusé. Vous n\'avez pas les permissions nécessaires.';
+      } else if (error.response?.status === 500) {
+        errorMessage = 'Erreur serveur. Veuillez réessayer dans quelques instants.';
+      } else if (error.response?.data?.error) {
+        errorMessage = error.response.data.error;
+      }
+      
+      setError(errorMessage);
       setBookings([]);
     } finally {
       setLoading(false);
