@@ -37,22 +37,25 @@ const TechnicianAvailabilityCalendar: React.FC<TechnicianAvailabilityCalendarPro
   const [selectedTime, setSelectedTime] = useState<string>('');
   const [currentMonth, setCurrentMonth] = useState<Date>(startOfMonth(new Date()));
 
-  // Get all days for the current month view (including padding days from previous/next month)
+  // Get only the days of the current month (no padding days)
   const getCalendarDays = () => {
     const monthStart = startOfMonth(currentMonth);
     const monthEnd = endOfMonth(currentMonth);
-    const calendarStart = startOfWeek(monthStart, { weekStartsOn: 1 }); // Monday = 1
-    const calendarEnd = endOfWeek(monthEnd, { weekStartsOn: 1 });
-    
-    return eachDayOfInterval({ start: calendarStart, end: calendarEnd });
+    return eachDayOfInterval({ start: monthStart, end: monthEnd });
   };
 
   const calendarDays = getCalendarDays();
   
-  // Check if a day belongs to the current month
-  const isCurrentMonth = (date: Date): boolean => {
-    return format(date, 'yyyy-MM') === format(currentMonth, 'yyyy-MM');
+  // Get the first day of the month to calculate padding
+  const getFirstDayOfWeek = (): number => {
+    const firstDay = startOfMonth(currentMonth);
+    // Get day of week (0 = Sunday, 1 = Monday, etc.)
+    const dayOfWeek = firstDay.getDay();
+    // Convert to Monday = 0 format
+    return dayOfWeek === 0 ? 6 : dayOfWeek - 1;
   };
+
+  const firstDayPadding = getFirstDayOfWeek();
 
   // Navigate to previous month
   const handlePreviousMonth = () => {
@@ -227,18 +230,29 @@ const TechnicianAvailabilityCalendar: React.FC<TechnicianAvailabilityCalendarPro
               </Typography>
               
               {/* Month Navigation */}
-              <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 2 }}>
+              <Box 
+                sx={{ 
+                  display: 'flex', 
+                  alignItems: 'center', 
+                  justifyContent: 'space-between', 
+                  mb: 2,
+                  px: 0.5,
+                }}
+              >
                 <IconButton
                   onClick={handlePreviousMonth}
+                  size="small"
                   sx={{
                     color: '#032B5A',
                     bgcolor: '#f5f5f5',
+                    width: 32,
+                    height: 32,
                     '&:hover': {
                       bgcolor: '#e0e0e0',
                     },
                   }}
                 >
-                  <ChevronLeftIcon />
+                  <ChevronLeftIcon fontSize="small" />
                 </IconButton>
                 <Typography 
                   variant="h6" 
@@ -246,22 +260,28 @@ const TechnicianAvailabilityCalendar: React.FC<TechnicianAvailabilityCalendarPro
                     fontWeight: 700, 
                     color: '#032B5A',
                     textTransform: 'capitalize',
-                    fontSize: '1.1rem',
+                    fontSize: '1rem',
+                    textAlign: 'center',
+                    flex: 1,
+                    mx: 1,
                   }}
                 >
                   {format(currentMonth, 'MMMM yyyy', { locale: fr })}
                 </Typography>
                 <IconButton
                   onClick={handleNextMonth}
+                  size="small"
                   sx={{
                     color: '#032B5A',
                     bgcolor: '#f5f5f5',
+                    width: 32,
+                    height: 32,
                     '&:hover': {
                       bgcolor: '#e0e0e0',
                     },
                   }}
                 >
-                  <ChevronRightIcon />
+                  <ChevronRightIcon fontSize="small" />
                 </IconButton>
               </Box>
 
@@ -270,8 +290,9 @@ const TechnicianAvailabilityCalendar: React.FC<TechnicianAvailabilityCalendarPro
                 sx={{
                   display: 'grid',
                   gridTemplateColumns: 'repeat(7, 1fr)',
-                  gap: 1,
+                  gap: 0.5,
                   mb: 1,
+                  px: 0.5,
                 }}
               >
                 {['Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam', 'Dim'].map((day) => (
@@ -282,9 +303,10 @@ const TechnicianAvailabilityCalendar: React.FC<TechnicianAvailabilityCalendarPro
                       textAlign: 'center',
                       fontWeight: 700,
                       color: '#666',
-                      fontSize: '0.75rem',
+                      fontSize: '0.7rem',
                       textTransform: 'uppercase',
                       letterSpacing: 0.5,
+                      py: 0.5,
                     }}
                   >
                     {day}
@@ -297,36 +319,45 @@ const TechnicianAvailabilityCalendar: React.FC<TechnicianAvailabilityCalendarPro
                 sx={{
                   display: 'grid',
                   gridTemplateColumns: 'repeat(7, 1fr)',
-                  gap: 1,
-                  p: 2,
+                  gap: 0.5,
+                  p: 1,
                   bgcolor: '#fafbfc',
                   borderRadius: 3,
                   border: '1px solid #e8eaed',
+                  width: '100%',
+                  boxSizing: 'border-box',
+                  overflow: 'hidden',
                 }}
               >
+                {/* Empty cells for days before month starts */}
+                {Array.from({ length: firstDayPadding }).map((_, index) => (
+                  <Box key={`padding-${index}`} sx={{ aspectRatio: '1', minHeight: 0 }} />
+                ))}
+                
+                {/* Actual month days */}
                 {calendarDays.map((day, index) => {
                   const isUnavailable = isDateUnavailable(day);
                   const isSelected = selectedDate && isSameDay(day, selectedDate);
                   const isPast = isBefore(day, startOfDay(new Date()));
                   const isToday = isSameDay(day, new Date());
-                  const isInCurrentMonth = isCurrentMonth(day);
 
                   return (
                     <Button
                       key={index}
                       onClick={() => handleDateSelect(day)}
-                      disabled={isUnavailable || isPast || !isInCurrentMonth}
+                      disabled={isUnavailable || isPast}
                       sx={{
-                        minWidth: 40,
-                        height: 48,
+                        minWidth: 0,
+                        width: '100%',
+                        aspectRatio: '1',
                         p: 0,
-                        borderRadius: 2,
+                        borderRadius: 1.5,
                         position: 'relative',
                         bgcolor: isSelected
                           ? '#F4C542'
                           : isUnavailable
                           ? '#ffebee'
-                          : isPast || !isInCurrentMonth
+                          : isPast
                           ? 'transparent'
                           : isToday
                           ? 'rgba(244, 197, 66, 0.1)'
@@ -335,7 +366,7 @@ const TechnicianAvailabilityCalendar: React.FC<TechnicianAvailabilityCalendarPro
                           ? '#032B5A'
                           : isUnavailable
                           ? '#d32f2f'
-                          : isPast || !isInCurrentMonth
+                          : isPast
                           ? '#d1d5db'
                           : '#032B5A',
                         border: isSelected
@@ -347,53 +378,54 @@ const TechnicianAvailabilityCalendar: React.FC<TechnicianAvailabilityCalendarPro
                           : '1px solid transparent',
                         boxShadow: isSelected ? '0 2px 8px rgba(244, 197, 66, 0.2)' : 'none',
                         '&:hover': {
-                          bgcolor: isUnavailable || isPast || !isInCurrentMonth
+                          bgcolor: isUnavailable || isPast
                             ? undefined
                             : isSelected
                             ? '#e0b038'
                             : 'rgba(244, 197, 66, 0.08)',
-                          borderColor: isUnavailable || isPast || !isInCurrentMonth
+                          borderColor: isUnavailable || isPast
                             ? undefined
                             : isSelected
                             ? '#F4C542'
                             : '#F4C542',
-                          transform: isUnavailable || isPast || !isInCurrentMonth ? undefined : 'translateY(-2px)',
-                          boxShadow: isUnavailable || isPast || !isInCurrentMonth ? 'none' : '0 4px 12px rgba(244, 197, 66, 0.15)',
+                          transform: isUnavailable || isPast ? undefined : 'translateY(-1px)',
+                          boxShadow: isUnavailable || isPast ? 'none' : '0 2px 8px rgba(244, 197, 66, 0.15)',
                         },
                         '&:disabled': {
                           color: isUnavailable ? '#d32f2f' : '#d1d5db',
                           bgcolor: isUnavailable ? '#ffebee' : 'transparent',
-                          opacity: isInCurrentMonth ? 1 : 0.3,
+                          opacity: isPast ? 0.4 : 1,
                         },
                         transition: 'all 0.2s ease',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
                       }}
                     >
-                      <Box sx={{ textAlign: 'center', width: '100%', position: 'relative' }}>
-                        <Typography 
-                          variant="body2" 
-                          sx={{ 
-                            fontSize: '0.95rem',
-                            fontWeight: isSelected || isToday ? 700 : 600,
-                            opacity: isUnavailable || isPast || !isInCurrentMonth ? 0.6 : 1,
+                      <Typography 
+                        variant="body2" 
+                        sx={{ 
+                          fontSize: { xs: '0.85rem', sm: '0.9rem' },
+                          fontWeight: isSelected || isToday ? 700 : 600,
+                          opacity: isUnavailable || isPast ? 0.6 : 1,
+                        }}
+                      >
+                        {format(day, 'd')}
+                      </Typography>
+                      {isUnavailable && (
+                        <Box
+                          sx={{
+                            position: 'absolute',
+                            top: 2,
+                            right: 2,
+                            width: 5,
+                            height: 5,
+                            borderRadius: '50%',
+                            bgcolor: '#d32f2f',
+                            border: '1px solid white',
                           }}
-                        >
-                          {format(day, 'd')}
-                        </Typography>
-                        {isUnavailable && isInCurrentMonth && (
-                          <Box
-                            sx={{
-                              position: 'absolute',
-                              top: 4,
-                              right: 4,
-                              width: 6,
-                              height: 6,
-                              borderRadius: '50%',
-                              bgcolor: '#d32f2f',
-                              border: '1px solid white',
-                            }}
-                          />
-                        )}
-                      </Box>
+                        />
+                      )}
                     </Button>
                   );
                 })}
