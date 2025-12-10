@@ -1029,7 +1029,8 @@ const TechnicianJobs: React.FC = () => {
                               >
                                 Message
                               </Button>
-                              {!booking.quote && (
+                              {/* Quote creation only available after technician arrives (ON_THE_WAY or later) */}
+                              {!booking.quote && (booking.status === 'ON_THE_WAY' || booking.status === 'IN_PROGRESS') && (
                                 <Button
                                   fullWidth
                                   variant="contained"

@@ -42,9 +42,10 @@ router.post(
       }
 
       // Check if booking is in a valid state for quote creation
-      if (!['ACCEPTED', 'ON_THE_WAY'].includes(booking.status)) {
+      // Quote can only be created after technician arrives (ON_THE_WAY or later)
+      if (!['ON_THE_WAY', 'IN_PROGRESS'].includes(booking.status)) {
         return res.status(400).json({ 
-          error: 'Quote can only be created for ACCEPTED or ON_THE_WAY bookings' 
+          error: 'Quote can only be created after technician arrives (status must be ON_THE_WAY or IN_PROGRESS)' 
         });
       }
 
