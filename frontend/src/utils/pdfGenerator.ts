@@ -53,7 +53,6 @@ export const generateBookingPDF = async (data: BookingPDFData): Promise<void> =>
   const margin = 20;
   let yPos = margin;
 
-  // Helper function to add a new page if needed
   const checkPageBreak = (requiredHeight: number) => {
     if (yPos + requiredHeight > pageHeight - margin) {
       doc.addPage();
@@ -94,16 +93,14 @@ export const generateBookingPDF = async (data: BookingPDFData): Promise<void> =>
   doc.setTextColor(0, 0, 0);
   doc.setFont('helvetica', 'normal');
 
-  // Booking ID
   doc.setFont('helvetica', 'bold');
-  doc.text('ID de Réservation:', margin, yPos);
+  doc.text('ID Réservation:', margin, yPos);
   doc.setFont('helvetica', 'normal');
   doc.text(data.bookingId, margin + 50, yPos);
   yPos += 7;
 
-  // Date
   doc.setFont('helvetica', 'bold');
-  doc.text('Date de Création:', margin, yPos);
+  doc.text('Date de création:', margin, yPos);
   doc.setFont('helvetica', 'normal');
   const createdDate = new Date(data.createdAt).toLocaleDateString('fr-FR', {
     year: 'numeric',
@@ -113,25 +110,10 @@ export const generateBookingPDF = async (data: BookingPDFData): Promise<void> =>
     minute: '2-digit',
   });
   doc.text(createdDate, margin + 50, yPos);
-  yPos += 7;
-
-  // Status
-  doc.setFont('helvetica', 'bold');
-  doc.text('Statut:', margin, yPos);
-  doc.setFont('helvetica', 'normal');
-  const statusText = {
-    PENDING: 'En attente',
-    ACCEPTED: 'Accepté',
-    ON_THE_WAY: 'En route',
-    IN_PROGRESS: 'En cours',
-    COMPLETED: 'Terminé',
-    AWAITING_PAYMENT: 'En attente de paiement',
-    CANCELLED: 'Annulé',
-  }[data.status] || data.status;
-  doc.text(statusText, margin + 50, yPos);
   yPos += 10;
 
-  // Client Information
+  // Client Info
+  checkPageBreak(40);
   doc.setFontSize(14);
   doc.setTextColor(3, 43, 90);
   doc.setFont('helvetica', 'bold');
@@ -144,22 +126,21 @@ export const generateBookingPDF = async (data: BookingPDFData): Promise<void> =>
   doc.setFont('helvetica', 'bold');
   doc.text('Nom:', margin, yPos);
   doc.setFont('helvetica', 'normal');
-  doc.text(data.clientName, margin + 20, yPos);
+  doc.text(data.clientName, margin + 50, yPos);
   yPos += 7;
-
   doc.setFont('helvetica', 'bold');
   doc.text('Email:', margin, yPos);
   doc.setFont('helvetica', 'normal');
-  doc.text(data.clientEmail, margin + 20, yPos);
+  doc.text(data.clientEmail, margin + 50, yPos);
   yPos += 7;
-
   doc.setFont('helvetica', 'bold');
   doc.text('Téléphone:', margin, yPos);
   doc.setFont('helvetica', 'normal');
-  doc.text(data.clientPhone, margin + 20, yPos);
+  doc.text(data.clientPhone, margin + 50, yPos);
   yPos += 10;
 
-  // Technician Information
+  // Technician Info
+  checkPageBreak(40);
   doc.setFontSize(14);
   doc.setTextColor(3, 43, 90);
   doc.setFont('helvetica', 'bold');
@@ -172,16 +153,16 @@ export const generateBookingPDF = async (data: BookingPDFData): Promise<void> =>
   doc.setFont('helvetica', 'bold');
   doc.text('Nom:', margin, yPos);
   doc.setFont('helvetica', 'normal');
-  doc.text(data.technicianName, margin + 20, yPos);
+  doc.text(data.technicianName, margin + 50, yPos);
   yPos += 7;
-
   doc.setFont('helvetica', 'bold');
   doc.text('Téléphone:', margin, yPos);
   doc.setFont('helvetica', 'normal');
-  doc.text(data.technicianPhone, margin + 20, yPos);
+  doc.text(data.technicianPhone, margin + 50, yPos);
   yPos += 10;
 
-  // Service Information
+  // Service Details
+  checkPageBreak(40);
   doc.setFontSize(14);
   doc.setTextColor(3, 43, 90);
   doc.setFont('helvetica', 'bold');
@@ -194,22 +175,20 @@ export const generateBookingPDF = async (data: BookingPDFData): Promise<void> =>
   doc.setFont('helvetica', 'bold');
   doc.text('Catégorie:', margin, yPos);
   doc.setFont('helvetica', 'normal');
-  doc.text(data.serviceCategory, margin + 30, yPos);
+  doc.text(data.serviceCategory, margin + 50, yPos);
   yPos += 7;
-
-  doc.setFont('helvetica', 'bold');
-  doc.text('Description:', margin, yPos);
-  yPos += 7;
-  doc.setFont('helvetica', 'normal');
-  const descriptionLines = doc.splitTextToSize(data.description, pageWidth - 2 * margin);
-  doc.text(descriptionLines, margin, yPos);
-  yPos += descriptionLines.length * 5 + 5;
-
   doc.setFont('helvetica', 'bold');
   doc.text('Adresse:', margin, yPos);
   doc.setFont('helvetica', 'normal');
-  doc.text(`${data.address}, ${data.city}`, margin + 25, yPos);
+  doc.text(`${data.address}, ${data.city}`, margin + 50, yPos);
   yPos += 7;
+  doc.setFont('helvetica', 'bold');
+  doc.text('Description:', margin, yPos);
+  yPos += 7;
+  const descriptionLines = doc.splitTextToSize(data.description, pageWidth - 2 * margin);
+  doc.setFont('helvetica', 'normal');
+  doc.text(descriptionLines, margin, yPos);
+  yPos += descriptionLines.length * 5 + 5;
 
   if (data.scheduledDate) {
     doc.setFont('helvetica', 'bold');
@@ -467,3 +446,202 @@ export const generateBookingPDF = async (data: BookingPDFData): Promise<void> =>
   doc.save(`facture-${data.bookingId.substring(0, 8)}.pdf`);
 };
 
+export const generateQuotePDF = async (data: QuotePDFData): Promise<void> => {
+  const doc = new jsPDF('p', 'mm', 'a4');
+  const pageWidth = doc.internal.pageSize.getWidth();
+  const pageHeight = doc.internal.pageSize.getHeight();
+  const margin = 20;
+  let yPos = margin;
+
+  const checkPageBreak = (requiredHeight: number) => {
+    if (yPos + requiredHeight > pageHeight - margin) {
+      doc.addPage();
+      yPos = margin;
+    }
+  };
+
+  // Title
+  doc.setFontSize(20);
+  doc.setTextColor(3, 43, 90); // #032B5A
+  doc.setFont('helvetica', 'bold');
+  doc.text('Devis de Service', pageWidth / 2, yPos, { align: 'center' });
+  yPos += 15;
+
+  // Company Info
+  doc.setFontSize(10);
+  doc.setTextColor(100, 100, 100);
+  doc.setFont('helvetica', 'normal');
+  doc.text('Allo Bricolage', pageWidth / 2, yPos, { align: 'center' });
+  yPos += 5;
+  doc.text('Plateforme de Services de Maintenance', pageWidth / 2, yPos, { align: 'center' });
+  yPos += 10;
+
+  // Divider
+  doc.setDrawColor(244, 197, 66); // #F4C542
+  doc.setLineWidth(0.5);
+  doc.line(margin, yPos, pageWidth - margin, yPos);
+  yPos += 10;
+
+  // Quote Details Section
+  doc.setFontSize(14);
+  doc.setTextColor(3, 43, 90);
+  doc.setFont('helvetica', 'bold');
+  doc.text('Détails du Devis', margin, yPos);
+  yPos += 10;
+
+  doc.setFontSize(10);
+  doc.setTextColor(0, 0, 0);
+  doc.setFont('helvetica', 'normal');
+
+  doc.setFont('helvetica', 'bold');
+  doc.text('ID Devis:', margin, yPos);
+  doc.setFont('helvetica', 'normal');
+  doc.text(data.quoteId, margin + 50, yPos);
+  yPos += 7;
+
+  doc.setFont('helvetica', 'bold');
+  doc.text('ID Réservation:', margin, yPos);
+  doc.setFont('helvetica', 'normal');
+  doc.text(data.bookingId, margin + 50, yPos);
+  yPos += 7;
+
+  doc.setFont('helvetica', 'bold');
+  doc.text('Date de Création:', margin, yPos);
+  doc.setFont('helvetica', 'normal');
+  const createdDate = new Date(data.createdAt).toLocaleDateString('fr-FR', {
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit',
+  });
+  doc.text(createdDate, margin + 50, yPos);
+  yPos += 10;
+
+  // Client Info
+  checkPageBreak(40);
+  doc.setFontSize(14);
+  doc.setTextColor(3, 43, 90);
+  doc.setFont('helvetica', 'bold');
+  doc.text('Informations Client', margin, yPos);
+  yPos += 10;
+
+  doc.setFontSize(10);
+  doc.setTextColor(0, 0, 0);
+  doc.setFont('helvetica', 'normal');
+  doc.setFont('helvetica', 'bold');
+  doc.text('Nom:', margin, yPos);
+  doc.setFont('helvetica', 'normal');
+  doc.text(data.clientName, margin + 50, yPos);
+  yPos += 7;
+  doc.setFont('helvetica', 'bold');
+  doc.text('Email:', margin, yPos);
+  doc.setFont('helvetica', 'normal');
+  doc.text(data.clientEmail, margin + 50, yPos);
+  yPos += 7;
+  doc.setFont('helvetica', 'bold');
+  doc.text('Téléphone:', margin, yPos);
+  doc.setFont('helvetica', 'normal');
+  doc.text(data.clientPhone, margin + 50, yPos);
+  yPos += 10;
+
+  // Technician Info
+  checkPageBreak(40);
+  doc.setFontSize(14);
+  doc.setTextColor(3, 43, 90);
+  doc.setFont('helvetica', 'bold');
+  doc.text('Informations Technicien', margin, yPos);
+  yPos += 10;
+
+  doc.setFontSize(10);
+  doc.setTextColor(0, 0, 0);
+  doc.setFont('helvetica', 'normal');
+  doc.setFont('helvetica', 'bold');
+  doc.text('Nom:', margin, yPos);
+  doc.setFont('helvetica', 'normal');
+  doc.text(data.technicianName, margin + 50, yPos);
+  yPos += 7;
+  doc.setFont('helvetica', 'bold');
+  doc.text('Téléphone:', margin, yPos);
+  doc.setFont('helvetica', 'normal');
+  doc.text(data.technicianPhone, margin + 50, yPos);
+  yPos += 10;
+
+  // Service Details
+  checkPageBreak(40);
+  doc.setFontSize(14);
+  doc.setTextColor(3, 43, 90);
+  doc.setFont('helvetica', 'bold');
+  doc.text('Détails du Service', margin, yPos);
+  yPos += 10;
+
+  doc.setFontSize(10);
+  doc.setTextColor(0, 0, 0);
+  doc.setFont('helvetica', 'normal');
+  doc.setFont('helvetica', 'bold');
+  doc.text('Catégorie:', margin, yPos);
+  doc.setFont('helvetica', 'normal');
+  doc.text(data.serviceCategory, margin + 50, yPos);
+  yPos += 7;
+  doc.setFont('helvetica', 'bold');
+  doc.text('Adresse:', margin, yPos);
+  doc.setFont('helvetica', 'normal');
+  doc.text(`${data.address}, ${data.city}`, margin + 50, yPos);
+  yPos += 7;
+  doc.setFont('helvetica', 'bold');
+  doc.text('Description:', margin, yPos);
+  yPos += 7;
+  const descriptionLines = doc.splitTextToSize(data.description, pageWidth - 2 * margin);
+  doc.setFont('helvetica', 'normal');
+  doc.text(descriptionLines, margin, yPos);
+  yPos += descriptionLines.length * 5 + 10;
+
+  // Quote Specifics
+  checkPageBreak(60);
+  doc.setFontSize(14);
+  doc.setTextColor(3, 43, 90);
+  doc.setFont('helvetica', 'bold');
+  doc.text('Conditions et Équipement', margin, yPos);
+  yPos += 10;
+
+  doc.setFontSize(10);
+  doc.setTextColor(0, 0, 0);
+  doc.setFont('helvetica', 'normal');
+  doc.setFont('helvetica', 'bold');
+  doc.text('Conditions:', margin, yPos);
+  yPos += 7;
+  const conditionsLines = doc.splitTextToSize(data.conditions, pageWidth - 2 * margin);
+  doc.setFont('helvetica', 'normal');
+  doc.text(conditionsLines, margin, yPos);
+  yPos += conditionsLines.length * 5 + 7;
+
+  doc.setFont('helvetica', 'bold');
+  doc.text('Équipement nécessaire:', margin, yPos);
+  yPos += 7;
+  const equipmentLines = doc.splitTextToSize(data.equipment, pageWidth - 2 * margin);
+  doc.setFont('helvetica', 'normal');
+  doc.text(equipmentLines, margin, yPos);
+  yPos += equipmentLines.length * 5 + 10;
+
+  // Price
+  checkPageBreak(30);
+  doc.setFontSize(16);
+  doc.setTextColor(3, 43, 90);
+  doc.setFont('helvetica', 'bold');
+  doc.text('Prix du Devis:', margin, yPos);
+  doc.setTextColor(244, 197, 66); // #F4C542
+  doc.text(`${data.price} MAD`, pageWidth - margin, yPos, { align: 'right' });
+  yPos += 15;
+
+  // Footer
+  const footerY = pageHeight - 20;
+  doc.setDrawColor(244, 197, 66);
+  doc.line(margin, footerY - 10, pageWidth - margin, footerY - 10);
+  doc.setFontSize(8);
+  doc.setTextColor(100, 100, 100);
+  doc.setFont('helvetica', 'normal');
+  doc.text('Merci d\'avoir utilisé Allo Bricolage!', pageWidth / 2, footerY, { align: 'center' });
+  doc.text(`Généré le ${new Date().toLocaleDateString('fr-FR')}`, pageWidth / 2, footerY + 5, { align: 'center' });
+
+  doc.save(`devis-${data.bookingId.substring(0, 8)}.pdf`);
+};

@@ -1742,7 +1742,11 @@ const TechnicianJobs: React.FC = () => {
                         variant="contained"
                         size="small"
                         startIcon={<PictureAsPdfIcon />}
-                        onClick={() => handleDownloadQuotePDF(selectedBooking.quote, selectedBooking)}
+                        onClick={() => {
+                          if (selectedBooking.quote) {
+                            handleDownloadQuotePDF(selectedBooking.quote, selectedBooking);
+                          }
+                        }}
                         sx={{
                           bgcolor: '#032B5A',
                           color: 'white',

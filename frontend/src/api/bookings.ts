@@ -4,6 +4,7 @@ export interface Booking {
   id: string;
   clientId: string;
   technicianId?: string;
+  technicianProfileId?: string;
   categoryId: string;
   description: string;
   photos: string[];
